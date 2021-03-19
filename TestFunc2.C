@@ -8,6 +8,7 @@ void TestFunc2() {
     double sensor_dist = 600.; // mm
     double B_field = 3.8; // telsa
     double PT_real = 2000.;
+    double PT_limmit = 2000.;
 
     double c_v = 2.99792458e+8;
 
@@ -287,7 +288,7 @@ void TestFunc2() {
                 cout << "PTmes > 3000. at index " << k << endl;
             }*/
             errPT = PTmes - PT_real;
-            if (PTmes >= PT_real)
+            if (PTmes >= PT_limmit)
             {
                 pass = true;
             } else {

@@ -35,7 +35,7 @@ B1PrimaryGeneratorAction::B1PrimaryGeneratorAction()
 {
   G4int n_particle = 1;
   G4String particleName = "e-";
-  pTMomentum = 2.e+9; // simulated transverse momentum
+  pTMomentum = 2.0e+9; // simulated transverse momentum
   G4double B = 3.8;
   distance = 0.6*m;
   // compute radius
@@ -70,8 +70,8 @@ B1PrimaryGeneratorAction::~B1PrimaryGeneratorAction()
 void B1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
   // O point selection
-  G4double x0 = 90*um; //360*um * (G4UniformRand()-0.5)
-  G4double y0 = 90*um * (G4UniformRand()-0.5);
+  G4double x0 = 360*um * (G4UniformRand()-0.5); //360*um * (G4UniformRand()-0.5)
+  G4double y0 = 360*um * (G4UniformRand()-0.5);
   // theta computation
   G4double D = sqrt(pow(x0, 2) + pow(distance, 2));
   G4double beta = asin(D / (2 * rayon));
@@ -107,11 +107,11 @@ void B1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   }
   // computation of x_I, x_A and x_B from z_I, z_A and z_B
   G4double z_I = -space;
-  G4double z_A = -posAB;
-  G4double z_B = posAB;
+  /*G4double z_A = -posAB;
+  G4double z_B = posAB;*/
   G4double x_I = -sqrt(pow(rayon, 2) - pow((z_I - b), 2)) + a;
-  G4double x_A = -sqrt(pow(rayon, 2) - pow((z_A - b), 2)) + a;
-  G4double x_B = -sqrt(pow(rayon, 2) - pow((z_B - b), 2)) + a;
+  /*G4double x_A = -sqrt(pow(rayon, 2) - pow((z_A - b), 2)) + a;
+  G4double x_B = -sqrt(pow(rayon, 2) - pow((z_B - b), 2)) + a;*/
   // computation of y_I, y_A and y_B
   // y_I
   G4double D_I = sqrt(pow(x_I, 2) + pow((distance + z_I), 2));
@@ -119,7 +119,7 @@ void B1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   G4double alpha_I = 2 * beta_I;
   G4double y_I = alpha_I * rayon * tan(phi);
   // y_A
-  G4double D_A = sqrt(pow(x_A, 2) + pow((distance + z_A), 2));
+  /*G4double D_A = sqrt(pow(x_A, 2) + pow((distance + z_A), 2));
   G4double beta_A = asin(D_A / (2 * rayon));
   G4double alpha_A = 2 * beta_A;
   G4double y_A = alpha_A * rayon * tan(phi);
@@ -127,7 +127,7 @@ void B1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   G4double D_B = sqrt(pow(x_B, 2) + pow((distance + z_B), 2));
   G4double beta_B = asin(D_B / (2 * rayon));
   G4double alpha_B = 2 * beta_B;
-  G4double y_B = alpha_B * rayon * tan(phi);
+  G4double y_B = alpha_B * rayon * tan(phi);*/
   // theta_I (initial) computation
   G4double m_dir = (z_I - b) / (x_I - a);
   G4double theta_I = atan(abs(m_dir));
@@ -143,14 +143,13 @@ void B1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   analysisManager->FillNtupleDColumn(3, theta_I);
   analysisManager->FillNtupleDColumn(4, phi);
   analysisManager->FillNtupleDColumn(5, E_kin);
-  analysisManager->FillNtupleDColumn(6, x0);
-  analysisManager->FillNtupleDColumn(7, y0);
-  analysisManager->FillNtupleDColumn(8, x_A);
-  analysisManager->FillNtupleDColumn(9, y_A);
-  analysisManager->FillNtupleDColumn(10, z_A);
-  analysisManager->FillNtupleDColumn(11, x_B);
-  analysisManager->FillNtupleDColumn(12, y_B);
-  analysisManager->FillNtupleDColumn(13, z_B);
+
+  /*G4cout << "************* computations *************" << G4endl;
+  G4cout << "x_0 " << x0 << "  y_0 " << y0 << G4endl;
+  G4cout << "x_A " << x_A << "  y_A " << y_A << "  z_A " << z_A << G4endl;
+  G4cout << "x_B " << x_B << "  y_B " << y_B << "  z_B " << z_B << G4endl;
+  G4cout << "****************************************" << G4endl;*/
+
 
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }

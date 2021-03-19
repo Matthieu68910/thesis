@@ -1,31 +1,31 @@
 void HistoTest1(){
 	TFile *f = TFile::Open("/media/matthieu/ssd1/Geant4/Data/data-new.root");
 
-	Double_t err_xA;
+	Double_t err;
 	Bool_t no_corr_stub;
 
-	TH1D *hErrXA;
+	TH1I *hErr;
 
 	TTree *data = (TTree *)f->Get("data");
 
 	Int_t entries = data->GetEntries();
 
-	data->SetBranchAddress("err_xA", &err_xA);
+	data->SetBranchAddress("errPT", &err);
 	data->SetBranchAddress("no_corr_stub", &no_corr_stub);
 
-	hErrXA = new TH1D("hErrXA", "Error in x_A", 1000, -50, 50);
+	hErr = new TH1I("hErr", "Error in pT", 1000, -2000, 8000);
 
-	hErrXA->GetXaxis()->SetTitle("µm");
+	hErr->GetXaxis()->SetTitle("MeV");
 
 	for (int i = 0; i < entries; ++i)
 	{
 		data->GetEntry(i);
 		if (!no_corr_stub)
 		{
-			hErrXA->Fill(err_xA * 1000);
+			hErr->Fill(err);
 		}
-		//hErrXA->Fill(err_xA * 1000);
+		//hErr->Fill(err_xA * 1000);
 	}
-	//hErrXA->FillRandom("gaus",10000);
-	hErrXA->Draw();
+	//hErr->FillRandom("gaus",10000);
+	hErr->Draw();
 }
