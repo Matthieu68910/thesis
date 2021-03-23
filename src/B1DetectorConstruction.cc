@@ -407,7 +407,7 @@ void B1DetectorConstruction::ConstructSDandField()
   // the field value is not zero.
 
   G4MagneticField *magField;
-  magField = new G4UniformMagField(G4ThreeVector(0., 3.8*tesla, 0.)); // 3.8*tesla en Y
+  magField = new G4UniformMagField(G4ThreeVector(0., 0.*tesla, 0.)); // 3.8*tesla en Y
   G4FieldManager* fieldManager
     = G4TransportationManager::GetTransportationManager()
       ->GetFieldManager();
