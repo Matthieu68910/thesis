@@ -35,7 +35,6 @@
 #include "G4PSEnergyDeposit.hh"
 
 
-
 G4ThreadLocal G4FieldManager* B1DetectorConstruction::fFieldMgr = 0;
 
 B1DetectorConstruction::B1DetectorConstruction()
@@ -98,18 +97,18 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
 
   // strips
   G4double strip_width = 90.*um;
-  G4double strip_thickness = 290.*um;
+  G4double strip_thickness = 270.*um;
   strip_nbr = 21; // 1016 for full sensor !!! change in line 45 !!!
-  G4double strip_length = strip_nbr*strip_width;
+  G4double strip_length = strip_nbr * strip_width;
 
   // silicon backplane
   G4double Si_bp_thickness = 30.*um;
 
   // aluminum backplane
-  G4double Al_bp_thickness = 10.*um;
+  G4double Al_bp_thickness = 5.*um;
 
   // sensors separation and tilt
-  posAB = 0.8*mm; // from mid-sensitiv-plane to center
+  posAB = 1.375*mm; // from mid-sensitiv-plane to center
   G4double sensor_sep = 2*posAB - Si_bp_thickness - Al_bp_thickness;
 
   G4RotationMatrix tilt1  = G4RotationMatrix();

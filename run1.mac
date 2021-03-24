@@ -1,29 +1,9 @@
-#/cuts/setLowEdge 3.6 eV
-#/run/initialize
-#/run/setCutForRegion SiliconUp 1 nm
-#
-# Initialize kernel
 /run/setCut 1 um
-#
 /run/initialize
-#
 /control/verbose 1 		# max 2
 /run/verbose 0 			# max 2
 /event/verbose 0		# max 2
 /tracking/verbose 0 	# max 5
-#
 /random/setSeeds 5463285 7562145
-#
-#/analysis/setFileName ntuples
 /analysis/ntuple/setActivationToAll  true
-#
-/run/beamOn 100
-#
-#/random/setSeeds 6915154 4622145
-#
-#/run/beamOn 1
-#
-#/random/setSeeds 1352157 6587488
-#
-#/run/beamOn 1
-#
+/run/beamOn 1

@@ -86,7 +86,7 @@ void B1EventAction::EndOfEventAction(const G4Event* evt)
     G4double edep = *(itr->second);
 
     fRunAction->AddEdep(copyNb, edep);
-    analysisManager->FillNtupleDColumn(copyNb + 14, edep);
+    analysisManager->FillNtupleDColumn(copyNb + 4, edep);
   }
   analysisManager->AddNtupleRow();
 }

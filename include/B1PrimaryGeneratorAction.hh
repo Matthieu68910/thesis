@@ -56,12 +56,7 @@ class B1PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
     G4ParticleGun*  fParticleGun; // pointer to G4 gun class
     G4Box* fEnvelopeBox;
     G4double space;
-    G4double posAB;
-    G4double distance;
-    G4double rayon;
-    G4double pTMomentum;
-    G4double masse;
-    const G4double c_speed;
+    G4double theta_i;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
