@@ -28,7 +28,7 @@ B1PrimaryGeneratorAction::B1PrimaryGeneratorAction()
   theta_i(0)
 {
   // variables
-  G4double pTMomentum = 2.0; // simulated transverse momentum [GeV]
+  G4double pTMomentum = 2.51978; // simulated transverse momentum [GeV]
   G4double distance = 0.6; // [m]
 
   // compute theta_i
@@ -39,7 +39,7 @@ B1PrimaryGeneratorAction::B1PrimaryGeneratorAction()
   fParticleGun  = new G4ParticleGun(n_particle);
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4String particleName;
-  G4ParticleDefinition* particle = particleTable->FindParticle(particleName="e-");
+  G4ParticleDefinition* particle = particleTable->FindParticle(particleName="e+");
   fParticleGun->SetParticleDefinition(particle);
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(tan(theta_i),0,1.));
   fParticleGun->SetParticleEnergy(5.*GeV);
@@ -57,8 +57,8 @@ B1PrimaryGeneratorAction::~B1PrimaryGeneratorAction()
 void B1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
   // 0 point selection
-  G4double x0 = 0.; //360*um * (G4UniformRand()-0.5)
-  G4double y0 = 0.;
+  G4double x0 = 360*um * (G4UniformRand()-1); //360*um * (G4UniformRand()-0.5)
+  G4double y0 = 360*um * (G4UniformRand()-0.5);
   if (space == 0) {
     const B1DetectorConstruction* detectorConstruction
           = static_cast<const B1DetectorConstruction*>
