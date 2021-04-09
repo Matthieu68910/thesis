@@ -1,16 +1,15 @@
+#include <iostream>
+
 void Adam2020() {
     TFile f("/media/matthieu/ssd1/Geant4/Data/data-new.root", "update");
     // rootcp -r /media/matthieu/ssd1/Geant4/Data/data.root /media/matthieu/ssd1/Geant4/Data/data-new.root
 
-    //************ Create variables ******************************************
-    int nbr_strip = 21;
-    // double B_field = 3.8; // telsa
-    int max_cluster_width = 3;
-    int cluster_window = 5;
-    double threshold = 0.0144; // MeV -> = 4 * (1000 * 3.6 keV)
+    //************ Create variables *****************
+    const int NBR_STRIP = 21;
+    const int MAX_CLUSTER_WIDTH = 3;
+    const int CLUSTER_WINDOW = 5;
+    const double THRESHOLD = 0.0144; // MeV -> = 4 * (1000 * 3.6 keV)
 
-
-    // double c_v = 2.99792458e+8;
     double nbr_pass = 0.;
 
     // for A and B detectors
@@ -50,23 +49,24 @@ void Adam2020() {
     auto newBranch_T8 = data->Branch("no_corr_stub", &no_corr_stub, "no_corr_stub/O");
 
     // Get the number of entries in TTree
-    Int_t entries = data->GetEntries();
+    const int ENTRIES = data->GetEntries();
+    cout << endl << "Number of entries: " << ENTRIES << endl;
 
     //**************** Set BranchAddress for datas recovery ***************
     // for strips
-    double strip_A [nbr_strip];
-    double strip_B [nbr_strip];
-    for (int i = 0; i < nbr_strip; ++i)
+    double strip_A[NBR_STRIP];
+    double strip_B[NBR_STRIP];
+    for (int i = 0; i < NBR_STRIP; ++i)
     {
         string strip_name = "s" + std::to_string(i);
         char const *pchar = strip_name.c_str();
         data->SetBranchAddress(pchar, &strip_B[i]);
     }
-    for (int i = nbr_strip; i < (2*nbr_strip); ++i)
+    for (int i = NBR_STRIP; i < (2*NBR_STRIP); ++i)
     {
         string strip_name = "s" + std::to_string(i);
         char const *pchar = strip_name.c_str();
-        data->SetBranchAddress(pchar, &strip_A[i-nbr_strip]);
+        data->SetBranchAddress(pchar, &strip_A[i-NBR_STRIP]);
     }
 
     // for other datas
@@ -76,7 +76,10 @@ void Adam2020() {
     data->SetBranchAddress("z0", &z0);
 
     //****************** Main loop over all entries **********************
-    for (int k = 0; k < entries; k++)
+    int count_loop = 0;
+    int iteration = 0;
+    std::vector<double> efficiencies;
+    for (int k = 0; k < ENTRIES; k++)
     {
     	// fill variables with datas from entry i
         data->GetEntry(k);
@@ -90,12 +93,12 @@ void Adam2020() {
         bool inside = false;
         double size;
         // clusters for sensor A
-        for (int i = 0; i < nbr_strip; ++i)
+        for (int i = 0; i < NBR_STRIP; ++i)
         {
-            if (strip_A[i] < threshold && !inside)        
-            {} else if (strip_A[i] < threshold && inside)
+            if (strip_A[i] < THRESHOLD && !inside)        
+            {} else if (strip_A[i] < THRESHOLD && inside)
             {
-                if (size <= max_cluster_width)
+                if (size <= MAX_CLUSTER_WIDTH)
                 {
                     clus_size_A.push_back(size);
                     if(size == 1){
@@ -113,11 +116,11 @@ void Adam2020() {
                     size = 0;
                     inside = false;
                 }
-            } else if (strip_A[i] >= threshold && !inside)
+            } else if (strip_A[i] >= THRESHOLD && !inside)
             {
                 size += 1;
                 inside = true;
-                if (i == (nbr_strip - 1))
+                if (i == (NBR_STRIP - 1))
                 {
                     clus_size_A.push_back(size);
                     if(size == 1){
@@ -131,12 +134,12 @@ void Adam2020() {
                     size = 0;
                     inside = false;
                 }
-            } else if (strip_A[i] >= threshold && inside)
+            } else if (strip_A[i] >= THRESHOLD && inside)
             {
                 size += 1;
-                if (i == (nbr_strip - 1))
+                if (i == (NBR_STRIP - 1))
                 {
-                    if (size <= max_cluster_width)
+                    if (size <= MAX_CLUSTER_WIDTH)
                     {
                         clus_size_A.push_back(size);
                         if(size == 1){
@@ -157,12 +160,12 @@ void Adam2020() {
             }
         }
         // clusters for sensor B
-        for (int i = 0; i < nbr_strip; ++i)
+        for (int i = 0; i < NBR_STRIP; ++i)
         {
-            if (strip_B[i] < threshold && !inside)        
-            {} else if (strip_B[i] < threshold && inside)
+            if (strip_B[i] < THRESHOLD && !inside)        
+            {} else if (strip_B[i] < THRESHOLD && inside)
             {
-                if (size <= max_cluster_width)
+                if (size <= MAX_CLUSTER_WIDTH)
                 {
                     clus_size_B.push_back(size);
                     if(size == 1){
@@ -180,11 +183,11 @@ void Adam2020() {
                     size = 0;
                     inside = false;
                 }         
-            } else if (strip_B[i] >= threshold && !inside)
+            } else if (strip_B[i] >= THRESHOLD && !inside)
             {
                 size += 1;
                 inside = true;
-                if (i == (nbr_strip - 1))
+                if (i == (NBR_STRIP - 1))
                 {
                     clus_size_B.push_back(size);
                     if(size == 1){
@@ -198,12 +201,12 @@ void Adam2020() {
                     size = 0;
                     inside = false;
                 }
-            } else if (strip_B[i] >= threshold && inside)
+            } else if (strip_B[i] >= THRESHOLD && inside)
             {
                 size += 1;
-                if (i == (nbr_strip - 1))
+                if (i == (NBR_STRIP - 1))
                 {
-                    if (size <= max_cluster_width)
+                    if (size <= MAX_CLUSTER_WIDTH)
                     {
                         clus_size_B.push_back(size);
                         if(size == 1){
@@ -239,7 +242,7 @@ void Adam2020() {
                 for (int j = 0; j < clus_pos_B.size(); ++j)
                 {
                     double candidat = clus_pos_B.at(j);
-                    if (abs(candidat - seed) <= cluster_window)
+                    if (abs(candidat - seed) <= CLUSTER_WINDOW)
                     {
                         stub_pos_a.push_back(seed);
                         stub_pos_b.push_back(candidat);
@@ -260,7 +263,7 @@ void Adam2020() {
             mCWA = std::accumulate(clus_size_A.begin(), clus_size_A.end(), 0.0) / clus_size_A.size();
             mCWB = std::accumulate(clus_size_B.begin(), clus_size_B.end(), 0.0) / clus_size_B.size();
     
-        } else {
+        } else {  // if no stubs are found
             nbrCA = clus_pos_A.size();
             nbrCB = clus_pos_B.size();
             if (clus_size_A.size() != 0)
@@ -296,8 +299,31 @@ void Adam2020() {
         
         // reset variables (if needed only)
         CA1 = CA2 = CAP = CB1 = CB2 = CBP = 0;
+
+        // verbose
+        count_loop += 1;
+        if (count_loop == ENTRIES /10)
+        {
+        	iteration += 1;
+        	cout << iteration * 10 << " %" << endl;
+        	count_loop = 0;
+        	efficiencies.push_back(nbr_pass / (ENTRIES / 10));
+        	nbr_pass = 0;
+        }
     }
-    cout << "Stub efficiency: " << nbr_pass / entries << endl;
+    // result computation and printing
+    double average = std::accumulate(efficiencies.begin(), efficiencies.end(), 0.0) / 10;
+    double variance, deviation;
+	for (int i = 0; i < 10; ++i)
+	{
+		variance += pow((efficiencies.at(i) - average), 2);
+		// cout << efficiencies.at(i) << endl;
+	}
+	variance /= 9;
+	deviation = sqrt(variance);
+
+    cout << "Stub efficiency:\taverage\t\tstd" << endl;
+    cout << std::scientific << "\t\t\t" << average << "\t" << deviation << endl;
 
     // Overwrite file with new data 
     data->Write("", TObject::kOverwrite);

@@ -108,7 +108,7 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
   G4double Al_bp_thickness = 5.*um;
 
   // sensors separation and tilt
-  posAB = 1.375*mm; // from mid-sensitiv-plane to center
+  posAB = 1.375*mm; // from mid-sensitiv-plane to center 1.375
   G4double sensor_sep = 2*posAB - Si_bp_thickness - Al_bp_thickness;
 
   G4RotationMatrix tilt1  = G4RotationMatrix();

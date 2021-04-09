@@ -28,7 +28,7 @@ B1PrimaryGeneratorAction::B1PrimaryGeneratorAction()
   theta_i(0)
 {
   // variables
-  G4double pTMomentum = 2.51978; // simulated transverse momentum [GeV]
+  G4double pTMomentum = 1.87568; // simulated transverse momentum [GeV]
   G4double distance = 0.6; // [m]
 
   // compute theta_i
