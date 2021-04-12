@@ -72,7 +72,7 @@ void B1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   }
 
   // 0 point selection
-  G4double x0 = 360*um * (G4UniformRand()-1); //360*um * (G4UniformRand()-0.5)
+  G4double x0 = 360*um * (G4UniformRand()-2.0); //360*um * (G4UniformRand()-0.5)
   G4double y0 = 360*um * (G4UniformRand()-0.5);
   if (space == 0) {
     const B1DetectorConstruction* detectorConstruction

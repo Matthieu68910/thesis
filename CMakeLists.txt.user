@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.11.0, 2021-04-12T11:05:02. -->
+<!-- Written by QtCreator 4.11.0, 2021-04-12T16:29:09. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -74,7 +74,6 @@
      <value type="QString">CMAKE_CXX_COMPILER:FILEPATH=/bin/c++</value>
      <value type="QString">CMAKE_C_COMPILER:FILEPATH=/bin/cc</value>
      <value type="QString">CMAKE_PREFIX_PATH:INTERNAL=/home/matthieu/Documents/Geant4/geant4.10.06.p02-install</value>
-     <value type="QString">QT_QMAKE_EXECUTABLE:STRING=%{Qt:qmakeExecutable}</value>
     </valuelist>
     <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/matthieu/Documents/Geant4/Tests/B1-build</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
