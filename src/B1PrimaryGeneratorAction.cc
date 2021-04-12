@@ -2,9 +2,12 @@
 /// \brief Implementation of the B1PrimaryGeneratorAction class
 
 #include "B1PrimaryGeneratorAction.hh"
+
+#include "PrimaryGeneratorMessenger.hh"
 #include "B1DetectorConstruction.hh"
 #include "HistoManager.hh"
 
+#include "G4Event.hh"
 #include "G4LogicalVolumeStore.hh"
 #include "G4LogicalVolume.hh"
 #include "G4Box.hh"
@@ -22,27 +25,18 @@
 
 B1PrimaryGeneratorAction::B1PrimaryGeneratorAction()
 : G4VUserPrimaryGeneratorAction(),
-  fParticleGun(0), 
-  fEnvelopeBox(0),
+  fParticleGun(0),
   space(0),
-  theta_i(0)
+  pTMomentum(0.),
+  fGunMessenger(0)
 {
-  // variables
-  G4double pTMomentum = 2.47000; // simulated transverse momentum [GeV]
-  G4double distance = 0.6; // [m]
-
-  // compute theta_i
-  theta_i = asin((0.57 * distance) / pTMomentum);  // radian
-
   // Create particle Gun
   G4int n_particle = 1;
   fParticleGun  = new G4ParticleGun(n_particle);
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4String particleName;
-  G4ParticleDefinition* particle = particleTable->FindParticle(particleName="e+");
-  fParticleGun->SetParticleDefinition(particle);
-  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(tan(theta_i),0,1.));
-  fParticleGun->SetParticleEnergy(5.*GeV);
+  SetDefaultKinematic();
+
+  //create a messenger for this class
+  fGunMessenger = new PrimaryGeneratorMessenger(this);
 }
 
 
@@ -50,12 +44,33 @@ B1PrimaryGeneratorAction::B1PrimaryGeneratorAction()
 B1PrimaryGeneratorAction::~B1PrimaryGeneratorAction()
 {
   delete fParticleGun;
+  delete fGunMessenger;
+}
+
+void B1PrimaryGeneratorAction::SetDefaultKinematic()
+{
+  // compute theta_i
+  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+  G4String particleName;
+  G4ParticleDefinition* particle = particleTable->FindParticle(particleName="e+");
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
+  fParticleGun->SetParticleDefinition(particle);
+  fParticleGun->SetParticleEnergy(5.*GeV);
 }
 
 
 //this function is called at the begining of ecah event
 void B1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
+  // pTMomentum and angle
+  G4double theta_i;
+  if(pTMomentum > 0.)
+  {
+      G4double distance = 0.6; // [m]
+      theta_i = asin((0.57 * distance) / pTMomentum);  // radian
+      fParticleGun->SetParticleMomentumDirection(G4ThreeVector(tan(theta_i),0,1.));
+  }
+
   // 0 point selection
   G4double x0 = 360*um * (G4UniformRand()-1); //360*um * (G4UniformRand()-0.5)
   G4double y0 = 360*um * (G4UniformRand()-0.5);
@@ -74,13 +89,6 @@ void B1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   analysisManager->FillNtupleDColumn(1, y0);
   analysisManager->FillNtupleDColumn(2, -space);
   analysisManager->FillNtupleDColumn(3, theta_i);
-
-  /*G4cout << "************* computations *************" << G4endl;
-  G4cout << "x_0 " << x0 << "  y_0 " << y0 << G4endl;
-  G4cout << "x_A " << x_A << "  y_A " << y_A << "  z_A " << z_A << G4endl;
-  G4cout << "x_B " << x_B << "  y_B " << y_B << "  z_B " << z_B << G4endl;
-  G4cout << "****************************************" << G4endl;*/
-
 
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }

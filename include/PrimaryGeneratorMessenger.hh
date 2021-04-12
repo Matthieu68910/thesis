@@ -23,48 +23,42 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
+/// \file electromagnetic/TestEm3/include/PrimaryGeneratorMessenger.hh
+/// \brief Definition of the PrimaryGeneratorMessenger class
 //
-/// \file B1PrimaryGeneratorAction.hh
-/// \brief Definition of the B1PrimaryGeneratorAction class
+//
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#ifndef B1PrimaryGeneratorAction_h
-#define B1PrimaryGeneratorAction_h 1
+#ifndef PrimaryGeneratorMessenger_h
+#define PrimaryGeneratorMessenger_h 1
 
-#include "G4VUserPrimaryGeneratorAction.hh"
-#include "G4ParticleGun.hh"
+#include "G4UImessenger.hh"
 #include "globals.hh"
 
-class G4ParticleGun;
-class G4Event;
-class G4Box;
-class PrimaryGeneratorMessenger;
+class B1PrimaryGeneratorAction;
+class G4UIdirectory;
+class G4UIcmdWithoutParameter;
+class G4UIcmdWithADouble;
 
-/// The primary generator action class with particle gun.
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class B1PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
+class PrimaryGeneratorMessenger: public G4UImessenger
 {
   public:
-    B1PrimaryGeneratorAction();    
-   ~B1PrimaryGeneratorAction();
-
-    // method from the base class
-  public:
-    void SetDefaultKinematic();
-    void SetTransverseMomentum(G4double val) {pTMomentum = val;}
-    virtual
-    void GeneratePrimaries(G4Event*);
-  
-    // method to access particle gun
-    const G4ParticleGun* GetParticleGun() const {return fParticleGun;}
-  
+    PrimaryGeneratorMessenger(B1PrimaryGeneratorAction*);
+   ~PrimaryGeneratorMessenger();
+    
+    virtual void SetNewValue(G4UIcommand*, G4String);
+    
   private:
-    G4ParticleGun*  fParticleGun; // pointer to G4 gun class
-    G4double space;
-    G4double pTMomentum;
-
-    PrimaryGeneratorMessenger* fGunMessenger;
+    B1PrimaryGeneratorAction*    fAction;
+    
+    G4UIdirectory*             fGunDir;
+    G4UIcmdWithADouble*        fpTCmd;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
+

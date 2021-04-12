@@ -23,48 +23,56 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
+/// \file electromagnetic/TestEm3/src/PrimaryGeneratorMessenger.cc
+/// \brief Implementation of the PrimaryGeneratorMessenger class
 //
-/// \file B1PrimaryGeneratorAction.hh
-/// \brief Definition of the B1PrimaryGeneratorAction class
+//
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#ifndef B1PrimaryGeneratorAction_h
-#define B1PrimaryGeneratorAction_h 1
+#include "PrimaryGeneratorMessenger.hh"
 
-#include "G4VUserPrimaryGeneratorAction.hh"
-#include "G4ParticleGun.hh"
-#include "globals.hh"
-
-class G4ParticleGun;
-class G4Event;
-class G4Box;
-class PrimaryGeneratorMessenger;
-
-/// The primary generator action class with particle gun.
-
-class B1PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
-{
-  public:
-    B1PrimaryGeneratorAction();    
-   ~B1PrimaryGeneratorAction();
-
-    // method from the base class
-  public:
-    void SetDefaultKinematic();
-    void SetTransverseMomentum(G4double val) {pTMomentum = val;}
-    virtual
-    void GeneratePrimaries(G4Event*);
-  
-    // method to access particle gun
-    const G4ParticleGun* GetParticleGun() const {return fParticleGun;}
-  
-  private:
-    G4ParticleGun*  fParticleGun; // pointer to G4 gun class
-    G4double space;
-    G4double pTMomentum;
-
-    PrimaryGeneratorMessenger* fGunMessenger;
-};
+#include "B1PrimaryGeneratorAction.hh"
+#include "G4UIdirectory.hh"
+#include "G4UIcmdWithADouble.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#endif
+PrimaryGeneratorMessenger::PrimaryGeneratorMessenger(
+                                             B1PrimaryGeneratorAction* Gun)
+:G4UImessenger(),fAction(Gun),
+ fGunDir(0),
+ fpTCmd(0)
+{
+  fGunDir = new G4UIdirectory("/generator/gun/");
+  fGunDir->SetGuidance("Primary Generator Control");
+  
+  fpTCmd = new G4UIcmdWithADouble("/generator/gun/pT",this);
+  fpTCmd->SetGuidance("Select simulated pT");
+  fpTCmd->SetGuidance("unit is GeV (max 1000)");
+  fpTCmd->SetParameterName("pTMomentum",false);
+  fpTCmd->SetRange("pTMomentum>=0.&&pTMomentum<=1000.");
+  fpTCmd->AvailableForStates(G4State_Idle);
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+PrimaryGeneratorMessenger::~PrimaryGeneratorMessenger()
+{
+  delete fpTCmd;
+  delete fGunDir;  
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command,
+                                               G4String newValue)
+{
+  if( command == fpTCmd )
+  {
+      fAction->SetTransverseMomentum(fpTCmd->GetNewDoubleValue(newValue));
+  }
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
