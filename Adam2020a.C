@@ -160,7 +160,7 @@ void CopyFile(int& n){
 }
 
 void Adam2020a() {
-    int n = 4; // number of files
+    int n = 25; // number of files
     // loop on all files
     for (int i = 1; i <= n; ++i)
     {
@@ -173,7 +173,7 @@ void Adam2020a() {
         TFile f(pchar, "read");
         //cout << "File " << i << " opened:" << endl;
 
-        const int NBR_STRIP = 21;
+        const int NBR_STRIP = 101;
         const int MAX_CLUSTER_WIDTH = 3;
         const int CLUSTER_WINDOW = 5;
         const double THRESHOLD = 0.0144; // MeV -> = 4 * (1000 * 3.6 keV)
