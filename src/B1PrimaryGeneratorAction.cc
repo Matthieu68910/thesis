@@ -28,7 +28,7 @@ B1PrimaryGeneratorAction::B1PrimaryGeneratorAction()
   theta_i(0)
 {
   // variables
-  G4double pTMomentum = 1.93; // simulated transverse momentum [GeV]
+  G4double pTMomentum = 2.47000; // simulated transverse momentum [GeV]
   G4double distance = 0.6; // [m]
 
   // compute theta_i
@@ -39,10 +39,10 @@ B1PrimaryGeneratorAction::B1PrimaryGeneratorAction()
   fParticleGun  = new G4ParticleGun(n_particle);
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4String particleName;
-  G4ParticleDefinition* particle = particleTable->FindParticle(particleName="pi+");
+  G4ParticleDefinition* particle = particleTable->FindParticle(particleName="e+");
   fParticleGun->SetParticleDefinition(particle);
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(tan(theta_i),0,1.));
-  fParticleGun->SetParticleEnergy(120.*GeV);
+  fParticleGun->SetParticleEnergy(5.*GeV);
 }
 
 

@@ -4,6 +4,19 @@
 /run/verbose 0 			# max 2
 /event/verbose 0		# max 2
 /tracking/verbose 0 	# max 5
-/random/setSeeds 5463285 7562145
 /analysis/ntuple/setActivationToAll  true
-/run/beamOn 1
+#
+/random/setSeeds 5463285 7562145
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/test_1
+/run/beamOn 10000
+/random/setSeeds 6325621 4125623
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/test_2
+/run/beamOn 10000
+/random/setSeeds 1235858 9653336
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/test_3
+/run/beamOn 10000
+/random/setSeeds 2554698 2001254
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/test_4
+/run/beamOn 10000
+#
+# /analysis/setFileName B5_proton
