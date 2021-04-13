@@ -28,7 +28,10 @@ B1PrimaryGeneratorAction::B1PrimaryGeneratorAction()
   fParticleGun(0),
   space(0),
   pTMomentum(0.),
-  fGunMessenger(0)
+  RdmPT(true),
+  fGunMessenger(0),
+  min_pT(0.),
+  max_pT(0.)
 {
   // Create particle Gun
   G4int n_particle = 1;
@@ -64,22 +67,32 @@ void B1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
   // pTMomentum and angle
   G4double theta_i;
-  if(pTMomentum > 0.)
+  G4double distance = 0.6; // [m]
+
+  if(RdmPT)
   {
-      G4double distance = 0.6; // [m]
+      pTMomentum = min_pT + (G4UniformRand() * (max_pT - min_pT));
       theta_i = asin((0.57 * distance) / pTMomentum);  // radian
       fParticleGun->SetParticleMomentumDirection(G4ThreeVector(tan(theta_i),0,1.));
+  } else if (pTMomentum > 0.)
+  {
+      theta_i = asin((0.57 * distance) / pTMomentum);  // radian
+      fParticleGun->SetParticleMomentumDirection(G4ThreeVector(tan(theta_i),0,1.));
+  } else
+  {
+      G4cout << "!!! WARNING !!! No pT input. Set to défaut" << G4endl;
   }
 
   // 0 point selection
-  G4double x0 = 360*um * (G4UniformRand()-2.0); //360*um * (G4UniformRand()-0.5)
-  G4double y0 = 360*um * (G4UniformRand()-0.5);
   if (space == 0) {
     const B1DetectorConstruction* detectorConstruction
           = static_cast<const B1DetectorConstruction*>
             (G4RunManager::GetRunManager()->GetUserDetectorConstruction());
     space = detectorConstruction->GetSpace();
   }
+
+  G4double x0 = 360*um * (G4UniformRand()-0.5) - (tan(theta_i) * space); //360*um * (G4UniformRand()-0.5)
+  G4double y0 = 360*um * (G4UniformRand()-0.5);
 
   fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, -space));
 
@@ -89,6 +102,7 @@ void B1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   analysisManager->FillNtupleDColumn(1, y0);
   analysisManager->FillNtupleDColumn(2, -space);
   analysisManager->FillNtupleDColumn(3, theta_i);
+  analysisManager->FillNtupleDColumn(4, pTMomentum);
 
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }

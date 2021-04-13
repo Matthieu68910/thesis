@@ -51,6 +51,9 @@ class B1PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
   public:
     void SetDefaultKinematic();
     void SetTransverseMomentum(G4double val) {pTMomentum = val;}
+    void SetTMRandom(G4bool val) {RdmPT = val;}
+    void SetMinValue(G4double val) {min_pT = val;}
+    void SetMaxValue(G4double val) {max_pT = val;}
     virtual
     void GeneratePrimaries(G4Event*);
   
@@ -61,6 +64,9 @@ class B1PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
     G4ParticleGun*  fParticleGun; // pointer to G4 gun class
     G4double space;
     G4double pTMomentum;
+    G4bool RdmPT;
+    G4double min_pT;
+    G4double max_pT;
 
     PrimaryGeneratorMessenger* fGunMessenger;
 };

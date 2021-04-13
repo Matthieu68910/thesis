@@ -47,6 +47,7 @@ void HistoManager::Book()
   analysis->CreateNtupleDColumn("y0");         //column 1
   analysis->CreateNtupleDColumn("z0");         //column 2
   analysis->CreateNtupleDColumn("theta_i");     //column 3
+  analysis->CreateNtupleDColumn("momentum");     //column 4
 
   if (strip_nbr == 0) {
     const B1DetectorConstruction* detectorConstruction

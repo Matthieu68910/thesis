@@ -40,6 +40,7 @@ class B1PrimaryGeneratorAction;
 class G4UIdirectory;
 class G4UIcmdWithoutParameter;
 class G4UIcmdWithADouble;
+class G4UIcmdWithABool;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -56,6 +57,9 @@ class PrimaryGeneratorMessenger: public G4UImessenger
     
     G4UIdirectory*             fGunDir;
     G4UIcmdWithADouble*        fpTCmd;
+    G4UIcmdWithABool*          fRndmCmd;
+    G4UIcmdWithADouble*        fSet_min;
+    G4UIcmdWithADouble*        fSet_max;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
