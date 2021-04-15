@@ -80,7 +80,8 @@ void B1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       fParticleGun->SetParticleMomentumDirection(G4ThreeVector(tan(theta_i),0,1.));
   } else
   {
-      G4cout << "!!! WARNING !!! No pT input. Set to défaut" << G4endl;
+      fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0,0,1.));
+      //G4cout << "!!! WARNING !!! No pT input. Set to défaut" << G4endl;
   }
 
   // 0 point selection
