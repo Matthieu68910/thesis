@@ -15,4 +15,4 @@
 /generator/momentum/SetRandomMinValue 1.
 /generator/momentum/SetRandomMaxValue 3.5
 #
-/run/beamOn 100000000
+/run/beamOn 1000000
