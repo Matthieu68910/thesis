@@ -1,4 +1,6 @@
 /vis/open OGL 600x600-0+0
+/vis/scene/add/magneticField
+/vis/scene/add/electricField
 /vis/viewer/set/autoRefresh false
 /vis/verbose errors
 /vis/drawVolume
@@ -25,4 +27,9 @@
 /vis/viewer/set/hiddenMarker true
 /vis/viewer/set/viewpointThetaPhi 90 90
 /vis/viewer/set/autoRefresh true
+#
+/vis/filtering/trajectories/create/attributeFilter
+/vis/filtering/trajectories/attributeFilter-0/setAttribute IMag
+/vis/filtering/trajectories/attributeFilter-0/addInterval 3.6 eV 10 GeV
+#
 /vis/verbose warnings

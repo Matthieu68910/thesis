@@ -40,8 +40,8 @@ B1PrimaryGeneratorAction::B1PrimaryGeneratorAction()
   G4String particleName;
   G4ParticleDefinition* particle = particleTable->FindParticle(particleName="e+");
   fParticleGun->SetParticleDefinition(particle);
-  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
-  fParticleGun->SetParticleEnergy(0.01*GeV);
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1.,0.,0.));
+  fParticleGun->SetParticleEnergy(5.*GeV);
 
   //create a messenger for this class
   fGunMessenger = new PrimaryGeneratorMessenger(this);
@@ -73,7 +73,7 @@ void B1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       fParticleGun->SetParticleMomentumDirection(G4ThreeVector(tan(theta_i),0,1.));
   } else
   {
-      fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0,0,1.));
+      fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
       //G4cout << "!!! WARNING !!! No pT input. Set to défaut" << G4endl;
   }
 

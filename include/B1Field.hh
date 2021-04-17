@@ -22,56 +22,52 @@
 // * use  in  resulting  scientific  publications,  and indicate your *
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
-//
-//
-/// \file B1DetectorConstruction.hh
-/// \brief Definition of the B1DetectorConstruction class
 
-#ifndef B1DetectorConstruction_h
-#define B1DetectorConstruction_h 1
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#include "G4VUserDetectorConstruction.hh"
+#ifndef B1Field_h
+#define B1Field_h 1
+
 #include "globals.hh"
-#include "tls.hh"
-#include "G4FieldManager.hh"
+#include "G4ElectroMagneticField.hh"
 
-class G4VPhysicalVolume;
-class G4LogicalVolume;
-class G4UniformMagField;
-class G4ChordFinder;
-class G4GenericMessenger;
-class B1Field;
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-/// Detector construction class to define materials and geometry.
-
-class B1DetectorConstruction : public G4VUserDetectorConstruction
+class B1Field : public G4ElectroMagneticField
 {
-  public:
-    B1DetectorConstruction();
-    virtual ~B1DetectorConstruction();
 
-  public:
-    virtual G4VPhysicalVolume* Construct();
-    virtual void ConstructSDandField();
-    
-    G4double GetSpace() const { return space; }
-    G4double GetPosAB() const { return posAB; }
-    G4int GetStripNumber() const {return strip_nbr; }
+public:
 
-  protected:
-    G4double  space;
-    G4double posAB;
-    G4int strip_nbr;
+  B1Field();
+  virtual ~B1Field();
 
-  private:
-    G4LogicalVolume* logicSiUp;
-    G4LogicalVolume* logicSiDo;
+  /// DoesFieldChangeEnergy() returns true.
+  virtual G4bool DoesFieldChangeEnergy() const { return true; }
 
-    static G4ThreadLocal B1Field* fFieldUp;
-    static G4ThreadLocal B1Field* fFieldDo;
+  /// GetFieldValue() returns the field value at a given point[].
+  /// field is really field[6]: Bx,By,Bz,Ex,Ey,Ez.
+  /// point[] is in global coordinates: x,y,z,t.
+  virtual void GetFieldValue(const G4double Point[4], G4double* Bfield) const;
+  void SetFieldValue(G4double a, G4double b, G4double c, G4double d, G4double e, G4double f)
+  {
+      Bx = a;
+      By = b;
+      Bz = c;
+      Ex = d;
+      Ey = e;
+      Ez = f;
+  }
+
+private:
+  G4double Bx;
+  G4double By;
+  G4double Bz;
+  G4double Ex;
+  G4double Ey;
+  G4double Ez;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
-

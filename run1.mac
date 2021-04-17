@@ -1,10 +1,10 @@
 /run/setCut 1 um
 /run/numberOfThreads 12
 /run/initialize
-/control/verbose 1 		# max 2
-/run/verbose 0 			# max 2
-/event/verbose 0		# max 2
-/tracking/verbose 0 	# max 5
+/control/verbose 2 		# max 2
+/run/verbose 2 			# max 2
+/event/verbose 2		# max 2
+/tracking/verbose 3 	# max 5
 /analysis/ntuple/setActivationToAll  true
 #
 /random/setSeeds 5463285 7562145
@@ -16,4 +16,4 @@
 /generator/momentum/SetRandomMinValue 1.
 /generator/momentum/SetRandomMaxValue 3.5
 #
-/run/beamOn 100
+/run/beamOn 1

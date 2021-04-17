@@ -2,6 +2,7 @@
 /// \brief Implementation of the B1DetectorConstruction class
 
 #include "B1DetectorConstruction.hh"
+#include "B1Field.hh"
 
 #include "G4RunManager.hh"
 #include "G4NistManager.hh"
@@ -26,17 +27,18 @@
 #include "G4FieldManager.hh"
 #include "G4TransportationManager.hh"
 #include "G4Mag_UsualEqRhs.hh"
+#include "G4ClassicalRK4.hh"
+#include "G4PropagatorInField.hh"
 
 #include "G4UniformMagField.hh"
 #include "G4ChordFinder.hh"
+#include "G4ElectroMagneticField.hh"
+#include "G4EqMagElectricField.hh"
 
 #include "G4MultiFunctionalDetector.hh"
 #include "G4SDManager.hh"
 #include "G4VPrimitiveScorer.hh"
 #include "G4PSEnergyDeposit.hh"
-
-G4ThreadLocal G4MagneticField* B1DetectorConstruction::magFieldSiUp = 0;
-G4ThreadLocal G4FieldManager* B1DetectorConstruction::SiUpFieldManager = 0;
 
 B1DetectorConstruction::B1DetectorConstruction()
 : G4VUserDetectorConstruction(),
@@ -394,6 +396,9 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
   return physWorld;
 }
 
+G4ThreadLocal B1Field* B1DetectorConstruction::fFieldUp = 0;
+G4ThreadLocal B1Field* B1DetectorConstruction::fFieldDo = 0;
+
 void B1DetectorConstruction::ConstructSDandField()
 {
   //******************* MF Detector **********************//
@@ -411,15 +416,95 @@ void B1DetectorConstruction::ConstructSDandField()
   // Uniform magnetic field is then created automatically if
   // the field value is not zero.
 
-  magFieldSiUp = new G4UniformMagField(G4ThreeVector(0., 3.8*tesla, 0.)); // 3.8*tesla en Y;
-  SiUpFieldManager = new G4FieldManager;
-  SiUpFieldManager->SetDetectorField(magFieldSiUp);
-  SiUpFieldManager->CreateChordFinder(magFieldSiUp);
-  G4bool allLocal = true;
-  logicSiUp->SetFieldManager(SiUpFieldManager, allLocal);
-  G4AutoDelete::Register(magFieldSiUp);
-  G4AutoDelete::Register(SiUpFieldManager);
+  if(!fFieldUp){
 
+      fFieldUp = new B1Field();
+      fFieldUp->SetFieldValue(0., 3.8*tesla, 0., 0., 0., -9.0E+5*volt/m);
+
+      G4EqMagElectricField* equation1 = new G4EqMagElectricField(fFieldUp);
+
+      G4FieldManager* SiUpFieldManager = new G4FieldManager;
+      SiUpFieldManager->SetDetectorField(fFieldUp);
+
+      G4MagIntegratorStepper* stepper = new G4ClassicalRK4(equation1,12);
+
+      G4double minStep           = 1*um;
+
+      G4ChordFinder* chordFinder =
+                  new G4ChordFinder((G4MagneticField*)fFieldUp,minStep,stepper);
+
+      // Set accuracy parameters
+      G4double deltaChord        = 1*um;
+      chordFinder->SetDeltaChord( deltaChord );
+
+      G4double deltaOneStep      = 10.*um;
+      SiUpFieldManager->SetAccuraciesWithDeltaOneStep(deltaOneStep);
+
+      G4double deltaIntersection = 1.*um;
+      SiUpFieldManager->SetDeltaIntersection(deltaIntersection);
+
+      G4TransportationManager* transportManager =
+                         G4TransportationManager::GetTransportationManager();
+
+      G4PropagatorInField* fieldPropagator =
+                                    transportManager->GetPropagatorInField();
+
+      G4double epsMin            = 2.5e-7*mm;
+      G4double epsMax            = 1.*um;
+
+      fieldPropagator->SetMinimumEpsilonStep(epsMin);
+      fieldPropagator->SetMaximumEpsilonStep(epsMax);
+
+      SiUpFieldManager->SetChordFinder(chordFinder);
+
+      G4bool allLocal = true;
+      logicSiUp->SetFieldManager(SiUpFieldManager, allLocal);
+  }
+
+  if(!fFieldDo){
+
+      fFieldDo = new B1Field();
+      fFieldDo->SetFieldValue(0., 3.8*tesla, 0., 0., 0., 9.0E+5*volt/m);
+
+      G4EqMagElectricField* equation2 = new G4EqMagElectricField(fFieldDo);
+
+      G4FieldManager* SiDoFieldManager = new G4FieldManager;
+      SiDoFieldManager->SetDetectorField(fFieldDo);
+
+      G4MagIntegratorStepper* stepper = new G4ClassicalRK4(equation2,12);
+
+      G4double minStep           = 1.*um;
+
+      G4ChordFinder* chordFinder =
+                  new G4ChordFinder((G4MagneticField*)fFieldDo,minStep,stepper);
+
+      // Set accuracy parameters
+      G4double deltaChord        = 1*um;
+      chordFinder->SetDeltaChord( deltaChord );
+
+      G4double deltaOneStep      = 10.*um;
+      SiDoFieldManager->SetAccuraciesWithDeltaOneStep(deltaOneStep);
+
+      G4double deltaIntersection = 1.*um;
+      SiDoFieldManager->SetDeltaIntersection(deltaIntersection);
+
+      G4TransportationManager* transportManager =
+                         G4TransportationManager::GetTransportationManager();
+
+      G4PropagatorInField* fieldPropagator =
+                                    transportManager->GetPropagatorInField();
+
+      G4double epsMin            = 2.5e-7*mm;
+      G4double epsMax            = 1.*um;
+
+      fieldPropagator->SetMinimumEpsilonStep(epsMin);
+      fieldPropagator->SetMaximumEpsilonStep(epsMax);
+
+      SiDoFieldManager->SetChordFinder(chordFinder);
+
+      G4bool allLocal = true;
+      logicSiDo->SetFieldManager(SiDoFieldManager, allLocal);
+  }
   //**********************************************************//
 }
 
