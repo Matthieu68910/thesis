@@ -49,7 +49,6 @@ class B1PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 
     // method from the base class
   public:
-    void SetDefaultKinematic();
     void SetTransverseMomentum(G4double val) {pTMomentum = val;}
     void SetTMRandom(G4bool val) {RdmPT = val;}
     void SetMinValue(G4double val) {min_pT = val;}

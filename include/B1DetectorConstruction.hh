@@ -63,7 +63,11 @@ class B1DetectorConstruction : public G4VUserDetectorConstruction
     G4int strip_nbr;
 
   private:
-    static G4ThreadLocal G4FieldManager* fFieldMgr;
+    G4LogicalVolume* logicSiUp;
+    G4LogicalVolume* logicSiDo;
+
+    static G4ThreadLocal G4MagneticField* magFieldSiUp;
+    static G4ThreadLocal G4FieldManager* SiUpFieldManager;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

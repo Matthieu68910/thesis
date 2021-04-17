@@ -28,7 +28,7 @@ B1PrimaryGeneratorAction::B1PrimaryGeneratorAction()
   fParticleGun(0),
   space(0),
   pTMomentum(0.),
-  RdmPT(true),
+  RdmPT(false),
   fGunMessenger(0),
   min_pT(0.),
   max_pT(0.)
@@ -36,7 +36,12 @@ B1PrimaryGeneratorAction::B1PrimaryGeneratorAction()
   // Create particle Gun
   G4int n_particle = 1;
   fParticleGun  = new G4ParticleGun(n_particle);
-  SetDefaultKinematic();
+  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+  G4String particleName;
+  G4ParticleDefinition* particle = particleTable->FindParticle(particleName="e+");
+  fParticleGun->SetParticleDefinition(particle);
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
+  fParticleGun->SetParticleEnergy(0.01*GeV);
 
   //create a messenger for this class
   fGunMessenger = new PrimaryGeneratorMessenger(this);
@@ -49,18 +54,6 @@ B1PrimaryGeneratorAction::~B1PrimaryGeneratorAction()
   delete fParticleGun;
   delete fGunMessenger;
 }
-
-void B1PrimaryGeneratorAction::SetDefaultKinematic()
-{
-  // compute theta_i
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4String particleName;
-  G4ParticleDefinition* particle = particleTable->FindParticle(particleName="e+");
-  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
-  fParticleGun->SetParticleDefinition(particle);
-  fParticleGun->SetParticleEnergy(5.*GeV);
-}
-
 
 //this function is called at the begining of ecah event
 void B1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
@@ -95,13 +88,13 @@ void B1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   G4double x0 = 360*um * (G4UniformRand()-0.5) - (tan(theta_i) * space); //360*um * (G4UniformRand()-0.5)
   G4double y0 = 360*um * (G4UniformRand()-0.5);
 
-  fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, -space));
+  fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, -(space + 1.*um)));
 
   G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
 
   analysisManager->FillNtupleDColumn(0, x0);
   analysisManager->FillNtupleDColumn(1, y0);
-  analysisManager->FillNtupleDColumn(2, -space);
+  analysisManager->FillNtupleDColumn(2, -(space + 1.*um));
   analysisManager->FillNtupleDColumn(3, theta_i);
   analysisManager->FillNtupleDColumn(4, pTMomentum);
 

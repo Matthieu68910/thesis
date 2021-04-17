@@ -35,14 +35,16 @@
 #include "G4VPrimitiveScorer.hh"
 #include "G4PSEnergyDeposit.hh"
 
-
-G4ThreadLocal G4FieldManager* B1DetectorConstruction::fFieldMgr = 0;
+G4ThreadLocal G4MagneticField* B1DetectorConstruction::magFieldSiUp = 0;
+G4ThreadLocal G4FieldManager* B1DetectorConstruction::SiUpFieldManager = 0;
 
 B1DetectorConstruction::B1DetectorConstruction()
 : G4VUserDetectorConstruction(),
   space(0),
   posAB(0),
-  strip_nbr(101.)
+  strip_nbr(101.),
+  logicSiUp(nullptr),
+  logicSiDo(nullptr)
 { }
 
 
@@ -245,7 +247,7 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
     new G4Box("SiUp",                    //its name
         Si_sizeX, Si_sizeY, Si_sizeZ); //its size
 
-  G4LogicalVolume* logicSiUp =
+  logicSiUp =
     new G4LogicalVolume(solidSiUp,            //its solid
                         Silicium,             //its material
                         "SiUp");         //its name
@@ -346,7 +348,7 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
 
   // Si Do
 
-  G4LogicalVolume* logicSiDo =
+  logicSiDo =
     new G4LogicalVolume(solidSiUp,            //its solid
                         Silicium,             //its material
                         "SiDo");         //its name
@@ -409,27 +411,14 @@ void B1DetectorConstruction::ConstructSDandField()
   // Uniform magnetic field is then created automatically if
   // the field value is not zero.
 
-  G4MagneticField *magField;
-  magField = new G4UniformMagField(G4ThreeVector(0., 0.*tesla, 0.)); // 3.8*tesla en Y
-  G4FieldManager* fieldManager
-    = G4TransportationManager::GetTransportationManager()
-      ->GetFieldManager();
-  fieldManager->SetDetectorField(magField);
-  fieldManager->CreateChordFinder(magField);
-  fieldManager->GetChordFinder()->SetDeltaChord(1.*um);
-
-  G4double minEps= 1.0e-6;  //   Minimum & value for largest steps
-  G4double maxEps= 1.0e-6;  //   Maximum & value for smallest steps
-
-  fieldManager->SetMinimumEpsilonStep(minEps);
-  fieldManager->SetMaximumEpsilonStep(maxEps);
-  fieldManager->SetDeltaOneStep(1.*um);
-  fieldManager->SetDeltaIntersection(1.*um);
-
-  //G4bool forceToAllContained = true;
-
-  G4AutoDelete::Register(magField);
-  G4AutoDelete::Register(fieldManager);
+  magFieldSiUp = new G4UniformMagField(G4ThreeVector(0., 3.8*tesla, 0.)); // 3.8*tesla en Y;
+  SiUpFieldManager = new G4FieldManager;
+  SiUpFieldManager->SetDetectorField(magFieldSiUp);
+  SiUpFieldManager->CreateChordFinder(magFieldSiUp);
+  G4bool allLocal = true;
+  logicSiUp->SetFieldManager(SiUpFieldManager, allLocal);
+  G4AutoDelete::Register(magFieldSiUp);
+  G4AutoDelete::Register(SiUpFieldManager);
 
   //**********************************************************//
 }
