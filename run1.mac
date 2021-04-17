@@ -8,11 +8,12 @@
 /analysis/ntuple/setActivationToAll  true
 #
 /random/setSeeds 5463285 7562145
-/run/printProgress 100000
-#/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/data
+#/run/printProgress 100000
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/data
 #
 /generator/momentum/SetRandom true
+#/generator/momentum/SetMomentum 0.0
 /generator/momentum/SetRandomMinValue 1.
 /generator/momentum/SetRandomMaxValue 3.5
 #
-/run/beamOn 1000000
+/run/beamOn 100

@@ -19,6 +19,7 @@
 #include "G4VisAttributes.hh"
 #include "G4UnionSolid.hh"
 #include "G4PVDivision.hh"
+#include "G4UnitsTable.hh"
 
 #include "G4GlobalMagFieldMessenger.hh"
 #include "G4AutoDelete.hh"
@@ -105,11 +106,11 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
   G4double Si_bp_thickness = 30.*um;
 
   // aluminum backplane
-  G4double Al_bp_thickness = 5.*um;
+  G4double Al_bp_thickness = 1.*um;
 
   // sensors separation and tilt
-  posAB = 1.375*mm; // from mid-sensitiv-plane to center 1.375
-  G4double sensor_sep = 2*posAB - Si_bp_thickness - Al_bp_thickness;
+  posAB = 1.375*mm; // from mid-sensitiv-plane to center 1.375 * 2 = 2.75 mm (375 -> 370 -> 365)
+  G4double sensor_sep = 2*posAB; //2*posAB - Si_bp_thickness - Al_bp_thickness
 
   G4RotationMatrix tilt1  = G4RotationMatrix();
   tilt1.rotateX(0*deg); // tilt first (viewed from particle)
@@ -192,6 +193,7 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
   logicAlUp -> SetVisAttributes(attriblue);
 
   G4double AlUp_posZ = (sensor_sep / 2) - (sensor_thickness / 2) + (Al_bp_thickness / 2);
+  G4cout << "Aluminium Up pos Z = " << G4BestUnit(AlUp_posZ, "Length") << G4endl;
 
   G4ThreeVector posAlUp = G4ThreeVector(0, 0, AlUp_posZ);
   G4Transform3D transformAlUp = G4Transform3D(tilt2,posAlUp);
@@ -221,6 +223,7 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
   logicSiBpUp -> SetVisAttributes(attriorange);
 
   G4double SiBpUp_posZ = AlUp_posZ + (Al_bp_thickness / 2) + (Si_bp_thickness / 2);
+  G4cout << "Silicium backplane Up pos Z = " << G4BestUnit(SiBpUp_posZ, "Length") << G4endl;
 
   G4ThreeVector posSiBpUp = G4ThreeVector(0, 0, SiBpUp_posZ);
   G4Transform3D transformSiBpUp = G4Transform3D(tilt2,posSiBpUp);
@@ -250,6 +253,7 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
   logicSiUp -> SetVisAttributes(attrigreen);
 
   G4double SiUp_posZ = SiBpUp_posZ + (Si_bp_thickness / 2) + (strip_thickness / 2);
+  G4cout << "Silicium Up pos Z = " << G4BestUnit(SiUp_posZ, "Length") << G4endl;
 
   G4Region* siliconUpRegion = new G4Region("SiliconUp");
   logicSiUp->SetRegion(siliconUpRegion);
