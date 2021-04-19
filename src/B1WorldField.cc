@@ -35,7 +35,7 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 B1WorldField::B1WorldField() : G4ElectroMagneticField(),
-    Bx1(0), By1(0.*tesla), Bz1(0), Ex1(0), Ey1(0), Ez1(0)
+    Bx1(0), By1(3.8*tesla), Bz1(0), Ex1(0), Ey1(0), Ez1(0)
 {
 }
 

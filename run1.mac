@@ -1,19 +1,107 @@
 /run/setCut 1 um
 /run/numberOfThreads 12
 /run/initialize
-/control/verbose 2 		# max 2
-/run/verbose 2 			# max 2
+/control/verbose 1 		# max 2
+/run/verbose 1 			# max 2
 /event/verbose 0		# max 2
 /tracking/verbose 0 	# max 5
 /analysis/ntuple/setActivationToAll  true
 #
 /random/setSeeds 5463285 7562145
-#/run/printProgress 100000
-/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/data
+/run/printProgress 100000
+#/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/data
 #
-/generator/momentum/SetRandom true
-#/generator/momentum/SetMomentum 0.0
-/generator/momentum/SetRandomMinValue 1.
-/generator/momentum/SetRandomMaxValue 3.5
-#
-/run/beamOn 1
+/generator/momentum/SetRandom false
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_0
+/run/beamOn 100000
+/generator/momentum/SetMomentum 39.19081
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_1
+/run/beamOn 100000
+/generator/momentum/SetMomentum 19.59615
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_2
+/run/beamOn 100000
+/generator/momentum/SetMomentum 13.06493
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_3
+/run/beamOn 100000
+/generator/momentum/SetMomentum 9.79957
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_4
+/run/beamOn 100000
+/generator/momentum/SetMomentum 7.84055
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_5
+/run/beamOn 100000
+/generator/momentum/SetMomentum 6.5347
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_6
+/run/beamOn 100000
+/generator/momentum/SetMomentum 5.6021
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_7
+/run/beamOn 100000
+/generator/momentum/SetMomentum 4.90277
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_8
+/run/beamOn 100000
+/generator/momentum/SetMomentum 4.35896
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_9
+/run/beamOn 100000
+/generator/momentum/SetMomentum 3.92401
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_10
+/run/beamOn 100000
+/generator/momentum/SetMomentum 3.56823
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_11
+/run/beamOn 100000
+/generator/momentum/SetMomentum 3.27184
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_12
+/run/beamOn 100000
+/generator/momentum/SetMomentum 3.02112
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_13
+/run/beamOn 100000
+/generator/momentum/SetMomentum 2.80628
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_14
+/run/beamOn 100000
+/generator/momentum/SetMomentum 2.62016
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_15
+/run/beamOn 100000
+/generator/momentum/SetMomentum 2.45737
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_16
+/run/beamOn 100000
+/generator/momentum/SetMomentum 2.31379
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_17
+/run/beamOn 100000
+/generator/momentum/SetMomentum 2.18622
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_18
+/run/beamOn 100000
+/generator/momentum/SetMomentum 2.07213
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_19
+/run/beamOn 100000
+/generator/momentum/SetMomentum 1.9695
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_20
+/run/beamOn 100000
+/generator/momentum/SetMomentum 1.87669
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_21
+/run/beamOn 100000
+/generator/momentum/SetMomentum 1.79237
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_22
+/run/beamOn 100000
+/generator/momentum/SetMomentum 1.71542
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_23
+/run/beamOn 100000
+/generator/momentum/SetMomentum 1.64493
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_24
+/run/beamOn 100000
+/generator/momentum/SetMomentum 1.58012
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_25
+/run/beamOn 100000
+/generator/momentum/SetMomentum 1.52033
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_26
+/run/beamOn 100000
+/generator/momentum/SetMomentum 1.46501
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_27
+/run/beamOn 100000
+/generator/momentum/SetMomentum 1.41368
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_28
+/run/beamOn 100000
+/generator/momentum/SetMomentum 1.36592
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_29
+/run/beamOn 100000
+/generator/momentum/SetMomentum 1.32139
+/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_30
+/run/beamOn 100000
+

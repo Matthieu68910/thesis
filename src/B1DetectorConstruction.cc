@@ -46,7 +46,7 @@ B1DetectorConstruction::B1DetectorConstruction()
 : G4VUserDetectorConstruction(),
   space(0),
   posAB(0),
-  strip_nbr(101.),
+  strip_nbr(254),
   logicSiUp(nullptr),
   logicSiDo(nullptr),
   logicWorld(nullptr)
@@ -106,8 +106,8 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
   // strips
   G4double strip_width = 90.*um;
   G4double strip_thickness = 270.*um;
-  strip_nbr = 101; // 1016 for full sensor !!! change in line 44 !!!
-  G4double strip_length = strip_nbr * strip_width;
+  strip_nbr = 254; // 1016 for full sensor !!! change in line 44 !!!
+  G4double strip_length = 5*cm;// strip_nbr * strip_width;
 
   // silicon backplane
   G4double Si_bp_thickness = 30.*um;

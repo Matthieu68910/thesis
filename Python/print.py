@@ -7,6 +7,6 @@ numbers = [0.00000,39.19081,19.59615,13.06493,9.79957,7.84055,6.53470,5.60210,4.
 
 for x in range(len(numbers)):
     print("/generator/momentum/SetMomentum " + str(round(numbers[x], 5)))
-    print("/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/test_" + str(x))
-    print("/run/beamOn 500000")
+    print("/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_2/test_" + str(x))
+    print("/run/beamOn 100000")
 
