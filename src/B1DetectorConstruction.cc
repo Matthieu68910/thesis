@@ -3,6 +3,7 @@
 
 #include "B1DetectorConstruction.hh"
 #include "B1Field.hh"
+#include "B1WorldField.hh"
 
 #include "G4RunManager.hh"
 #include "G4NistManager.hh"
@@ -28,8 +29,9 @@
 #include "G4TransportationManager.hh"
 #include "G4Mag_UsualEqRhs.hh"
 #include "G4ClassicalRK4.hh"
+#include "G4DormandPrince745.hh"
+#include "G4BogackiShampine45.hh"
 #include "G4PropagatorInField.hh"
-
 #include "G4UniformMagField.hh"
 #include "G4ChordFinder.hh"
 #include "G4ElectroMagneticField.hh"
@@ -46,7 +48,8 @@ B1DetectorConstruction::B1DetectorConstruction()
   posAB(0),
   strip_nbr(101.),
   logicSiUp(nullptr),
-  logicSiDo(nullptr)
+  logicSiDo(nullptr),
+  logicWorld(nullptr)
 { }
 
 
@@ -113,7 +116,7 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
   G4double Al_bp_thickness = 1.*um;
 
   // sensors separation and tilt
-  posAB = 1.375*mm; // from mid-sensitiv-plane to center 1.375 * 2 = 2.75 mm (375 -> 370 -> 365)
+  posAB = 1.375*mm; // from mid-plane to center 1.375 * 2 = 2.75 mm (375 -> 370 -> 365)
   G4double sensor_sep = 2*posAB; //2*posAB - Si_bp_thickness - Al_bp_thickness
 
   G4RotationMatrix tilt1  = G4RotationMatrix();
@@ -162,7 +165,7 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
     new G4Box("World",                       //its name
        world_sizeX, world_sizeY, world_sizeZ);     //its size
       
-  G4LogicalVolume* logicWorld =                         
+  logicWorld =
     new G4LogicalVolume(solidWorld,          //its solid
                         world_mat,           //its material
                         "World");            //its name
@@ -398,6 +401,7 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
 
 G4ThreadLocal B1Field* B1DetectorConstruction::fFieldUp = 0;
 G4ThreadLocal B1Field* B1DetectorConstruction::fFieldDo = 0;
+G4ThreadLocal B1WorldField* B1DetectorConstruction::fFieldWorld = 0;
 
 void B1DetectorConstruction::ConstructSDandField()
 {
@@ -415,32 +419,75 @@ void B1DetectorConstruction::ConstructSDandField()
   // Create global magnetic field messenger.
   // Uniform magnetic field is then created automatically if
   // the field value is not zero.
+  if(!fFieldWorld){
+
+      fFieldWorld = new B1WorldField();
+
+      G4EqMagElectricField* equation0 = new G4EqMagElectricField(fFieldWorld);
+
+      G4FieldManager* WorldFieldManager = new G4FieldManager;
+      WorldFieldManager->SetDetectorField(fFieldWorld);
+
+      G4MagIntegratorStepper* stepper = new G4DormandPrince745(equation0,8);
+
+      G4double minStep           = 100.*nm;
+
+      G4ChordFinder* chordFinder =
+                  new G4ChordFinder((G4MagneticField*)fFieldWorld,minStep,stepper);
+
+      // Set accuracy parameters
+      G4double deltaChord        = 100.*nm;
+      chordFinder->SetDeltaChord( deltaChord );
+
+      G4double deltaOneStep      = 10.*nm;
+      WorldFieldManager->SetAccuraciesWithDeltaOneStep(deltaOneStep);
+
+      G4double deltaIntersection = 10.*nm;
+      WorldFieldManager->SetDeltaIntersection(deltaIntersection);
+
+      G4TransportationManager* transportManager =
+                         G4TransportationManager::GetTransportationManager();
+
+      G4PropagatorInField* fieldPropagator =
+                                    transportManager->GetPropagatorInField();
+
+      G4double epsMin            = 1.0e-6;
+      G4double epsMax            = 1.0e-5;
+
+      fieldPropagator->SetMinimumEpsilonStep(epsMin);
+      fieldPropagator->SetMaximumEpsilonStep(epsMax);
+
+      WorldFieldManager->SetChordFinder(chordFinder);
+
+      G4bool allLocal = true;
+      logicWorld->SetFieldManager(WorldFieldManager, allLocal);
+  }
+
 
   if(!fFieldUp){
 
       fFieldUp = new B1Field();
-      fFieldUp->SetFieldValue(0., 3.8*tesla, 0., 0., 0., -9.0E+5*volt/m);
 
       G4EqMagElectricField* equation1 = new G4EqMagElectricField(fFieldUp);
 
       G4FieldManager* SiUpFieldManager = new G4FieldManager;
       SiUpFieldManager->SetDetectorField(fFieldUp);
 
-      G4MagIntegratorStepper* stepper = new G4ClassicalRK4(equation1,12);
+      G4MagIntegratorStepper* stepper = new G4DormandPrince745(equation1,8);
 
-      G4double minStep           = 1*um;
+      G4double minStep           = 100*nm;
 
       G4ChordFinder* chordFinder =
                   new G4ChordFinder((G4MagneticField*)fFieldUp,minStep,stepper);
 
       // Set accuracy parameters
-      G4double deltaChord        = 1*um;
+      G4double deltaChord        = 100.*nm;
       chordFinder->SetDeltaChord( deltaChord );
 
-      G4double deltaOneStep      = 10.*um;
+      G4double deltaOneStep      = 10.*nm;
       SiUpFieldManager->SetAccuraciesWithDeltaOneStep(deltaOneStep);
 
-      G4double deltaIntersection = 1.*um;
+      G4double deltaIntersection = 10.*nm;
       SiUpFieldManager->SetDeltaIntersection(deltaIntersection);
 
       G4TransportationManager* transportManager =
@@ -449,8 +496,8 @@ void B1DetectorConstruction::ConstructSDandField()
       G4PropagatorInField* fieldPropagator =
                                     transportManager->GetPropagatorInField();
 
-      G4double epsMin            = 2.5e-7*mm;
-      G4double epsMax            = 1.*um;
+      G4double epsMin            = 1.0e-6;
+      G4double epsMax            = 1.0e-5;
 
       fieldPropagator->SetMinimumEpsilonStep(epsMin);
       fieldPropagator->SetMaximumEpsilonStep(epsMax);
@@ -464,28 +511,27 @@ void B1DetectorConstruction::ConstructSDandField()
   if(!fFieldDo){
 
       fFieldDo = new B1Field();
-      fFieldDo->SetFieldValue(0., 3.8*tesla, 0., 0., 0., 9.0E+5*volt/m);
 
       G4EqMagElectricField* equation2 = new G4EqMagElectricField(fFieldDo);
 
       G4FieldManager* SiDoFieldManager = new G4FieldManager;
       SiDoFieldManager->SetDetectorField(fFieldDo);
 
-      G4MagIntegratorStepper* stepper = new G4ClassicalRK4(equation2,12);
+      G4MagIntegratorStepper* stepper = new G4DormandPrince745(equation2,8);
 
-      G4double minStep           = 1.*um;
+      G4double minStep           = 100.*nm;
 
       G4ChordFinder* chordFinder =
                   new G4ChordFinder((G4MagneticField*)fFieldDo,minStep,stepper);
 
       // Set accuracy parameters
-      G4double deltaChord        = 1*um;
+      G4double deltaChord        = 100*nm;
       chordFinder->SetDeltaChord( deltaChord );
 
-      G4double deltaOneStep      = 10.*um;
+      G4double deltaOneStep      = 10.*nm;
       SiDoFieldManager->SetAccuraciesWithDeltaOneStep(deltaOneStep);
 
-      G4double deltaIntersection = 1.*um;
+      G4double deltaIntersection = 10.*nm;
       SiDoFieldManager->SetDeltaIntersection(deltaIntersection);
 
       G4TransportationManager* transportManager =
@@ -494,8 +540,8 @@ void B1DetectorConstruction::ConstructSDandField()
       G4PropagatorInField* fieldPropagator =
                                     transportManager->GetPropagatorInField();
 
-      G4double epsMin            = 2.5e-7*mm;
-      G4double epsMax            = 1.*um;
+      G4double epsMin            = 1.0e-6;
+      G4double epsMax            = 1.0e-5;
 
       fieldPropagator->SetMinimumEpsilonStep(epsMin);
       fieldPropagator->SetMaximumEpsilonStep(epsMax);

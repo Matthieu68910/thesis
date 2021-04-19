@@ -30,11 +30,14 @@
 #include "B1Field.hh"
 
 #include "G4SystemOfUnits.hh"
+#include "G4GeometryManager.hh"
+#include "G4Track.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 B1Field::B1Field() : G4ElectroMagneticField(),
-    Bx(0), By(0), Bz(0), Ex(0), Ey(0), Ez(0)
+    Bx1(0), By1(0), Bz1(0), Ex1(0), Ey1(0), Ez1(-9.0E+5*volt/m),
+    Bx2(0), By2(0), Bz2(0), Ex2(0), Ey2(0), Ez2(9.0E+5*volt/m)
 {
 }
 
@@ -49,14 +52,25 @@ B1Field::~B1Field()
 void B1Field::GetFieldValue( const G4double Point[4], G4double* Bfield ) const
 {
   // Point[0],Point[1],Point[2] are x-, y-, z-cordinates, Point[3] is time
-  
-  Bfield[0]=Bx;
-  Bfield[1]=By; //3.8*tesla;
-  Bfield[2]=Bz;
 
-  Bfield[3]=Ex;
-  Bfield[4]=Ey;
-  Bfield[5]=Ez;
+  if(Point[2] >= 0)
+  {
+      Bfield[0]=Bx1;
+      Bfield[1]=By1;
+      Bfield[2]=Bz1;
+      Bfield[3]=Ex1;
+      Bfield[4]=Ey1;
+      Bfield[5]=Ez1;
+  } else
+  {
+      Bfield[0]=Bx2;
+      Bfield[1]=By2;
+      Bfield[2]=Bz2;
+      Bfield[3]=Ex2;
+      Bfield[4]=Ey2;
+      Bfield[5]=Ez2;
+  }
+
 
   return;
 }

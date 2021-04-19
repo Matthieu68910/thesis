@@ -26,21 +26,21 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#ifndef B1Field_h
-#define B1Field_h 1
+#ifndef B1WorldField_h
+#define B1WorldField_h 1
 
 #include "globals.hh"
 #include "G4ElectroMagneticField.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class B1Field : public G4ElectroMagneticField
+class B1WorldField : public G4ElectroMagneticField
 {
 
 public:
 
-  B1Field();
-  virtual ~B1Field();
+  B1WorldField();
+  virtual ~B1WorldField();
 
   /// DoesFieldChangeEnergy() returns true.
   virtual G4bool DoesFieldChangeEnergy() const { return true; }

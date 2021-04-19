@@ -22,39 +22,43 @@
 // * use  in  resulting  scientific  publications,  and indicate your *
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
+//
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#ifndef B1Field_h
-#define B1Field_h 1
+#include "B1WorldField.hh"
 
-#include "globals.hh"
-#include "G4ElectroMagneticField.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4GeometryManager.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class B1Field : public G4ElectroMagneticField
+B1WorldField::B1WorldField() : G4ElectroMagneticField(),
+    Bx1(0), By1(0.*tesla), Bz1(0), Ex1(0), Ey1(0), Ez1(0)
 {
-
-public:
-
-  B1Field();
-  virtual ~B1Field();
-
-  /// DoesFieldChangeEnergy() returns true.
-  virtual G4bool DoesFieldChangeEnergy() const { return true; }
-
-  /// GetFieldValue() returns the field value at a given point[].
-  /// field is really field[6]: Bx,By,Bz,Ex,Ey,Ez.
-  /// point[] is in global coordinates: x,y,z,t.
-  virtual void GetFieldValue(const G4double Point[4], G4double* Bfield) const;
-
-private:
-  G4double Bx1, By1, Bz1, Ex1, Ey1, Ez1;
-  G4double Bx2, By2, Bz2, Ex2, Ey2, Ez2;
-};
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#endif
+B1WorldField::~B1WorldField()
+{
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void B1WorldField::GetFieldValue( const G4double Point[4], G4double* Bfield ) const
+{
+  // Point[0],Point[1],Point[2] are x-, y-, z-cordinates, Point[3] is time
+
+
+  Bfield[0]=Bx1;
+  Bfield[1]=By1;
+  Bfield[2]=Bz1;
+  Bfield[3]=Ex1;
+  Bfield[4]=Ey1;
+  Bfield[5]=Ez1;
+
+
+  return;
+}

@@ -37,7 +37,7 @@
 class G4ParticleGun;
 class G4Event;
 class G4Box;
-class PrimaryGeneratorMessenger;
+class B1PrimaryGeneratorMessenger;
 
 /// The primary generator action class with particle gun.
 
@@ -67,7 +67,7 @@ class B1PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
     G4double min_pT;
     G4double max_pT;
 
-    PrimaryGeneratorMessenger* fGunMessenger;
+    B1PrimaryGeneratorMessenger* fGunMessenger;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

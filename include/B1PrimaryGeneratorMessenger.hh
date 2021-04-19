@@ -23,15 +23,12 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-/// \file electromagnetic/TestEm3/include/PrimaryGeneratorMessenger.hh
-/// \brief Definition of the PrimaryGeneratorMessenger class
-//
 //
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#ifndef PrimaryGeneratorMessenger_h
-#define PrimaryGeneratorMessenger_h 1
+#ifndef B1PrimaryGeneratorMessenger_h
+#define B1PrimaryGeneratorMessenger_h 1
 
 #include "G4UImessenger.hh"
 #include "globals.hh"
@@ -44,11 +41,11 @@ class G4UIcmdWithABool;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class PrimaryGeneratorMessenger: public G4UImessenger
+class B1PrimaryGeneratorMessenger: public G4UImessenger
 {
   public:
-    PrimaryGeneratorMessenger(B1PrimaryGeneratorAction*);
-   ~PrimaryGeneratorMessenger();
+    B1PrimaryGeneratorMessenger(B1PrimaryGeneratorAction*);
+   ~B1PrimaryGeneratorMessenger();
     
     virtual void SetNewValue(G4UIcommand*, G4String);
     

@@ -3,8 +3,8 @@
 /run/initialize
 /control/verbose 2 		# max 2
 /run/verbose 2 			# max 2
-/event/verbose 2		# max 2
-/tracking/verbose 3 	# max 5
+/event/verbose 0		# max 2
+/tracking/verbose 0 	# max 5
 /analysis/ntuple/setActivationToAll  true
 #
 /random/setSeeds 5463285 7562145

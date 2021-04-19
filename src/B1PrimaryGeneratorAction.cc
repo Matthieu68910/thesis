@@ -3,7 +3,7 @@
 
 #include "B1PrimaryGeneratorAction.hh"
 
-#include "PrimaryGeneratorMessenger.hh"
+#include "B1PrimaryGeneratorMessenger.hh"
 #include "B1DetectorConstruction.hh"
 #include "HistoManager.hh"
 
@@ -44,7 +44,7 @@ B1PrimaryGeneratorAction::B1PrimaryGeneratorAction()
   fParticleGun->SetParticleEnergy(5.*GeV);
 
   //create a messenger for this class
-  fGunMessenger = new PrimaryGeneratorMessenger(this);
+  fGunMessenger = new B1PrimaryGeneratorMessenger(this);
 }
 
 

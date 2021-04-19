@@ -23,14 +23,11 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-/// \file electromagnetic/TestEm3/src/PrimaryGeneratorMessenger.cc
-/// \brief Implementation of the PrimaryGeneratorMessenger class
-//
 //
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#include "PrimaryGeneratorMessenger.hh"
+#include "B1PrimaryGeneratorMessenger.hh"
 
 #include "B1PrimaryGeneratorAction.hh"
 #include "G4UIdirectory.hh"
@@ -39,7 +36,7 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-PrimaryGeneratorMessenger::PrimaryGeneratorMessenger(
+B1PrimaryGeneratorMessenger::B1PrimaryGeneratorMessenger(
                                              B1PrimaryGeneratorAction* Gun)
 :G4UImessenger(),fAction(Gun),
  fGunDir(0),
@@ -62,14 +59,14 @@ PrimaryGeneratorMessenger::PrimaryGeneratorMessenger(
   fpTCmd->SetGuidance("Select simulated pT");
   fpTCmd->SetGuidance("unit is GeV (max 1000)");
   fpTCmd->SetParameterName("pTMomentum",false);
-  fpTCmd->SetRange("pTMomentum>=0.&&pTMomentum<=1000.");
+  fpTCmd->SetRange("pTMomentum>=0.4&&pTMomentum<=1000.");
   fpTCmd->AvailableForStates(G4State_Idle);
 
   fSet_min = new G4UIcmdWithADouble("/generator/momentum/SetRandomMinValue",this);
   fSet_min->SetGuidance("Set min randum value");
-  fSet_min->SetGuidance("unit is GeV (min 0.5)");
+  fSet_min->SetGuidance("unit is GeV (min 0.4)");
   fSet_min->SetParameterName("min_value",false);
-  fSet_min->SetRange("min_value>=0.5&&min_value<=1000.");
+  fSet_min->SetRange("min_value>=0.4&&min_value<=1000.");
   fSet_min->AvailableForStates(G4State_Idle);
 
   fSet_max = new G4UIcmdWithADouble("/generator/momentum/SetRandomMaxValue",this);
@@ -82,7 +79,7 @@ PrimaryGeneratorMessenger::PrimaryGeneratorMessenger(
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-PrimaryGeneratorMessenger::~PrimaryGeneratorMessenger()
+B1PrimaryGeneratorMessenger::~B1PrimaryGeneratorMessenger()
 {
   delete fpTCmd;
   delete fGunDir;
@@ -93,7 +90,7 @@ PrimaryGeneratorMessenger::~PrimaryGeneratorMessenger()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command,
+void B1PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command,
                                                G4String newValue)
 {
   if( command == fpTCmd )
