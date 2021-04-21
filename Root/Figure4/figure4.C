@@ -2,35 +2,39 @@
 #include "TTree.h"
 #include <iostream>
 
+std::default_random_engine generator;
+std::normal_distribution<double> distribution(0.00362, 0.00220994475); // µ = 1000 e-, s = 800 e-
+
 bool CBC2(
-	const vector<double> &strip_A, 
-	const vector<double> &strip_B, 
-	vector<double> &res_A, // [0:4]-> 1-5 strip wide clusters,[5]-> number of clusters (tot), [6]-> mean cluster width (tot), [7:8]-> accepted
-	vector<double> &res_B,
-	const int MAX_CLUSTER_WIDTH = 2,
-	const int CLUSTER_WINDOW = 5,
-	const double THRESHOLD = 0.0216
-	){
+    const vector<double> &strip_A, 
+    const vector<double> &strip_B, 
+    vector<double> &res_A, // [0:4]-> 1-5 strip wide clusters,[5]-> number of clusters (tot), [6]-> mean cluster width (tot), [7:8]-> accepted
+    vector<double> &res_B,
+    const int MAX_CLUSTER_WIDTH = 3,
+    const int CLUSTER_WINDOW = 5,
+    const double THRESHOLD = 0.0222
+    ){
 
-	const int NBR_STRIP = strip_A.size();
+    const int NBR_STRIP = strip_A.size();
 
-	// Clusters in sensor A
-	std::vector<double> clus_pos_A;
-	std::vector<double> clus_size_A;
-	bool inside = false;
-	int size = 0;
-	// Loop on sensor A strips
-	for (int i = 0; i < NBR_STRIP; ++i)
+    // Clusters in sensor A
+    std::vector<double> clus_pos_A;
+    std::vector<double> clus_size_A;
+    bool inside = false;
+    int size = 0;
+    // Loop on sensor A strips
+    for (int i = 0; i < NBR_STRIP; ++i)
     {
-        if (strip_A[i] < THRESHOLD && !inside)        
-        {} else if (strip_A[i] < THRESHOLD && inside)
+        double strip_energy = abs(strip_A[i] + distribution(generator));
+        if (strip_energy < THRESHOLD && !inside)        
+        {} else if (strip_energy < THRESHOLD && inside)
         {
-	        clus_size_A.push_back(size);
-	        if(size <= 5) res_A.at(size - 1) += 1;
-	        clus_pos_A.push_back(floor((i - 1) - (size / 2) + 0.5));
-	        size = 0;
-	        inside = false;
-        } else if (strip_A[i] >= THRESHOLD && !inside)
+            clus_size_A.push_back(size);
+            if(size <= 5) res_A.at(size - 1) += 1;
+            clus_pos_A.push_back(floor((i - 1) - (size / 2) + 0.5));
+            size = 0;
+            inside = false;
+        } else if (strip_energy >= THRESHOLD && !inside)
         {
             size = 1;
             inside = true;
@@ -42,7 +46,7 @@ bool CBC2(
                 size = 0;
                 inside = false;
             }
-        } else if (strip_A[i] >= THRESHOLD && inside)
+        } else if (strip_energy >= THRESHOLD && inside)
         {
             size += 1;
             if (i == (NBR_STRIP - 1))
@@ -57,22 +61,23 @@ bool CBC2(
     }
 
     // Clusters in sensor B
-	std::vector<double> clus_pos_B;
-	std::vector<double> clus_size_B;
-	inside = false;
-	size = 0;
-	// Loop on sensor B strips
-	for (int i = 0; i < NBR_STRIP; ++i)
+    std::vector<double> clus_pos_B;
+    std::vector<double> clus_size_B;
+    inside = false;
+    size = 0;
+    // Loop on sensor B strips
+    for (int i = 0; i < NBR_STRIP; ++i)
     {
-        if (strip_B[i] < THRESHOLD && !inside)        
-        {} else if (strip_B[i] < THRESHOLD && inside)
+        double strip_energy = abs(strip_B[i] + distribution(generator));
+        if (strip_energy < THRESHOLD && !inside)        
+        {} else if (strip_energy < THRESHOLD && inside)
         {
-	        clus_size_B.push_back(size);
-	        if(size <= 5) res_B.at(size - 1) += 1;
-	        clus_pos_B.push_back(floor((i - 1) - (size / 2) + 0.5));
-	        size = 0;
-	        inside = false;
-        } else if (strip_B[i] >= THRESHOLD && !inside)
+            clus_size_B.push_back(size);
+            if(size <= 5) res_B.at(size - 1) += 1;
+            clus_pos_B.push_back(floor((i - 1) - (size / 2) + 0.5));
+            size = 0;
+            inside = false;
+        } else if (strip_energy >= THRESHOLD && !inside)
         {
             size = 1;
             inside = true;
@@ -84,7 +89,7 @@ bool CBC2(
                 size = 0;
                 inside = false;
             }
-        } else if (strip_B[i] >= THRESHOLD && inside)
+        } else if (strip_energy >= THRESHOLD && inside)
         {
             size += 1;
             if (i == (NBR_STRIP - 1))
@@ -108,20 +113,20 @@ bool CBC2(
     // for A
     for (int i = clus_size_A.size() - 1; i >= 0; --i)
     {
-    	if (clus_size_A.at(i) > MAX_CLUSTER_WIDTH)
-    	{	
-    		clus_size_A.erase(clus_size_A.begin() + i);
-    		clus_pos_A.erase(clus_pos_A.begin() + i);
-    	}
+        if (clus_size_A.at(i) > MAX_CLUSTER_WIDTH)
+        {   
+            clus_size_A.erase(clus_size_A.begin() + i);
+            clus_pos_A.erase(clus_pos_A.begin() + i);
+        }
     }
     // for B
     for (int i = clus_size_B.size() - 1; i >= 0; --i)
     {
-    	if (clus_size_B.at(i) > MAX_CLUSTER_WIDTH)
-    	{	
-    		clus_size_B.erase(clus_size_B.begin() + i);
-    		clus_pos_B.erase(clus_pos_B.begin() + i);
-    	}
+        if (clus_size_B.at(i) > MAX_CLUSTER_WIDTH)
+        {   
+            clus_size_B.erase(clus_size_B.begin() + i);
+            clus_pos_B.erase(clus_pos_B.begin() + i);
+        }
     }
 
     // fill results (accepted)
@@ -133,37 +138,29 @@ bool CBC2(
     // return false if no possible stub
     if (clus_pos_A.size() == 0 || clus_pos_B.size() == 0)
     {
-    	return false;
+        return false;
     }
 
     // stub finding logic
     for (int i = 0; i < clus_pos_A.size(); ++i)
     {
-    	for (int j = 0; j < clus_pos_B.size(); ++j)
-    	{
-    		if (abs(clus_pos_A.at(i) - clus_pos_B.at(j)) <= CLUSTER_WINDOW)
-    		{
-    			return true;
-    		}
-    	}
+        for (int j = 0; j < clus_pos_B.size(); ++j)
+        {
+            if (abs(clus_pos_A.at(i) - clus_pos_B.at(j)) <= CLUSTER_WINDOW)
+            {
+                return true;
+            }
+        }
     }
     return false;
 }
 
-void CopyFile(int& n){
-    string cmd = ".!rootcp -r /media/matthieu/ssd1/Geant4/Data/test_" + std::to_string(n);
-    cmd += ".root /media/matthieu/ssd1/Geant4/Data/test_";
-    cmd += std::to_string(n);
-    cmd += "_new.root";      
-    char const *pchar = cmd.c_str();
-    gROOT->ProcessLine(pchar);
-}
 
-void fig20_2() {
+void figure4() {
 	// data for Adam2020
 	const Int_t n = 24;
  
-	Double_t x1[n] = {	1.32089,
+	Double_t x1[n] = {	1.32089, // Adam2020 un-irradiated
 						1.48578,
 						1.57853,
 						1.71422,
@@ -187,7 +184,6 @@ void fig20_2() {
 						12.2483,
 						13.0642,
 						15.0738};
-
     Double_t y1[n] = {	0.00162849,
 						0.00298557,
 						0.00298557,
@@ -212,29 +208,57 @@ void fig20_2() {
 						0.98415500,
 						0.98415500,
 						0.98551200};
-
     Double_t ex1[n] = {0.};
     Double_t ey1[n] = {0.};
 
+    const Int_t m = 16;
+ 
+    Double_t x2[m] = {  1.57853,
+                        1.71422,
+                        1.87568,
+                        1.93064,
+                        1.98904,
+                        2.07149,
+                        2.13847,
+                        2.1608,
+                        2.18485,
+                        2.31367,
+                        2.42703,
+                        2.51978,
+                        2.80491,
+                        2.84613,
+                        3.1656,
+                        3.92307};
+    Double_t y2[m] = {  0.001628,
+                        0.001628,
+                        0.007057,
+                        0.024699,
+                        0.097981,
+                        0.305615,
+                        0.486106,
+                        0.547175,
+                        0.598744,
+                        0.876945,
+                        0.947514,
+                        0.955656,
+                        0.963799,
+                        0.96787,
+                        0.957013,
+                        0.965156};
+    Double_t ex2[m] = {0.};
+    Double_t ey2[m] = {0.};
+
 	// open file
-    TFile *f = TFile::Open("/media/matthieu/ssd1/Geant4/Data/DataSet_3/data1M.root", "read");
+    TFile *f = TFile::Open("/media/matthieu/ssd1/Geant4/Data/DataSet_3/data10M.root", "read");
 
     //************* variable ***************//
     const int NBR_STRIP = 254;
 
-    const int MAX_CLUSTER_WIDTH1 = 1;
-    const int CLUSTER_WINDOW1 =5;
-    const double THRESHOLD1 = 0.0222; // MeV -> = 4 * (1000 * 3.6 keV)
+    const int MAX_CLUSTER_WIDTH = 3;
+    const int CLUSTER_WINDOW =5;
+    const double THRESHOLD = 0.0222; // MeV -> = 4 * (1000 * 3.6 keV)
 
-    const int MAX_CLUSTER_WIDTH2 = 2;
-    const int CLUSTER_WINDOW2 =5;
-    const double THRESHOLD2 = 0.0222; // MeV -> = 4 * (1000 * 3.6 keV)
-
-    const int MAX_CLUSTER_WIDTH3 = 3;
-    const int CLUSTER_WINDOW3 =5;
-    const double THRESHOLD3 = 0.0222; // MeV -> = 4 * (1000 * 3.6 keV)
-
-    const int NBR_BINS = 200;
+    const int NBR_BINS = 100;
     
     /*Int_t nbrCAT, nbrCA, nbrCBT, nbrCB; // for A and B detectors
     Double_t mCWAT, mCWBT, mCWA, mCWB;
@@ -280,23 +304,16 @@ void fig20_2() {
 
     TH1* h1 = new TH1D("h1", "Stub efficiency for 2S mini-module", NBR_BINS, 1.0, 3.5);
     h1->SetName("h1");
-    TH1* h2 = new TH1D("h2", "Stub efficiency 2", NBR_BINS, 1.0, 3.5);
-    h2->SetName("h2");
-    TH1* h3 = new TH1D("h3", "Stub efficiency 3", NBR_BINS, 1.0, 3.5);
-    h3->SetName("h3");
 
     gPad->SetTitle("Stub efficiency for 2S mini-module");
 
     // Create vectors for bin content
-    std::vector<double> nbr_stub1(NBR_BINS+2, 0);
-    std::vector<double> nbr_event1(NBR_BINS+2, 0);
-    std::vector<double> nbr_stub2(NBR_BINS+2, 0);
-    std::vector<double> nbr_event2(NBR_BINS+2, 0);
-    std::vector<double> nbr_stub3(NBR_BINS+2, 0);
-    std::vector<double> nbr_event3(NBR_BINS+2, 0);
+    std::vector<double> nbr_stub(NBR_BINS+2, 0);
+    std::vector<double> nbr_event(NBR_BINS+2, 0);
 
     //****************** Main loop over all entries **********************//
     int count_loop = 0;
+    int cnt = 0;
     for (int k = 0; k < ENTRIES; k++)
     {
         // fill variables with datas from entry i
@@ -305,40 +322,15 @@ void fig20_2() {
         std::vector<double> res_A(9, 0);
         std::vector<double> res_B(9, 0);
 
-        bool stub1 = CBC2(strip_A, strip_B, res_A, res_B, MAX_CLUSTER_WIDTH1, CLUSTER_WINDOW1, THRESHOLD1);
-        bool stub2 = CBC2(strip_A, strip_B, res_A, res_B, MAX_CLUSTER_WIDTH2, CLUSTER_WINDOW2, THRESHOLD2);
-        bool stub3 = CBC2(strip_A, strip_B, res_A, res_B, MAX_CLUSTER_WIDTH3, CLUSTER_WINDOW3, THRESHOLD3);
+        bool stub = CBC2(strip_A, strip_B, res_A, res_B, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, THRESHOLD);
 
+        if(stub){nbr_stub.at(h1->FindBin(momentum)) += 1.;}
+        nbr_event.at(h1->FindBin(momentum)) += 1.;
 
-        /*CA1 = (int)res_A.at(0); // for A
-        CA2 = (int)res_A.at(1);
-        CA3 = (int)res_A.at(2);
-        CA4 = (int)res_A.at(3);
-        CA5 = (int)res_A.at(4);
-        nbrCAT = (int)res_A.at(5);
-        mCWAT = (double)res_A.at(6);
-        nbrCA = (int)res_A.at(7);
-        mCWA = (double)res_A.at(8);
-
-        CB1 = (int)res_B.at(0); // for B
-        CB2 = (int)res_B.at(1);
-        CB3 = (int)res_B.at(2);
-        CB4 = (int)res_B.at(3);
-        CB5 = (int)res_B.at(4);
-        nbrCBT = (int)res_B.at(5);
-        mCWBT = (double)res_B.at(6);
-        nbrCB = (int)res_B.at(7);
-        mCWB = (double)res_B.at(8);*/
-
-        //corr_stub = stub; // for general
-        if(stub1){nbr_stub1.at(h1->FindBin(momentum)) += 1.;}
-        nbr_event1.at(h1->FindBin(momentum)) += 1.;
-
-        if(stub2){nbr_stub2.at(h2->FindBin(momentum)) += 1.;}
-        nbr_event2.at(h2->FindBin(momentum)) += 1.;
-
-        if(stub3){nbr_stub3.at(h3->FindBin(momentum)) += 1.;}
-        nbr_event3.at(h3->FindBin(momentum)) += 1.;
+        if(h1->FindBin(momentum) == 4 && stub){
+            cout << "suspect at event number " << k << endl;
+            cnt += 1;
+        }
 
         count_loop += 1;
         if (count_loop == ENTRIES / 10)
@@ -350,30 +342,18 @@ void fig20_2() {
     double error = 0., content = 0.;
     for (int i = 1; i <= NBR_BINS; ++i)
     {
-    	content = nbr_stub1.at(i) / nbr_event1.at(i);
+    	content = nbr_stub.at(i) / nbr_event.at(i);
     	h1->SetBinContent(i, content);
-    	//error = sqrt(nbr_event1.at(i)) / nbr_event1.at(i); //* content;
-    	//h1->SetBinError(i, error);
-    	content = nbr_stub2.at(i) / nbr_event2.at(i);
-    	h2->SetBinContent(i, content);
-    	content = nbr_stub3.at(i) / nbr_event3.at(i);
-    	h3->SetBinContent(i, content);
+        if(i == 4){
+            cout << "Stubs " << nbr_stub.at(i) << "Events" << nbr_event.at(i) << endl;
+            cout << "content: " << content << endl;
+        }
     }
     
     h1->SetLineColor(kGreen+2);
-    h1->SetLineWidth(1);
+    h1->SetLineWidth(2);
     //h1->SetLineStyle(9);
     h1->Draw("SAME");
-
-    h2->SetLineColor(kBlue+2);
-    h2->SetLineWidth(1);
-    //h1->SetLineStyle(9);
-    h2->Draw("SAME");
-
-    h3->SetLineColor(kMagenta+2);
-    h3->SetLineWidth(1);
-    //h1->SetLineStyle(9);
-    h3->Draw("SAME");
 
     TGraphErrors *gr1 = new TGraphErrors(n,x1,y1,ex1,ey1);
     gr1->SetName("gr1");
@@ -382,12 +362,26 @@ void fig20_2() {
     gr1->SetMarkerSize(1.2);
     gr1->Draw("SAME P");
 
-    TF1* func1 = new TF1("func1", "([0]/(1+ TMath::Exp(-[1]*(x-[2]))))", x1[0], x1[9]);
+    TF1* func1 = new TF1("func1", "([0]/(1+ TMath::Exp(-[1]*(x-[2]))))", x1[0], x1[n-1]);
     func1->SetParameters(1, 15, 2);
     func1->SetLineColor(kRed+2);
     func1->SetLineWidth(1);
     func1->SetLineStyle(7);
     gr1->Fit(func1);
+
+    TGraphErrors *gr2 = new TGraphErrors(m,x2,y2,ex2,ey2);
+    gr2->SetName("gr2");
+    gr2->SetMarkerColor(kBlue+2);
+    gr2->SetMarkerStyle(20);
+    gr2->SetMarkerSize(1.2);
+    gr2->Draw("SAME P");
+
+    TF1* func2 = new TF1("func2", "([0]/(1+ TMath::Exp(-[1]*(x-[2]))))", x2[0], x2[m-1]);
+    func2->SetParameters(1, 15, 2);
+    func2->SetLineColor(kBlue+2);
+    func2->SetLineWidth(1);
+    func2->SetLineStyle(7);
+    gr2->Fit(func2);
 
     TAxis *xaxis = h1->GetXaxis();
     TAxis *yaxis = h1->GetYaxis();
@@ -401,10 +395,9 @@ void fig20_2() {
     c1->RedrawAxis();
 
     auto legend = new TLegend(0.65,0.1,0.9,0.35);
-    legend->AddEntry("gr1","Adam et al. 2020","p");
-    legend->AddEntry("h1","Geant4: max cluster width = 1","l");
-    legend->AddEntry("h2","Geant4: max cluster width = 2","l");
-    legend->AddEntry("h3","Geant4: max cluster width = 3","l");
+    legend->AddEntry("gr1","Adam et al. 2020 - non-irradiated","p");
+    legend->AddEntry("h1","Geant4","l");
+    legend->AddEntry("gr2","Adam et al. 2020 - irradiated","p");
     legend->Draw();
 
     gPad->Modified();

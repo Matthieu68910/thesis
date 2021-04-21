@@ -2,35 +2,39 @@
 #include "TTree.h"
 #include <iostream>
 
+std::default_random_engine generator;
+std::normal_distribution<double> distribution(0.00362, 0.00220994475); // µ = 1000 e-, s = 800 e-
+
 bool CBC2(
-	const vector<double> &strip_A, 
-	const vector<double> &strip_B, 
-	vector<double> &res_A, // [0:4]-> 1-5 strip wide clusters,[5]-> number of clusters (tot), [6]-> mean cluster width (tot), [7:8]-> accepted
-	vector<double> &res_B,
-	const int MAX_CLUSTER_WIDTH = 2,
-	const int CLUSTER_WINDOW = 5,
-	const double THRESHOLD = 0.0216
-	){
+    const vector<double> &strip_A, 
+    const vector<double> &strip_B, 
+    vector<double> &res_A, // [0:4]-> 1-5 strip wide clusters,[5]-> number of clusters (tot), [6]-> mean cluster width (tot), [7:8]-> accepted
+    vector<double> &res_B,
+    const int MAX_CLUSTER_WIDTH = 3,
+    const int CLUSTER_WINDOW = 5,
+    const double THRESHOLD = 0.0148
+    ){
 
-	const int NBR_STRIP = strip_A.size();
+    const int NBR_STRIP = strip_A.size();
 
-	// Clusters in sensor A
-	std::vector<double> clus_pos_A;
-	std::vector<double> clus_size_A;
-	bool inside = false;
-	int size = 0;
-	// Loop on sensor A strips
-	for (int i = 0; i < NBR_STRIP; ++i)
+    // Clusters in sensor A
+    std::vector<double> clus_pos_A;
+    std::vector<double> clus_size_A;
+    bool inside = false;
+    int size = 0;
+    // Loop on sensor A strips
+    for (int i = 0; i < NBR_STRIP; ++i)
     {
-        if (strip_A[i] < THRESHOLD && !inside)        
-        {} else if (strip_A[i] < THRESHOLD && inside)
+        double strip_energy = abs(strip_A[i] + distribution(generator));
+        if (strip_energy < THRESHOLD && !inside)        
+        {} else if (strip_energy < THRESHOLD && inside)
         {
-	        clus_size_A.push_back(size);
-	        if(size <= 5) res_A.at(size - 1) += 1;
-	        clus_pos_A.push_back(floor((i - 1) - (size / 2) + 0.5));
-	        size = 0;
-	        inside = false;
-        } else if (strip_A[i] >= THRESHOLD && !inside)
+            clus_size_A.push_back(size);
+            if(size <= 5) res_A.at(size - 1) += 1;
+            clus_pos_A.push_back(floor((i - 1) - (size / 2) + 0.5));
+            size = 0;
+            inside = false;
+        } else if (strip_energy >= THRESHOLD && !inside)
         {
             size = 1;
             inside = true;
@@ -42,7 +46,7 @@ bool CBC2(
                 size = 0;
                 inside = false;
             }
-        } else if (strip_A[i] >= THRESHOLD && inside)
+        } else if (strip_energy >= THRESHOLD && inside)
         {
             size += 1;
             if (i == (NBR_STRIP - 1))
@@ -57,22 +61,23 @@ bool CBC2(
     }
 
     // Clusters in sensor B
-	std::vector<double> clus_pos_B;
-	std::vector<double> clus_size_B;
-	inside = false;
-	size = 0;
-	// Loop on sensor B strips
-	for (int i = 0; i < NBR_STRIP; ++i)
+    std::vector<double> clus_pos_B;
+    std::vector<double> clus_size_B;
+    inside = false;
+    size = 0;
+    // Loop on sensor B strips
+    for (int i = 0; i < NBR_STRIP; ++i)
     {
-        if (strip_B[i] < THRESHOLD && !inside)        
-        {} else if (strip_B[i] < THRESHOLD && inside)
+        double strip_energy = abs(strip_B[i] + distribution(generator));
+        if (strip_energy < THRESHOLD && !inside)        
+        {} else if (strip_energy < THRESHOLD && inside)
         {
-	        clus_size_B.push_back(size);
-	        if(size <= 5) res_B.at(size - 1) += 1;
-	        clus_pos_B.push_back(floor((i - 1) - (size / 2) + 0.5));
-	        size = 0;
-	        inside = false;
-        } else if (strip_B[i] >= THRESHOLD && !inside)
+            clus_size_B.push_back(size);
+            if(size <= 5) res_B.at(size - 1) += 1;
+            clus_pos_B.push_back(floor((i - 1) - (size / 2) + 0.5));
+            size = 0;
+            inside = false;
+        } else if (strip_energy >= THRESHOLD && !inside)
         {
             size = 1;
             inside = true;
@@ -84,7 +89,7 @@ bool CBC2(
                 size = 0;
                 inside = false;
             }
-        } else if (strip_B[i] >= THRESHOLD && inside)
+        } else if (strip_energy >= THRESHOLD && inside)
         {
             size += 1;
             if (i == (NBR_STRIP - 1))
@@ -108,20 +113,20 @@ bool CBC2(
     // for A
     for (int i = clus_size_A.size() - 1; i >= 0; --i)
     {
-    	if (clus_size_A.at(i) > MAX_CLUSTER_WIDTH)
-    	{	
-    		clus_size_A.erase(clus_size_A.begin() + i);
-    		clus_pos_A.erase(clus_pos_A.begin() + i);
-    	}
+        if (clus_size_A.at(i) > MAX_CLUSTER_WIDTH)
+        {   
+            clus_size_A.erase(clus_size_A.begin() + i);
+            clus_pos_A.erase(clus_pos_A.begin() + i);
+        }
     }
     // for B
     for (int i = clus_size_B.size() - 1; i >= 0; --i)
     {
-    	if (clus_size_B.at(i) > MAX_CLUSTER_WIDTH)
-    	{	
-    		clus_size_B.erase(clus_size_B.begin() + i);
-    		clus_pos_B.erase(clus_pos_B.begin() + i);
-    	}
+        if (clus_size_B.at(i) > MAX_CLUSTER_WIDTH)
+        {   
+            clus_size_B.erase(clus_size_B.begin() + i);
+            clus_pos_B.erase(clus_pos_B.begin() + i);
+        }
     }
 
     // fill results (accepted)
@@ -133,31 +138,23 @@ bool CBC2(
     // return false if no possible stub
     if (clus_pos_A.size() == 0 || clus_pos_B.size() == 0)
     {
-    	return false;
+        return false;
     }
 
     // stub finding logic
     for (int i = 0; i < clus_pos_A.size(); ++i)
     {
-    	for (int j = 0; j < clus_pos_B.size(); ++j)
-    	{
-    		if (abs(clus_pos_A.at(i) - clus_pos_B.at(j)) <= CLUSTER_WINDOW)
-    		{
-    			return true;
-    		}
-    	}
+        for (int j = 0; j < clus_pos_B.size(); ++j)
+        {
+            if (abs(clus_pos_A.at(i) - clus_pos_B.at(j)) <= CLUSTER_WINDOW)
+            {
+                return true;
+            }
+        }
     }
     return false;
 }
 
-void CopyFile(int& n){
-    string cmd = ".!rootcp -r /media/matthieu/ssd1/Geant4/Data/test_" + std::to_string(n);
-    cmd += ".root /media/matthieu/ssd1/Geant4/Data/test_";
-    cmd += std::to_string(n);
-    cmd += "_new.root";      
-    char const *pchar = cmd.c_str();
-    gROOT->ProcessLine(pchar);
-}
 
 void fig20_1test() {
 	// data for Adam2020

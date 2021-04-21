@@ -13,7 +13,7 @@ bool CBC2(
 	vector<double> &res_B,
 	const int MAX_CLUSTER_WIDTH = 3,
 	const int CLUSTER_WINDOW = 5,
-	double THRESHOLD = 0.0148
+	double THRESHOLD = 0.0222
 	){
 
 	const int NBR_STRIP = strip_A.size();
@@ -210,7 +210,7 @@ void figure1() {
     auto data = f->Get<TTree>("data");
 
     // Get the number of entries in TTree
-    const int ENTRIES = data->GetEntries();
+    const int ENTRIES = data->GetEntries() / 10;
     //cout << std::scientific << "Number of entries: " << ENTRIES << endl;
 
     //**************** Set BranchAddress for datas recovery ***************
