@@ -45,6 +45,7 @@
 B1DetectorConstruction::B1DetectorConstruction()
 : G4VUserDetectorConstruction(),
   space(0),
+  backplane(0),
   posAB(0),
   strip_nbr(254),
   logicSiUp(nullptr),
@@ -116,7 +117,7 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
   G4double Al_bp_thickness = 1.*um;
 
   // sensors separation and tilt
-  posAB = 1.375*mm; // from mid-plane to center 1.375 * 2 = 2.75 mm (375 -> 370 -> 365)
+  posAB = 2.75*mm / 2; // from mid-plane to center 1.375 * 2 = 2.75 mm if |-<-| |->-| (375 -> 370 -> 365) 2245 if |<--| |-->|
   G4double sensor_sep = 2*posAB; //2*posAB - Si_bp_thickness - Al_bp_thickness
 
   G4RotationMatrix tilt1  = G4RotationMatrix();
@@ -132,6 +133,7 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
   G4double sensor_thickness = strip_thickness + Si_bp_thickness + Al_bp_thickness;
 
   space = (sensor_sep + sensor_thickness) / 2;
+  backplane = (sensor_sep - sensor_thickness) / 2;
 
   // world safety margin
   G4double WorldSafeX = 2*sensor_sep;

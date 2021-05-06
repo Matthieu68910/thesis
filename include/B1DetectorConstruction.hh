@@ -57,12 +57,14 @@ class B1DetectorConstruction : public G4VUserDetectorConstruction
     
     G4double    GetSpace() const { return space; }
     G4double    GetPosAB() const { return posAB; }
+    G4double    GetBackPlane() const { return backplane; }
     G4int       GetStripNumber() const {return strip_nbr; }
 
   protected:
     G4double    space;
     G4double    posAB;
     G4int       strip_nbr;
+    G4double    backplane;
 
   private:
     G4LogicalVolume* logicSiUp;

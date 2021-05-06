@@ -16,7 +16,7 @@
 /vis/set/textColour    # Revert to default text colour (blue)
 #/vis/scene/add/axes
 #/vis/scene/add/magneticField 10
-/vis/scene/add/electricField
+/vis/scene/add/electricField 10
 /vis/set/colour red
 /vis/set/lineWidth 2
 /vis/scene/add/frame   # Simple frame around the view

@@ -467,7 +467,7 @@ void figure3() {
 	    auto data = f.Get<TTree>("data");
 
 	    // Get the number of entries in TTree
-	    const int ENTRIES = data->GetEntries() / 10;
+	    const int ENTRIES = data->GetEntries();
 	    //cout << std::scientific << "Number of entries: " << ENTRIES << endl;
 
 	    //**************** Set BranchAddress for datas recovery ***************

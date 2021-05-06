@@ -156,11 +156,10 @@ bool CBC2(
 }
 
 
-void figure4() {
-	// data for Adam2020
-	const Int_t n = 24;
+void figure4_1() {
+	const Int_t n = 24; // data for Adam2020
  
-	Double_t x1[n] = {	1.32089, // Adam2020 un-irradiated
+	Double_t x1[n] = {	1.32089,
 						1.48578,
 						1.57853,
 						1.71422,
@@ -211,7 +210,7 @@ void figure4() {
     Double_t ex1[n] = {0.};
     Double_t ey1[n] = {0.};
 
-    const Int_t m = 16;
+    const Int_t m = 16; // // Adam2020 irradiated
  
     Double_t x2[m] = {  1.57853,
                         1.71422,
@@ -249,16 +248,24 @@ void figure4() {
     Double_t ey2[m] = {0.};
 
 	// open file
-    TFile *f = TFile::Open("/media/matthieu/ssd1/Geant4/Data/DataSet_3/data10M.root", "read");
+    TFile *f = TFile::Open("/media/matthieu/ssd1/Geant4/Data/DataSet_3/data1M.root", "read");
 
     //************* variable ***************//
     const int NBR_STRIP = 254;
 
-    const int MAX_CLUSTER_WIDTH = 3;
-    const int CLUSTER_WINDOW =5;
-    const double THRESHOLD = 0.0222; // MeV -> = 4 * (1000 * 3.6 keV)
+    const int MAX_CLUSTER_WIDTH1 = 1;
+    const int CLUSTER_WINDOW1 =5;
+    const double THRESHOLD1 = 0.0222; // MeV -> = 4 * (1000 * 3.6 keV)
 
-    const int NBR_BINS = 100;
+    const int MAX_CLUSTER_WIDTH2 = 2;
+    const int CLUSTER_WINDOW2 =5;
+    const double THRESHOLD2 = 0.0222; // MeV -> = 4 * (1000 * 3.6 keV)
+
+    const int MAX_CLUSTER_WIDTH3 = 3;
+    const int CLUSTER_WINDOW3 =5;
+    const double THRESHOLD3 = 0.0222; // MeV -> = 4 * (1000 * 3.6 keV)
+
+    const int NBR_BINS = 200;
     
     /*Int_t nbrCAT, nbrCA, nbrCBT, nbrCB; // for A and B detectors
     Double_t mCWAT, mCWBT, mCWA, mCWB;
@@ -304,16 +311,24 @@ void figure4() {
 
     TH1* h1 = new TH1D("h1", "Stub efficiency for 2S mini-module", NBR_BINS, 1.0, 3.5);
     h1->SetName("h1");
+    TH1* h2 = new TH1D("h2", "Stub efficiency 2", NBR_BINS, 1.0, 3.5);
+    h2->SetName("h2");
+    TH1* h3 = new TH1D("h3", "Stub efficiency 3", NBR_BINS, 1.0, 3.5);
+    h3->SetName("h3");
 
     gPad->SetTitle("Stub efficiency for 2S mini-module");
 
     // Create vectors for bin content
-    std::vector<double> nbr_stub(NBR_BINS+2, 0);
-    std::vector<double> nbr_event(NBR_BINS+2, 0);
+    std::vector<double> nbr_stub1(NBR_BINS+2, 0);
+    std::vector<double> nbr_event1(NBR_BINS+2, 0);
+    std::vector<double> nbr_stub2(NBR_BINS+2, 0);
+    std::vector<double> nbr_event2(NBR_BINS+2, 0);
+    std::vector<double> nbr_stub3(NBR_BINS+2, 0);
+    std::vector<double> nbr_event3(NBR_BINS+2, 0);
 
     //****************** Main loop over all entries **********************//
     int count_loop = 0;
-    int cnt = 0;
+    int percentage = 0;
     for (int k = 0; k < ENTRIES; k++)
     {
         // fill variables with datas from entry i
@@ -322,63 +337,101 @@ void figure4() {
         std::vector<double> res_A(9, 0);
         std::vector<double> res_B(9, 0);
 
-        bool stub = CBC2(strip_A, strip_B, res_A, res_B, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, THRESHOLD);
+        bool stub1 = CBC2(strip_A, strip_B, res_A, res_B, MAX_CLUSTER_WIDTH1, CLUSTER_WINDOW1, THRESHOLD1);
+        bool stub2 = CBC2(strip_A, strip_B, res_A, res_B, MAX_CLUSTER_WIDTH2, CLUSTER_WINDOW2, THRESHOLD2);
+        bool stub3 = CBC2(strip_A, strip_B, res_A, res_B, MAX_CLUSTER_WIDTH3, CLUSTER_WINDOW3, THRESHOLD3);
 
-        if(stub){nbr_stub.at(h1->FindBin(momentum)) += 1.;}
-        nbr_event.at(h1->FindBin(momentum)) += 1.;
 
-        if(h1->FindBin(momentum) == 4 && stub){
-            cout << "suspect at event number " << k << endl;
-            cnt += 1;
-        }
+        /*CA1 = (int)res_A.at(0); // for A
+        CA2 = (int)res_A.at(1);
+        CA3 = (int)res_A.at(2);
+        CA4 = (int)res_A.at(3);
+        CA5 = (int)res_A.at(4);
+        nbrCAT = (int)res_A.at(5);
+        mCWAT = (double)res_A.at(6);
+        nbrCA = (int)res_A.at(7);
+        mCWA = (double)res_A.at(8);
+
+        CB1 = (int)res_B.at(0); // for B
+        CB2 = (int)res_B.at(1);
+        CB3 = (int)res_B.at(2);
+        CB4 = (int)res_B.at(3);
+        CB5 = (int)res_B.at(4);
+        nbrCBT = (int)res_B.at(5);
+        mCWBT = (double)res_B.at(6);
+        nbrCB = (int)res_B.at(7);
+        mCWB = (double)res_B.at(8);*/
+
+        //corr_stub = stub; // for general
+        if(stub1){nbr_stub1.at(h1->FindBin(momentum)) += 1.;}
+        nbr_event1.at(h1->FindBin(momentum)) += 1.;
+
+        if(stub2){nbr_stub2.at(h2->FindBin(momentum)) += 1.;}
+        nbr_event2.at(h2->FindBin(momentum)) += 1.;
+
+        if(stub3){nbr_stub3.at(h3->FindBin(momentum)) += 1.;}
+        nbr_event3.at(h3->FindBin(momentum)) += 1.;
 
         count_loop += 1;
-        if (count_loop == ENTRIES / 10)
+        if (count_loop == ENTRIES / 100)
         {
         	count_loop = 0;
-        	cout << "*" << endl;
+        	percentage += 1;
+        	cout << percentage << " %" << endl;
         }
     }
     double error = 0., content = 0.;
     for (int i = 1; i <= NBR_BINS; ++i)
     {
-    	content = nbr_stub.at(i) / nbr_event.at(i);
+    	content = nbr_stub1.at(i) / nbr_event1.at(i);
     	h1->SetBinContent(i, content);
-        if(i == 4){
-            cout << "Stubs " << nbr_stub.at(i) << "Events" << nbr_event.at(i) << endl;
-            cout << "content: " << content << endl;
-        }
+    	//error = sqrt(nbr_event1.at(i)) / nbr_event1.at(i); //* content;
+    	//h1->SetBinError(i, error);
+    	content = nbr_stub2.at(i) / nbr_event2.at(i);
+    	h2->SetBinContent(i, content);
+    	content = nbr_stub3.at(i) / nbr_event3.at(i);
+    	h3->SetBinContent(i, content);
     }
     
     h1->SetLineColor(kGreen+2);
-    h1->SetLineWidth(2);
+    h1->SetLineWidth(1);
     //h1->SetLineStyle(9);
     h1->Draw("SAME");
 
-    TGraphErrors *gr1 = new TGraphErrors(n,x1,y1,ex1,ey1);
+    h2->SetLineColor(kBlue+2);
+    h2->SetLineWidth(1);
+    //h1->SetLineStyle(9);
+    h2->Draw("SAME");
+
+    h3->SetLineColor(kMagenta+2);
+    h3->SetLineWidth(1);
+    //h1->SetLineStyle(9);
+    h3->Draw("SAME");
+
+    TGraphErrors *gr1 = new TGraphErrors(n,x1,y1,ex1,ey1); // non-irradiated
     gr1->SetName("gr1");
-    gr1->SetMarkerColor(kRed+2);
-    gr1->SetMarkerStyle(20);
+    gr1->SetMarkerColor(13);
+    gr1->SetMarkerStyle(24);
     gr1->SetMarkerSize(1.2);
     gr1->Draw("SAME P");
 
+    TGraphErrors *gr2 = new TGraphErrors(m,x2,y2,ex2,ey2); // irradiated
+    gr2->SetName("gr2");
+    gr2->SetMarkerColor(13);
+    gr2->SetMarkerStyle(25);
+    gr2->SetMarkerSize(1.2);
+    gr2->Draw("SAME P");
+
     TF1* func1 = new TF1("func1", "([0]/(1+ TMath::Exp(-[1]*(x-[2]))))", x1[0], x1[n-1]);
     func1->SetParameters(1, 15, 2);
-    func1->SetLineColor(kRed+2);
+    func1->SetLineColor(13);
     func1->SetLineWidth(1);
     func1->SetLineStyle(7);
     gr1->Fit(func1);
 
-    TGraphErrors *gr2 = new TGraphErrors(m,x2,y2,ex2,ey2);
-    gr2->SetName("gr2");
-    gr2->SetMarkerColor(kBlue+2);
-    gr2->SetMarkerStyle(20);
-    gr2->SetMarkerSize(1.2);
-    gr2->Draw("SAME P");
-
     TF1* func2 = new TF1("func2", "([0]/(1+ TMath::Exp(-[1]*(x-[2]))))", x2[0], x2[m-1]);
     func2->SetParameters(1, 15, 2);
-    func2->SetLineColor(kBlue+2);
+    func2->SetLineColor(13);
     func2->SetLineWidth(1);
     func2->SetLineStyle(7);
     gr2->Fit(func2);
@@ -396,8 +449,10 @@ void figure4() {
 
     auto legend = new TLegend(0.65,0.1,0.9,0.35);
     legend->AddEntry("gr1","Adam et al. 2020 - non-irradiated","p");
-    legend->AddEntry("h1","Geant4","l");
     legend->AddEntry("gr2","Adam et al. 2020 - irradiated","p");
+    legend->AddEntry("h1","Geant4: max cluster width = 1","l");
+    legend->AddEntry("h2","Geant4: max cluster width = 2","l");
+    legend->AddEntry("h3","Geant4: max cluster width = 3","l");
     legend->Draw();
 
     gPad->Modified();

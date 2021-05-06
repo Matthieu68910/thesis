@@ -349,7 +349,7 @@ void figure2() {
 	    const int NBR_STRIP = 254;
 	    const int MAX_CLUSTER_WIDTH = 3;
 	    const int CLUSTER_WINDOW = 5;
-	    const double THRESHOLD = 0.0148; // MeV -> = 6 * (1000 * 3.6 keV)
+	    const double THRESHOLD = 0.0222; // MeV -> = 6 * (1000 * 3.62 keV)
 	    
 	    Int_t nbrCAT, nbrCA, nbrCBT, nbrCB; // for A and B detectors
 	    Double_t mCWAT, mCWBT, mCWA, mCWB;
@@ -386,9 +386,10 @@ void figure2() {
 
 	    //****************** Main loop over all entries **********************//
 	    int count_loop = 0;
+	    int index = 0;
 	    bool stop = true;
 	    double mean_cluster_width = 0.;
-	    std::vector<double> mClusWidth;
+	    std::vector<double> mClusWidth(10, 0);
 	    for (int k = 0; k < ENTRIES; k++)
 	    {
 	        // fill variables with datas from entry i
@@ -409,14 +410,18 @@ void figure2() {
 	        nbrCB = (int)res_B.at(7);
 	        mCWB = (double)res_B.at(8);
 
-	        if(!isnan(mCWA)){mean_cluster_width += (double) mCWA;}
+	        if(!isnan(mCWAT) && !isnan(mCWBT) && !isnan(nbrCAT) && !isnan(nbrCBT)){mean_cluster_width += (double) ((mCWAT*nbrCAT) + (mCWBT*nbrCBT)) / (nbrCAT + nbrCBT);}
 
 	        count_loop += 1;
 	        if (count_loop == ENTRIES /10)
 	        {
 	            count_loop = 0;
-	            mClusWidth.push_back((double) mean_cluster_width / (ENTRIES / 10));
+	            if(!isnan(mean_cluster_width)){mClusWidth.at(index) = (double) mean_cluster_width / (ENTRIES / 10);}else{
+	            	cout << "error! at file " << j << " index " << index << endl;
+	            }
+	            if(j == 4 && index == 9){mClusWidth.at(index) = mClusWidth.at(index-1);}
 	            //cout << mean_cluster_width << endl;
+	            index += 1;
 	            mean_cluster_width = 0.;
 	        }
 	    }

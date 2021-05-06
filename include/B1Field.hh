@@ -50,9 +50,8 @@ public:
   /// point[] is in global coordinates: x,y,z,t.
   virtual void GetFieldValue(const G4double Point[4], G4double* Bfield) const;
 
-private:
-  G4double Bx1, By1, Bz1, Ex1, Ey1, Ez1;
-  G4double Bx2, By2, Bz2, Ex2, Ey2, Ez2;
+protected:
+  G4double backplane;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

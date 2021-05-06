@@ -4,7 +4,8 @@
 #include <random>
 
 std::default_random_engine generator;
-std::normal_distribution<double> distribution(0.00362, 0.00220994475); // µ = 1000 e-, s = 800 e-
+std::normal_distribution<double> distribution(0., 0.0028779); // µ = 0 e-, s = 2.12*375 = 795 e-
+std::uniform_real_distribution<> distribution1(0.0, 1.0);
 
 bool CBC2(
 	const vector<double> &strip_A, 
@@ -13,7 +14,8 @@ bool CBC2(
 	vector<double> &res_B,
 	const int MAX_CLUSTER_WIDTH = 3,
 	const int CLUSTER_WINDOW = 5,
-	double THRESHOLD = 0.0222
+	double THRESHOLD = 0.0222,
+    double kill_value = 0.04331
 	){
 
 	const int NBR_STRIP = strip_A.size();
@@ -26,7 +28,8 @@ bool CBC2(
 	// Loop on sensor A strips
 	for (int i = 0; i < NBR_STRIP; ++i)
     {
-    	double strip_energy = abs(strip_A[i] + distribution(generator));
+    	double strip_energy = strip_A[i] + abs(distribution(generator));
+        if(distribution1(generator) < kill_value){strip_energy = 0.;}
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -69,7 +72,8 @@ bool CBC2(
 	// Loop on sensor B strips
 	for (int i = 0; i < NBR_STRIP; ++i)
     {
-    	double strip_energy = abs(strip_B[i] + distribution(generator));
+    	double strip_energy = strip_B[i] + abs(distribution(generator));
+        if(distribution1(generator) < kill_value){strip_energy = 0.;}
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -156,7 +160,7 @@ bool CBC2(
     return false;
 }
 
-void figure1() {
+void figure13() {
 	// data for Adam2020
 
 	// open file
@@ -168,42 +172,106 @@ void figure1() {
     const int MAX_CLUSTER_WIDTH = 3;
     const int CLUSTER_WINDOW = 5;
 
-    const int NBR_BINS = 18;
-    //const double LOWER_SIDE = 0.5;
-    //const double INCREMENT = 0.5;
+    const int NBR_BINS = 14;
 
     // array creation
-    Double_t x1[NBR_BINS] = {	2.0,
-							    2.2,
-							    2.4,
-							    2.6,
-							    2.8,
-							    3.0,
-							    3.5,
-							    4.0,
-							    4.5,
-							    5.0,
-							    7.5,
-							    10.0,
-							    15.0,
-							    20.0,
-							    25.0,
-							    30.0,
-							    35.0,
-							    40.0}; // in keV !!!
+    Double_t x1[NBR_BINS] = {	2.715000, // D0 geant4
+                                5.491088,
+                                8.267175,
+                                10.898010,
+                                19.081020,
+                                21.857108,
+                                27.263080,
+                                35.299751,
+                                40.852334,
+                                59.847831,
+                                70.660726,
+                                76.101993,
+                                81.473621,
+                                86.880000}; // in keV !!!
     Double_t y1[NBR_BINS] = {0.};
     Double_t ex1[NBR_BINS] = {0.};
     Double_t ey1[NBR_BINS] = {0.};
 
-    Double_t x2[NBR_BINS] = {0.};
+    Double_t x2[NBR_BINS] = {   2.86161000, // D1 geant4
+                                5.63769750,
+                                8.26717500,
+                                11.04326250,
+                                19.22627250,
+                                21.85710750,
+                                27.26307975,
+                                35.44581825,
+                                40.85233350,
+                                59.91163350,
+                                70.80679275,
+                                76.21330800,
+                                81.61968750,
+                                87.02606700}; // in keV !!!
     Double_t y2[NBR_BINS] = {0.};
     Double_t ex2[NBR_BINS] = {0.};
     Double_t ey2[NBR_BINS] = {0.};
 
-    for (int i = 0; i < NBR_BINS; ++i)
-    {
-    	x1[i] = x2[i] = x1[i] * 3.62;
-    }
+    Double_t x3[NBR_BINS] = {   2.715000, // D0 Adam
+                                5.491088,
+                                8.267175,
+                                10.898010,
+                                19.081020,
+                                21.857108,
+                                27.263080,
+                                35.299751,
+                                40.852334,
+                                59.847831,
+                                70.660726,
+                                76.101993,
+                                81.473621,
+                                86.880000}; // in keV !!!
+    Double_t y3[NBR_BINS] = {   38.080700,
+                                20.937800,
+                                4.368410,
+                                1.542830,
+                                1.157780,
+                                1.144010,
+                                1.116960,
+                                1.090560,
+                                1.077590,
+                                0.944719,
+                                0.717475,
+                                0.581773,
+                                0.466412,
+                                0.362798};
+    Double_t ex3[NBR_BINS] = {0.};
+    Double_t ey3[NBR_BINS] = {0.};
+
+    Double_t x4[NBR_BINS] = {   2.86161000, // D1 Adam
+                                5.63769750,
+                                8.26717500,
+                                11.04326250,
+                                19.22627250,
+                                21.85710750,
+                                27.26307975,
+                                35.44581825,
+                                40.85233350,
+                                59.91163350,
+                                70.80679275,
+                                76.21330800,
+                                81.61968750,
+                                87.02606700}; // in keV !!!
+    Double_t y4[NBR_BINS] = {   41.406900,
+                                19.959500,
+                                3.438860,
+                                1.470740,
+                                1.200090,
+                                1.185810,
+                                1.144010,
+                                1.116960,
+                                1.103680,
+                                0.972574,
+                                0.734848,
+                                0.599618,
+                                0.472025,
+                                0.376055};
+    Double_t ex4[NBR_BINS] = {0.};
+    Double_t ey4[NBR_BINS] = {0.};
 
 
     //************ Get the TTree ******************************************
@@ -245,8 +313,8 @@ void figure1() {
     for (int j = 0; j < NBR_BINS; ++j)
     {
 	    // Create vectors for stat
-	    std::vector<double> nbr_clusterA(10, 0);
-	    std::vector<double> nbr_clusterB(10, 0);
+	    std::vector<double> nbr_hitsA(10, 0);
+	    std::vector<double> nbr_hitsB(10, 0);
 
 	    //****************** Main loop over all entries **********************//
 	    int count_loop = 0;
@@ -256,14 +324,17 @@ void figure1() {
 	        // fill variables with datas from entry i
 	        data->GetEntry(k);
 
-	        std::vector<double> res_A(9, 0);
-	        std::vector<double> res_B(9, 0);
+	        std::vector<double> res_A1(9, 0);
+	        std::vector<double> res_B1(9, 0);
+            std::vector<double> res_A2(9, 0);
+            std::vector<double> res_B2(9, 0);
 
-	        bool stub1 = CBC2(strip_A, strip_B, res_A, res_B, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, x1[j]/1000);
+	        bool stub1 = CBC2(strip_A, strip_B, res_A1, res_B1, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, x1[j]/1000);
+            bool stub2 = CBC2(strip_A, strip_B, res_A2, res_B2, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, x2[j]/1000);
 
-	        nbr_clusterA.at(loop_number) += (double)res_A.at(5) / (ENTRIES / 10);
+	        nbr_hitsA.at(loop_number) += (double)res_A1.at(5) / (ENTRIES / 10);
 
-	        nbr_clusterB.at(loop_number) += (double)res_B.at(5) / (ENTRIES / 10);
+	        nbr_hitsB.at(loop_number) += (double)res_B2.at(5) / (ENTRIES / 10);
 
 	        count_loop += 1;
 	        if (count_loop == ENTRIES / 10)
@@ -273,8 +344,8 @@ void figure1() {
 	        }
 	    }
 	    double variance1 = 0., deviation1 = 0., average1 = 0.;
-		average1 = std::accumulate(nbr_clusterA.begin(), nbr_clusterA.end(), 0.0) / 10;
-		for (int i = 0; i < 10; ++i){variance1 += pow((nbr_clusterA.at(i) - average1), 2);}
+		average1 = std::accumulate(nbr_hitsA.begin(), nbr_hitsA.end(), 0.0) / 10;
+		for (int i = 0; i < 10; ++i){variance1 += pow((nbr_hitsA.at(i) - average1), 2);}
 		variance1 /= 9;
 		deviation1 = sqrt(variance1);
 		
@@ -283,8 +354,8 @@ void figure1() {
 		ey1[j] = deviation1;
 
 		double variance2 = 0., deviation2 = 0., average2 = 0.;
-		average2 = std::accumulate(nbr_clusterB.begin(), nbr_clusterB.end(), 0.0) / 10;
-		for (int i = 0; i < 10; ++i){variance2 += pow((nbr_clusterB.at(i) - average2), 2);}
+		average2 = std::accumulate(nbr_hitsB.begin(), nbr_hitsB.end(), 0.0) / 10;
+		for (int i = 0; i < 10; ++i){variance2 += pow((nbr_hitsB.at(i) - average2), 2);}
 		variance2 /= 9;
 		deviation2 = sqrt(variance2);
 		cout << std::scientific << x1[j] << "\t" << average1 << "\t" << deviation1 << "\t" << average2 << "\t" << deviation2 << endl;

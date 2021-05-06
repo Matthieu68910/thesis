@@ -38,10 +38,10 @@ B1PrimaryGeneratorAction::B1PrimaryGeneratorAction()
   fParticleGun  = new G4ParticleGun(n_particle);
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4String particleName;
-  G4ParticleDefinition* particle = particleTable->FindParticle(particleName="e+");
+  G4ParticleDefinition* particle = particleTable->FindParticle(particleName="pi+");
   fParticleGun->SetParticleDefinition(particle);
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1.,0.,0.));
-  fParticleGun->SetParticleEnergy(5.*GeV);
+  fParticleGun->SetParticleEnergy(120.*GeV);
 
   //create a messenger for this class
   fGunMessenger = new B1PrimaryGeneratorMessenger(this);

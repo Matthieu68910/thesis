@@ -9,9 +9,6 @@
 #
 /random/setSeeds 5463285 7562145
 /run/printProgress 100000
-#
-/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/DataSet_3/data10M
-/generator/momentum/SetRandom true
-/generator/momentum/SetRandomMinValue 1.0
-/generator/momentum/SetRandomMaxValue 3.5
-/run/beamOn 10000000
+#/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/data
+/run/beamOn 1
+
