@@ -72,6 +72,7 @@ void B1Field::GetFieldValue( const G4double Point[4], G4double* Bfield ) const
       Bfield[3]=0.;
       Bfield[4]=0.;
       Bfield[5]= - (4.6394E+9 * ((Point[2] - backplane + 0.0585) / 1000)) * volt/m;
+      //G4cout << "    calc = " << G4BestUnit((Point[2] - backplane + 0.0585), "Length") << G4endl;
   } else                // Ez1(9.0E+5*volt/m)
   {
       Bfield[0]=0.;
@@ -79,12 +80,12 @@ void B1Field::GetFieldValue( const G4double Point[4], G4double* Bfield ) const
       Bfield[2]=0.;
       Bfield[3]=0.;
       Bfield[4]=0.;
-      Bfield[5]= (4.6394E+9 * ((Point[2] + backplane + 0.0585) / 1000)) * volt/m;
+      Bfield[5]= (4.6394E+9 * ((0.0585 - (Point[2] + backplane)) / 1000)) * volt/m;
+      //G4cout << "    calc = " << G4BestUnit((0.0585 - (Point[2] + backplane)), "Length") << G4endl;
   }
 
-  G4cout << "z = " << G4BestUnit(Point[2], "Length") << " Field = " << G4BestUnit(Bfield[5], "Electric field") << G4endl;
-  G4cout << "    calc = " << G4BestUnit((Point[2] - backplane + 0.0585), "Length") << G4endl;
-  G4cout << "    bkpl = " << G4BestUnit(backplane, "Length") << G4endl;
+  //G4cout << "z = " << G4BestUnit(Point[2], "Length") << " Field = " << G4BestUnit(Bfield[5], "Electric field") << G4endl;
+  //G4cout << "    bkpl = " << G4BestUnit(backplane, "Length") << G4endl;
 
   return;
 }
