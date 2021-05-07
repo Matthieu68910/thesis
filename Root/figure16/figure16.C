@@ -474,7 +474,7 @@ void figure16() {
     auto legend = new TLegend(0.7,0.9,0.9,0.75);
     legend->AddEntry("gr1","Geant4","ep");
     legend->AddEntry("gr2","Adam et al. - non-irr.","ep");
-    legend->AddEntry("gr3","Adam et al. - top sensor","p");
+    legend->AddEntry("gr3","Adam et al. - irradiated","ep");
     legend->Draw();
 
     gPad->Modified();
