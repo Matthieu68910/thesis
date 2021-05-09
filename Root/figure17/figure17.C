@@ -5,7 +5,7 @@
 #include <fstream>
 
 std::default_random_engine generator;
-std::normal_distribution<double> distribution(0., 0.795); // µ = 0 e-, s = 2.13*375*3.62
+std::normal_distribution<double> distribution(0., 0.795); // µ = 0 e-, s = 2.13*375
 std::uniform_real_distribution<> distribution1(0.0, 1.0);
 
 bool CBC2(
@@ -15,7 +15,7 @@ bool CBC2(
 	vector<double> &res_B,
 	const int MAX_CLUSTER_WIDTH = 3,
 	const int CLUSTER_WINDOW = 5,
-	double THRESHOLD = 0.0222,
+	double THRESHOLD = 5.1975,
     double kill_value = 0.04331
 	){
 
@@ -31,7 +31,8 @@ bool CBC2(
 	// Loop on sensor A strips
 	for (int i = 0; i < NBR_STRIP; ++i)
     {
-    	double strip_energy = strip_A[i] + abs(distribution(generator));
+    	double strip_energy = (strip_A[i] / 0.00362) + distribution(generator);
+    	if(strip_energy < 0){strip_energy = 0;}
         //if(distribution1(generator) < kill_value){strip_energy = 0.;}
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
@@ -78,7 +79,8 @@ bool CBC2(
 	// Loop on sensor B strips
 	for (int i = 0; i < NBR_STRIP; ++i)
     {
-    	double strip_energy = strip_B[i] + abs(distribution(generator));
+    	double strip_energy = (strip_B[i] / 0.00362) + distribution(generator);
+    	if(strip_energy < 0){strip_energy = 0.;}
         //if(distribution1(generator) < kill_value){strip_energy = 0.;}
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
@@ -177,7 +179,7 @@ void SaveData(
 
 	// open file
 	ofstream myfile;
-    myfile.open ("figure17_data.txt");
+    myfile.open ("figure17_data-1.txt");
     myfile << "x\ty\tey\n";
     for (int i = 0; i < k; ++i)
     {
@@ -364,7 +366,7 @@ void figure17() {
     {
         //CopyFile(j);
 
-        string file_path = "/media/matthieu/ssd1/Geant4/Data/Data_figure17-19/data_";
+        string file_path = "/media/matthieu/ssd1/Geant4/Data/Data_figure17-19-newCC/data_";
         file_path += std::to_string(j);
         file_path += ".root";
         char const *pchar = file_path.c_str();
@@ -375,7 +377,7 @@ void figure17() {
 	    const int NBR_STRIP = 254;
 	    const int MAX_CLUSTER_WIDTH = 3;
 	    const int CLUSTER_WINDOW = 5;
-	    const double THRESHOLD = 0.019005; // (14 * 375 * 3.62) / 1000000
+	    const double THRESHOLD = 5.1975; // (14 * 375 * 3.62) / 1000000
 	    
 	    Int_t nbrCAT, nbrCA, nbrCBT, nbrCB; // for A and B detectors
 	    Double_t mCWAT, mCWBT, mCWA, mCWB;
@@ -548,7 +550,7 @@ void figure17() {
 
     gPad->Modified();
 
-    c1->SaveAs("figure17.pdf");
+    c1->SaveAs("figure17-1.pdf");
     //c1->SaveAs("figure17.png");
 
     SaveData(k, x2, y2, ey2);

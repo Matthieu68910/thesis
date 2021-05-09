@@ -67,28 +67,28 @@ void B1SteppingAction::UserSteppingAction(const G4Step* step)
           G4double edepStep = step->GetTotalEnergyDeposit();
           // get position
           G4double pos_x = step->GetPreStepPoint()->GetPosition().getX();
-          G4cout << "pos_x = " << pos_x << G4endl;
+          //G4cout << "pos_x = " << pos_x << G4endl;
           G4double pos_strip;
           if(stripNbr <= 253){
               pos_strip = (stripNbr - 127 + 0.5) * 0.09*mm;
           }else{
               pos_strip = (stripNbr - 381 + 0.5) * 0.09*mm;
           }
-          G4cout << "pos_strip = " << pos_strip << G4endl;
+          //G4cout << "pos_strip = " << pos_strip << G4endl;
           G4double difference = pos_x - pos_strip; // < +/- 45*um
-          G4cout << "difference = " << difference << G4endl;
+          //G4cout << "difference = " << difference << G4endl;
           if(difference > 0){
-              G4double factor = difference / (90.*um);
-              G4cout << "Factor+ = " << factor << G4endl;
+              G4double factor = pow((difference / (45.*um)), 20) * 0.5;
+              //G4cout << "Factor+ = " << factor << G4endl;
               fEventAction->AddEnergy(stripNbr, (edepStep * (1-factor)));
-              fEventAction->AddEnergy(stripNbr+1, (edepStep * factor));
+              if(stripNbr < 507){fEventAction->AddEnergy(stripNbr+1, (edepStep * factor));}
           }else if(difference < 0){
-              G4double factor = -difference / (90.*um);
-              G4cout << "Factor- = " << factor << G4endl;
+              G4double factor = pow((-difference / (45.*um)), 20) * 0.5;
+              //G4cout << "Factor- = " << factor << G4endl;
               fEventAction->AddEnergy(stripNbr, (edepStep * (1-factor)));
-              fEventAction->AddEnergy(stripNbr-1, (edepStep * factor));
+              if(stripNbr > 0){fEventAction->AddEnergy(stripNbr-1, (edepStep * factor));}
           }
-          G4cout << G4endl;
+          //G4cout << G4endl;
 
 
           /*

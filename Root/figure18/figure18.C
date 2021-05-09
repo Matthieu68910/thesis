@@ -26,7 +26,8 @@ bool CBC2(
 	// Loop on sensor A strips
 	for (int i = 0; i < NBR_STRIP; ++i)
     {
-    	double strip_energy = (strip_A[i] / 0.00362) + abs(distribution(generator));
+    	double strip_energy = (strip_A[i] / 0.00362) + distribution(generator);
+    	if(strip_energy < 0){strip_energy = 0;}
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -69,7 +70,8 @@ bool CBC2(
 	// Loop on sensor B strips
 	for (int i = 0; i < NBR_STRIP; ++i)
     {
-    	double strip_energy = (strip_B[i] / 0.00362) + abs(distribution(generator));
+    	double strip_energy = (strip_B[i] / 0.00362) + distribution(generator);
+    	if(strip_energy < 0){strip_energy = 0;}
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -169,7 +171,7 @@ void SaveData(
 
 	// open file
 	ofstream myfile;
-    myfile.open ("figure18_data.txt");
+    myfile.open ("figure18_data-1.txt");
     myfile << "x\ty1\tey1\ty2\tey2\ty3\tey3\n";
     for (int i = 0; i < k; ++i)
     {
@@ -464,7 +466,7 @@ void figure18() {
     {
         //CopyFile(j);
 
-        string file_path = "/media/matthieu/ssd1/Geant4/Data/Data_figure17-19/data_";
+        string file_path = "/media/matthieu/ssd1/Geant4/Data/Data_figure17-19-newCC/data_";
         file_path += std::to_string(j);
         file_path += ".root";
         char const *pchar = file_path.c_str();
@@ -666,7 +668,7 @@ void figure18() {
 
     gPad->Modified();
 
-    c1->SaveAs("figure18.pdf");
+    c1->SaveAs("figure18-1.pdf");
 
     SaveData(k, x4, y4, ey4, y5, ey5, y6, ey6);
 }
