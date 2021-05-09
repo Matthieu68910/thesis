@@ -25,7 +25,7 @@ bool CBC2(
     // Loop on sensor A strips
     for (int i = 0; i < NBR_STRIP; ++i)
     {
-        double strip_energy = (strip_A[i] / 0.00362) + abs(distribution(generator));
+        double strip_energy = (strip_A[i] / 0.00362) + distribution(generator);
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -68,7 +68,7 @@ bool CBC2(
     // Loop on sensor B strips
     for (int i = 0; i < NBR_STRIP; ++i)
     {
-        double strip_energy = (strip_B[i] / 0.00362) + abs(distribution(generator));
+        double strip_energy = (strip_B[i] / 0.00362) + distribution(generator);
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -341,7 +341,7 @@ void figure20_0() {
     {
         //CopyFile(j);
 
-        string file_path = "/media/matthieu/ssd1/Geant4/Data/Data_figure20/data_";
+        string file_path = "/media/matthieu/ssd1/Geant4/Data/Data_figure20-newCC/data_";
         file_path += std::to_string(j);
         file_path += ".root";
         char const *pchar = file_path.c_str();
@@ -520,9 +520,9 @@ void figure20_0() {
 	A1->Draw("SAME");
 
     auto legend = new TLegend(0.6,0.1,0.9,0.4);
-    legend->AddEntry("gr1","Adam et al. - non-irr. 2.75 mm","p");
-    legend->AddEntry("gr2","Adam et al. - irr. 3.05 mm","p");
-    legend->AddEntry("gr3","Geant4 - 2.75 mm","ep");
+    legend->AddEntry("gr1","Adam et al. - non-irr.","p");
+    legend->AddEntry("gr2","Adam et al. - irr.","p");
+    legend->AddEntry("gr3","Geant4 - 2.63 mm","ep");
     legend->Draw();
 
     gPad->Modified();

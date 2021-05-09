@@ -171,7 +171,7 @@ void SaveData(
 
 	// open file
 	ofstream myfile;
-    myfile.open ("figure18_data-1.txt");
+    myfile.open ("figure18_data.txt");
     myfile << "x\ty1\tey1\ty2\tey2\ty3\tey3\n";
     for (int i = 0; i < k; ++i)
     {
@@ -668,7 +668,7 @@ void figure18() {
 
     gPad->Modified();
 
-    c1->SaveAs("figure18-1.pdf");
+    c1->SaveAs("figure18.pdf");
 
     SaveData(k, x4, y4, ey4, y5, ey5, y6, ey6);
 }

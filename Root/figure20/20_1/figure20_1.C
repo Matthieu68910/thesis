@@ -3,7 +3,7 @@
 #include <iostream>
 
 std::default_random_engine generator;
-std::normal_distribution<double> distribution(0.00362, 0.00220994475); // µ = 1000 e-, s = 800 e-
+std::normal_distribution<double> distribution(0., 0.795); // µ = 1000 e-, s = 800 e-
 
 bool CBC2(
     const vector<double> &strip_A, 
@@ -12,7 +12,7 @@ bool CBC2(
     vector<double> &res_B,
     const int MAX_CLUSTER_WIDTH = 3,
     const int CLUSTER_WINDOW = 5,
-    const double THRESHOLD = 0.0222
+    const double THRESHOLD = 5.1975
     ){
 
     const int NBR_STRIP = strip_A.size();
@@ -25,7 +25,7 @@ bool CBC2(
     // Loop on sensor A strips
     for (int i = 0; i < NBR_STRIP; ++i)
     {
-        double strip_energy = abs(strip_A[i] + distribution(generator));
+        double strip_energy = (strip_A[i] / 0.00362) + distribution(generator);
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -68,7 +68,7 @@ bool CBC2(
     // Loop on sensor B strips
     for (int i = 0; i < NBR_STRIP; ++i)
     {
-        double strip_energy = abs(strip_B[i] + distribution(generator));
+        double strip_energy = (strip_B[i] / 0.00362) + distribution(generator);
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -156,7 +156,7 @@ bool CBC2(
 }
 
 
-void figure4_1() {
+void figure20_1() {
 	const Int_t n = 24; // data for Adam2020
  
 	Double_t x1[n] = {	1.32089,
@@ -248,22 +248,22 @@ void figure4_1() {
     Double_t ey2[m] = {0.};
 
 	// open file
-    TFile *f = TFile::Open("/media/matthieu/ssd1/Geant4/Data/DataSet_3/data1M.root", "read");
+    TFile *f = TFile::Open("/media/matthieu/ssd1/Geant4/Data/Data_figure20-1/data1M.root", "read");
 
     //************* variable ***************//
     const int NBR_STRIP = 254;
 
     const int MAX_CLUSTER_WIDTH1 = 1;
     const int CLUSTER_WINDOW1 =5;
-    const double THRESHOLD1 = 0.0222; // MeV -> = 4 * (1000 * 3.6 keV)
+    const double THRESHOLD1 = 5.1975; // MeV -> = 4 * (1000 * 3.6 keV)
 
     const int MAX_CLUSTER_WIDTH2 = 2;
     const int CLUSTER_WINDOW2 =5;
-    const double THRESHOLD2 = 0.0222; // MeV -> = 4 * (1000 * 3.6 keV)
+    const double THRESHOLD2 = 5.1975; // MeV -> = 4 * (1000 * 3.6 keV)
 
     const int MAX_CLUSTER_WIDTH3 = 3;
     const int CLUSTER_WINDOW3 =5;
-    const double THRESHOLD3 = 0.0222; // MeV -> = 4 * (1000 * 3.6 keV)
+    const double THRESHOLD3 = 5.1975; // MeV -> = 4 * (1000 * 3.6 keV)
 
     const int NBR_BINS = 200;
     
@@ -279,7 +279,7 @@ void figure4_1() {
     auto data = f->Get<TTree>("data");
 
     // Get the number of entries in TTree
-    const int ENTRIES = data->GetEntries();
+    const int ENTRIES = data->GetEntries() / 10;
     //cout << std::scientific << "Number of entries: " << ENTRIES << endl;
 
     //**************** Set BranchAddress for datas recovery ***************
@@ -303,7 +303,7 @@ void figure4_1() {
     data->SetBranchAddress("momentum", &momentum);
 
     //****************** Create Histo ************************************//
-    auto c1 = new TCanvas("c1","c1",1920,1080);
+    auto c1 = new TCanvas("c1","c1",1000,600);
 	c1->SetTitle("Stub efficiency for 2S mini-module");
 	gStyle->SetOptStat(0);
 	gPad->SetGridx(1);
@@ -422,28 +422,53 @@ void figure4_1() {
     gr2->SetMarkerSize(1.2);
     gr2->Draw("SAME P");
 
-    TF1* func1 = new TF1("func1", "([0]/(1+ TMath::Exp(-[1]*(x-[2]))))", x1[0], x1[n-1]);
-    func1->SetParameters(1, 15, 2);
+    TF1* func1 = new TF1("func1", "(0.5*[0]*(1+ TMath::Erf((x-[1])/[2])))", x1[0], x1[n-1]);
+    func1->SetParameters(0.98, 1.85, 0.15);
     func1->SetLineColor(13);
     func1->SetLineWidth(1);
     func1->SetLineStyle(7);
     gr1->Fit(func1);
 
-    TF1* func2 = new TF1("func2", "([0]/(1+ TMath::Exp(-[1]*(x-[2]))))", x2[0], x2[m-1]);
-    func2->SetParameters(1, 15, 2);
+    TF1* func2 = new TF1("func2", "(0.5*[0]*(1+ TMath::Erf((x-[1])/[2])))", x2[0], x2[m-1]);
+    func2->SetParameters(0.98, 1.85, 0.15);
     func2->SetLineColor(13);
     func2->SetLineWidth(1);
     func2->SetLineStyle(7);
     gr2->Fit(func2);
 
-    TAxis *xaxis = h1->GetXaxis();
-    TAxis *yaxis = h1->GetYaxis();
-    xaxis->SetTitle("Emulated pT [GeV]");
-    //xaxis->Set(25, 1.0, 3.5);
+    TAxis *xaxis = gr2->GetXaxis();
+    TAxis *yaxis = gr2->GetYaxis();
+    xaxis->SetLabelFont(42);
+    xaxis->SetLabelSize(0.04);
+    xaxis->SetTitle("pT [GeV]");
+    xaxis->SetTitleFont(22);
+    xaxis->SetTitleSize(0.05);
+    xaxis->SetTitleOffset(0.95);
     xaxis->SetRangeUser(1.0, 3.5);
-
+    yaxis->SetLabelFont(42);
+    yaxis->SetLabelSize(0.04);
     yaxis->SetTitle("Stub efficiency");
+    yaxis->SetTitleFont(22);
+    yaxis->SetTitleSize(0.05);
+    yaxis->SetTitleOffset(0.9);
     yaxis->SetRangeUser(0., 1.1);
+
+    TF1* f1 = new TF1("f1", "x", 1.0, 3.5);
+    TGaxis* A1 = new TGaxis(1.0, yaxis->GetXmax(), 3.5, yaxis->GetXmax(), "f1", 510, "-");
+    A1->SetLabelFont(42);
+    A1->SetLabelSize(0.04);
+    A1->SetTitle("Angle d'incidence [deg]");
+    A1->SetTitleFont(22);
+    A1->SetTitleSize(0.05);
+    A1->SetTitleOffset(0.95);
+    A1->ChangeLabel(1, -1, -1, -1, -1, -1, "19.6");
+    A1->ChangeLabel(2, -1, -1, -1, -1, -1, "13.1");
+    A1->ChangeLabel(3, -1, -1, -1, -1, -1, "9.8");
+    A1->ChangeLabel(4, -1, -1, -1, -1, -1, "7.8");
+    A1->ChangeLabel(5, -1, -1, -1, -1, -1, "6.5");
+    A1->ChangeLabel(6, -1, -1, -1, -1, -1, "5.6");
+    A1->ChangeLabel(7, -1, -1, -1, -1, -1, "");
+    A1->Draw("SAME");
 
     c1->RedrawAxis();
 
@@ -460,4 +485,5 @@ void figure4_1() {
 
     // Close file when finished
     //f.Close();
+    c1->SaveAs("figure20_1.pdf");
 }

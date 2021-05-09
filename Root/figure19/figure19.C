@@ -4,7 +4,7 @@
 #include <random>
 
 std::default_random_engine generator;
-std::normal_distribution<double> distribution(0., 0.002891475); // µ = 0 e-, s = 2.13*375*3.62
+std::normal_distribution<double> distribution(0., 0.795); // µ = 0 e-, s = 2.13*375*3.62
 std::uniform_real_distribution<> distribution1(0.0, 1.0);
 
 bool CBC2(
@@ -16,7 +16,7 @@ bool CBC2(
 	vector<double> &res_B,
 	const int MAX_CLUSTER_WIDTH = 3,
 	const int CLUSTER_WINDOW = 5,
-	double THRESHOLD = 0.0222,
+	double THRESHOLD = 5.1975,
     double kill_value = 0.04331
 	){
 
@@ -32,7 +32,7 @@ bool CBC2(
 	// Loop on sensor A strips
 	for (int i = 0; i < NBR_STRIP; ++i)
     {
-    	double strip_energy = strip_A[i] + abs(distribution(generator));
+    	double strip_energy = (strip_A[i] / 0.00362) + distribution(generator);
         //if(distribution1(generator) < kill_value){strip_energy = 0.;}
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
@@ -79,7 +79,7 @@ bool CBC2(
 	// Loop on sensor B strips
 	for (int i = 0; i < NBR_STRIP; ++i)
     {
-    	double strip_energy = strip_B[i] + abs(distribution(generator));
+    	double strip_energy = (strip_B[i] / 0.00362) + distribution(generator);
         //if(distribution1(generator) < kill_value){strip_energy = 0.;}
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
@@ -155,7 +155,7 @@ bool CBC2(
         double pos_real = x0 + (tan(theta_i) * 0.135);
         //cout << "pos_sensor = " << pos_sensor << endl;
         //cout << "pos_real = " << pos_real << endl;
-        if(abs(pos_real - pos_sensor) <= (0.103923 / cos(theta_i))){match = true;}
+        if(abs(pos_real - pos_sensor) <= (0.113643 / cos(theta_i))){match = true;}
         //cout << "match : " << match << endl;
     }
 
@@ -183,10 +183,6 @@ bool CBC2(
 
 void figure19() {
 	// data for Adam2020
-
-	// open file
-    TFile *f = TFile::Open("/media/matthieu/ssd1/Geant4/Data/Data_figure13-16/data100k_pions.root", "read");
-
     const Int_t n = 25; // adam2020 non-irradiated
  
     Double_t x2[n] = {  1.300,
@@ -393,7 +389,7 @@ void figure19() {
     Double_t ey1[index] = {0.};
 
     //****************** Create Histo ************************************//
-    auto c1 = new TCanvas("c1","c1",1920,1080);
+    auto c1 = new TCanvas("c1","c1",1000,600);
 	c1->SetTitle("Figure 1: threshold variation");
 	gStyle->SetOptStat(0);
 	gPad->SetGridx(1);
@@ -407,7 +403,7 @@ void figure19() {
     {
         //CopyFile(j);
 
-        string file_path = "/media/matthieu/ssd1/Geant4/Data/Data_figure17-19/data_";
+        string file_path = "/media/matthieu/ssd1/Geant4/Data/Data_figure17-19-newCC/data_";
         file_path += std::to_string(j);
         file_path += ".root";
         char const *pchar = file_path.c_str();
@@ -416,9 +412,9 @@ void figure19() {
 
         //************* variable ***************//
         const int NBR_STRIP = 254;
-        const int MAX_CLUSTER_WIDTH = 5;
-        const int CLUSTER_WINDOW = 5;
-        const double THRESHOLD = 0.019005; // (14 * 375 * 3.62) / 1000000
+        const int MAX_CLUSTER_WIDTH = 10;
+        const int CLUSTER_WINDOW = 7;
+        const double THRESHOLD = 5.1975; // (14 * 375 * 3.62) / 1000000
 
         Int_t nbrCAT, nbrCA, nbrCBT, nbrCB; // for A and B detectors
         Double_t mCWAT, mCWBT, mCWA, mCWB;
@@ -430,7 +426,7 @@ void figure19() {
         auto data = f.Get<TTree>("data");
 
         // Get the number of entries in TTree
-        const int ENTRIES = data->GetEntries() / 10;
+        const int ENTRIES = data->GetEntries();
         //cout << std::scientific << "Number of entries: " << ENTRIES << endl;
 
         //**************** Set BranchAddress for datas recovery ***************
@@ -500,6 +496,8 @@ void figure19() {
         y1[j] = average1;
         ey1[j] = deviation1;
 
+        cout << std::scientific << "File " << j << " cluster efficiency:\t" << average1 << "\t+/- " << deviation1 << endl;
+
         // Close file when finished
         f.Close();
     }  
@@ -512,39 +510,66 @@ void figure19() {
 
     TGraphErrors *gr2 = new TGraphErrors(n,x2,y2,ex2,ey2);
     gr2->SetName("gr2");
-    gr2->SetMarkerColor(kBlue+2);
-    gr2->SetMarkerStyle(20);
+    gr2->SetMarkerColor(13);
+    gr2->SetMarkerStyle(24);
     gr2->SetMarkerSize(1.0);
 
     TGraphErrors *gr3 = new TGraphErrors(m,x3,y3,ex3,ey3);
     gr3->SetName("gr3");
-    gr3->SetMarkerColor(kGreen+3);
-    gr3->SetMarkerStyle(20);
+    gr3->SetMarkerColor(13);
+    gr3->SetMarkerStyle(25);
     gr3->SetMarkerSize(1.0);
 
     TMultiGraph *mg = new TMultiGraph();
     mg->Add(gr1);
     mg->Add(gr2);
     mg->Add(gr3);
-    mg->SetTitle("Figure 19: Cluster efficiency");
+    mg->SetTitle("");
     mg->Draw("AP");
 
     TAxis *xaxis = mg->GetXaxis();
     TAxis *yaxis = mg->GetYaxis();
-    xaxis->SetTitle("Angle [deg]");
-    //xaxis->Set(25, 1.0, 3.5);
-    xaxis->SetRangeUser(0., 16.5);
-
+    xaxis->SetLabelFont(42);
+    xaxis->SetLabelSize(0.04);
+    xaxis->SetTitle("Angle d'incidence [deg]");
+    xaxis->SetTitleFont(22);
+    xaxis->SetTitleSize(0.05);
+    xaxis->SetTitleOffset(0.95);
+    xaxis->SetRangeUser(0.5, 15);
+    yaxis->SetLabelFont(42);
+    yaxis->SetLabelSize(0.04);
     yaxis->SetTitle("Cluster efficiency");
-    yaxis->SetRangeUser(0.92, 1.01);
+    yaxis->SetTitleFont(22);
+    yaxis->SetTitleSize(0.05);
+    yaxis->SetTitleOffset(0.9);
+    yaxis->SetRangeUser(0.95, 1.01);
+    //yaxis->SetRangeUser(0.002, 1.1);
 
-    c1->RedrawAxis();
+    TF1* f1 = new TF1("f1", "x", 0.5, 15);
+    TGaxis* A1 = new TGaxis(0.5, 1.01, 15.0, 1.01, "f1", 510, "-");
+    A1->SetLabelFont(42);
+    A1->SetLabelSize(0.04);
+    A1->SetTitle("pT [GeV]");
+    A1->SetTitleFont(22);
+    A1->SetTitleSize(0.05);
+    A1->SetTitleOffset(0.95);
+    A1->ChangeLabel(1, -1, -1, -1, -1, -1, "9.8");
+    A1->ChangeLabel(2, -1, -1, -1, -1, -1, "4.9");
+    A1->ChangeLabel(3, -1, -1, -1, -1, -1, "3.3");
+    A1->ChangeLabel(4, -1, -1, -1, -1, -1, "2.5");
+    A1->ChangeLabel(5, -1, -1, -1, -1, -1, "2.0");
+    A1->ChangeLabel(6, -1, -1, -1, -1, -1, "1.6");
+    A1->ChangeLabel(7, -1, -1, -1, -1, -1, "1.4");
+    A1->Draw("SAME");
 
-    auto legend = new TLegend(0.7,0.9,0.9,0.75);
+
+    auto legend = new TLegend(0.1,0.4,0.4,0.1);
     legend->AddEntry("gr1","Geant4","ep");
     legend->AddEntry("gr2","Adam et al. - non-irr.","ep");
     legend->AddEntry("gr3","Adam et al. - irradiated","ep");
     legend->Draw();
 
     gPad->Modified();
+
+    c1->SaveAs("figure19.pdf");
 }
