@@ -37,6 +37,7 @@
 #include "G4RunManager.hh"
 #include "G4LogicalVolume.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4UnitsTable.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -54,24 +55,54 @@ B1SteppingAction::~B1SteppingAction()
 
 void B1SteppingAction::UserSteppingAction(const G4Step* step)
 {
-    /*if (!fScoringVolume) {
-        const B1DetectorConstruction* detectorConstruction
-          = static_cast<const B1DetectorConstruction*>
-            (G4RunManager::GetRunManager()->GetUserDetectorConstruction());
-        fScoringVolume = detectorConstruction->GetScoringVolume();
-      }
-
       // get volume of the current step
       G4LogicalVolume* volume
         = step->GetPreStepPoint()->GetTouchableHandle()
           ->GetVolume()->GetLogicalVolume();
 
-      // check if we are in scoring volume
-      if (volume != fScoringVolume) return;
+      if(volume->GetName() == "logicStrip"){
+          // get strip number
+          G4int stripNbr = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetCopyNo();
+          // get energy deposited in this step
+          G4double edepStep = step->GetTotalEnergyDeposit();
+          // get position
+          G4double pos_x = step->GetPreStepPoint()->GetPosition().getX();
+          G4cout << "pos_x = " << pos_x << G4endl;
+          G4double pos_strip;
+          if(stripNbr <= 253){
+              pos_strip = (stripNbr - 127 + 0.5) * 0.09*mm;
+          }else{
+              pos_strip = (stripNbr - 381 + 0.5) * 0.09*mm;
+          }
+          G4cout << "pos_strip = " << pos_strip << G4endl;
+          G4double difference = pos_x - pos_strip; // < +/- 45*um
+          G4cout << "difference = " << difference << G4endl;
+          if(difference > 0){
+              G4double factor = difference / (90.*um);
+              G4cout << "Factor+ = " << factor << G4endl;
+              fEventAction->AddEnergy(stripNbr, (edepStep * (1-factor)));
+              fEventAction->AddEnergy(stripNbr+1, (edepStep * factor));
+          }else if(difference < 0){
+              G4double factor = -difference / (90.*um);
+              G4cout << "Factor- = " << factor << G4endl;
+              fEventAction->AddEnergy(stripNbr, (edepStep * (1-factor)));
+              fEventAction->AddEnergy(stripNbr-1, (edepStep * factor));
+          }
+          G4cout << G4endl;
 
-      // collect energy deposited in this step
-      G4double edepStep = step->GetTotalEnergyDeposit();
-      //fEventAction->AddEdep(edepStep);*/
+
+          /*
+          G4cout << "Volume name: "
+                 << volume->GetName()
+                 << " number "
+                 << stripNbr
+                 << ", at: "
+                 << G4BestUnit(pos_x, "Length")
+                 << ", energy: "
+                 << G4BestUnit(edepStep, "Energy")
+                 << G4endl;
+         */
+      }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

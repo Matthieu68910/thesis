@@ -32,6 +32,8 @@
 
 #include "G4UserSteppingAction.hh"
 #include "globals.hh"
+#include "B1EventAction.hh"
+#include <vector>
 
 class B1EventAction;
 
