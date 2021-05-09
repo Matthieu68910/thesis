@@ -2,9 +2,10 @@
 #include "TTree.h"
 #include <iostream>
 #include <random>
+#include <fstream>
 
 std::default_random_engine generator;
-std::normal_distribution<double> distribution(0., 0.002891475); // µ = 0 e-, s = 2.13*375*3.62
+std::normal_distribution<double> distribution(0., 0.795); // µ = 0 e-, s = 2.13*375*3.62
 std::uniform_real_distribution<> distribution1(0.0, 1.0);
 
 bool CBC2(
@@ -165,6 +166,26 @@ bool CBC2(
     	}
     }
     return false;
+}
+
+void SaveData(
+	const int &k,
+	Double_t x[],
+	Double_t y[],
+	Double_t ey[]
+	){
+
+	// open file
+	ofstream myfile;
+    myfile.open ("figure17_data.txt");
+    myfile << "x\ty\tey\n";
+    for (int i = 0; i < k; ++i)
+    {
+    	myfile << std::scientific << x[i] << "\t" << y[i] << "\t" << ey[i] << "\n";
+    }
+    myfile.close();
+
+    return;
 }
 
 void figure17() {
@@ -330,7 +351,7 @@ void figure17() {
     Double_t ey2[k] = {0.};
 
     //****************** Create Histo ************************************//
-    auto c1 = new TCanvas("c1","c1",1920,1080);
+    auto c1 = new TCanvas("c1","c1", 1000, 600);
 	c1->SetTitle("Mean cluster width for 2S mini-module");
 	gStyle->SetOptStat(0);
 	gPad->SetGridx(1);
@@ -433,7 +454,7 @@ void figure17() {
 	            count_loop = 0;
 	            if(!isnan(cluster_width))
 	            {
-	            	mClusWidth.at(index) = ((cluster_width / nbr_clusters) / (ENTRIES / 10)) * 10000;
+	            	mClusWidth.at(index) = cluster_width / nbr_clusters;
 	            }else
 	            {
 	            	cout << "error! at file " << j << " index " << index << endl;
@@ -463,41 +484,72 @@ void figure17() {
 	// Fill graphs
 	TGraphErrors *gr1 = new TGraphErrors(n,x1,y1,ex1,ey1); // non-irradiated
     gr1->SetName("gr1");
-    gr1->SetMarkerColor(12);
+    gr1->SetMarkerColor(1);
     gr1->SetMarkerStyle(24);
-    gr1->SetMarkerSize(1.2);
+    gr1->SetMarkerSize(1.);
 
     TGraphErrors *gr3 = new TGraphErrors(m,x3,y3,ex3,ey3); // non-irradiated
     gr3->SetName("gr3");
-    gr3->SetMarkerColor(12);
+    gr3->SetMarkerColor(1);
     gr3->SetMarkerStyle(25);
-    gr3->SetMarkerSize(1.2);
+    gr3->SetMarkerSize(1.);
 
     TGraphErrors *gr2 = new TGraphErrors(k,x2,y2,ex2,ey2);
     gr2->SetName("gr2");
-    gr2->SetMarkerColor(2);
+    gr2->SetMarkerColor(kRed+2);
     gr2->SetMarkerStyle(20);
-    gr2->SetMarkerSize(1.2);
+    gr2->SetMarkerSize(1.);
 
     TMultiGraph *mg = new TMultiGraph();
     mg->Add(gr1);
     mg->Add(gr3);
     mg->Add(gr2);
-    mg->SetTitle("Figure 17 - Mean cluster width for 2S mini-module");
+    mg->SetTitle("");
     mg->Draw("AP");
 
     TAxis *xaxis = mg->GetXaxis();
     TAxis *yaxis = mg->GetYaxis();
-    xaxis->SetTitle("Incident angle [deg]");
-    xaxis->SetRangeUser(0, 15);
-    yaxis->SetTitle("Mean cluster width [strip]");
+    xaxis->SetLabelFont(42);
+	xaxis->SetLabelSize(0.04);
+    xaxis->SetTitle("Angle d'incidence [deg]");
+    xaxis->SetTitleFont(22);
+	xaxis->SetTitleSize(0.05);
+	xaxis->SetTitleOffset(0.95);
+    xaxis->SetRangeUser(0.5, 15);
+    yaxis->SetLabelFont(42);
+	yaxis->SetLabelSize(0.04);
+    yaxis->SetTitle("Largeur moyenne des clusters [strip]");
+    yaxis->SetTitleFont(22);
+	yaxis->SetTitleSize(0.05);
+	yaxis->SetTitleOffset(0.9);
 
-    auto legend = new TLegend(0.1,0.7,0.35,0.9);
-    legend->SetHeader("Legend","C");
-    legend->AddEntry("gr1","Adam et al. 2020 - non-irradiated","p");
-    legend->AddEntry("gr3","Adam et al. 2020 - irradiated","p");
+    TF1* f1 = new TF1("f1", "x", 0.5, 15);
+    TGaxis* A1 = new TGaxis(0.5, yaxis->GetXmax(), 15.0, yaxis->GetXmax(), "f1", 510, "-");
+    A1->SetLabelFont(42);
+	A1->SetLabelSize(0.04);
+	A1->SetTitle("pT [GeV]");
+	A1->SetTitleFont(22);
+	A1->SetTitleSize(0.05);
+	A1->SetTitleOffset(0.95);
+    A1->ChangeLabel(1, -1, -1, -1, -1, -1, "9.8");
+    A1->ChangeLabel(2, -1, -1, -1, -1, -1, "4.9");
+    A1->ChangeLabel(3, -1, -1, -1, -1, -1, "3.3");
+    A1->ChangeLabel(4, -1, -1, -1, -1, -1, "2.5");
+    A1->ChangeLabel(5, -1, -1, -1, -1, -1, "2.0");
+    A1->ChangeLabel(6, -1, -1, -1, -1, -1, "1.6");
+    A1->ChangeLabel(7, -1, -1, -1, -1, -1, "1.4");
+	A1->Draw("SAME");
+
+    auto legend = new TLegend(0.15,0.6,0.45,0.85);
+    legend->AddEntry("gr1","Adam et al. - non-irr.","p");
+    legend->AddEntry("gr3","Adam et al. - irr.","p");
     legend->AddEntry("gr2","Geant4","ep");
     legend->Draw();
 
     gPad->Modified();
+
+    c1->SaveAs("figure17.pdf");
+    //c1->SaveAs("figure17.png");
+
+    SaveData(k, x2, y2, ey2);
 }
