@@ -3,7 +3,7 @@
 #include <iostream>
 
 std::default_random_engine generator;
-std::normal_distribution<double> distribution(0.0, 0.002891475); // µ = 1000 e-, s = 800 e-
+std::normal_distribution<double> distribution(0.0, 0.795); // µ = 1000 e-, s = 800 e-
 
 bool CBC2(
     const vector<double> &strip_A, 
@@ -12,7 +12,7 @@ bool CBC2(
     vector<double> &res_B,
     const int MAX_CLUSTER_WIDTH = 3,
     const int CLUSTER_WINDOW = 5,
-    const double THRESHOLD = 0.0222
+    const double THRESHOLD = 5.1975
     ){
 
     const int NBR_STRIP = strip_A.size();
@@ -25,7 +25,7 @@ bool CBC2(
     // Loop on sensor A strips
     for (int i = 0; i < NBR_STRIP; ++i)
     {
-        double strip_energy = abs(strip_A[i] + distribution(generator));
+        double strip_energy = (strip_A[i] / 0.00362) + abs(distribution(generator));
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -68,7 +68,7 @@ bool CBC2(
     // Loop on sensor B strips
     for (int i = 0; i < NBR_STRIP; ++i)
     {
-        double strip_energy = abs(strip_B[i] + distribution(generator));
+        double strip_energy = (strip_B[i] / 0.00362) + abs(distribution(generator));
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -155,6 +155,38 @@ bool CBC2(
     return false;
 }
 
+void SaveData(
+	const int &k,
+	Double_t x[],
+	Double_t y[],
+	Double_t ey[],
+	Double_t p1,
+	Double_t p2,
+	Double_t p3,
+	Double_t t1,
+	Double_t t2,
+	Double_t t3,
+	Double_t s1,
+	Double_t s2,
+	Double_t s3
+	){
+
+	// open file
+	ofstream myfile;
+    myfile.open ("figure20_0_data.txt");
+    myfile << "x\ty\tey\n";
+    for (int i = 0; i < k; ++i)
+    {
+    	myfile << std::scientific << x[i] << "\t" << y[i] << "\t" << ey[i] << "\n";
+    }
+    myfile << std::scientific << "serie\t" << "param0\t" << "param1\t" << "param2\n";
+    myfile << std::scientific << "Adam\t" << p1 << "\t" << t1 << "\t" << s1 << "\n";
+    myfile << std::scientific << "Adam-irr\t" << p2 << "\t" << t2 << "\t" << s2 << "\n";
+    myfile << std::scientific << "Geant4\t" << p3 << "\t" << t3 << "\t" << s3 << "\n";
+    myfile.close();
+
+    return;
+}
 
 void figure20_0() {
 	// data for Adam2020
@@ -296,7 +328,7 @@ void figure20_0() {
     Double_t ey3[p] = {0.};
 
 	//****************** Create Histo ************************************//
-    auto c1 = new TCanvas("c1","c1",1920,1080);
+    auto c1 = new TCanvas("c1","c1",1000,600);
     c1->SetTitle("Cluster efficiency for 2S mini-module");
     gStyle->SetOptStat(0);
     gPad->SetGridx(1);
@@ -320,7 +352,7 @@ void figure20_0() {
         const int NBR_STRIP = 254;
         const int MAX_CLUSTER_WIDTH = 3;
         const int CLUSTER_WINDOW = 5;
-        const double THRESHOLD = 0.019005; // MeV -> = 6 * (1000 * 3.6 keV)
+        const double THRESHOLD = 5.1975; // MeV -> = 6 * (1000 * 3.6 keV)
         
         Int_t nbrCAT, nbrCA, nbrCBT, nbrCB; // for A and B detectors
         Double_t mCWAT, mCWBT, mCWA, mCWB;
@@ -400,60 +432,102 @@ void figure20_0() {
     gr1->SetName("gr1");
     gr1->SetMarkerColor(13);
     gr1->SetMarkerStyle(24);
-    gr1->SetMarkerSize(1.2);
+    gr1->SetMarkerSize(1.);
 
     TGraphErrors *gr2 = new TGraphErrors(m,x2,y2,ex2,ey2); // irradiated
     gr2->SetName("gr2");
     gr2->SetMarkerColor(13);
     gr2->SetMarkerStyle(25);
-    gr2->SetMarkerSize(1.2);
+    gr2->SetMarkerSize(1.);
 
     TGraphErrors *gr3 = new TGraphErrors(p,x3,y3,ex3,ey3); // simulation
     gr3->SetName("gr3");
     gr3->SetMarkerColor(kRed+2);
     gr3->SetMarkerStyle(20);
-    gr3->SetMarkerSize(1.2);
+    gr3->SetMarkerSize(1.);
 
     TF1* func1 = new TF1("func1", "(0.5*[0]*(1+ TMath::Erf((x-[1])/[2])))", x1[0], x1[n-1]);
     func1->SetParameters(0.98, 1.85, 0.15);
     func1->SetLineColor(13);
     func1->SetLineWidth(1);
     func1->SetLineStyle(7);
-    gr1->Fit(func1);
+    TFitResultPtr r1 = gr1->Fit(func1, "S");
 
     TF1* func2 = new TF1("func2", "(0.5*[0]*(1+ TMath::Erf((x-[1])/[2])))", x2[0], x2[m-1]);
     func2->SetParameters(0.95, 2.15, 0.15);
     func2->SetLineColor(13);
     func2->SetLineWidth(1);
     func2->SetLineStyle(7);
-    gr2->Fit(func2);
+    TFitResultPtr r2 = gr2->Fit(func2, "S");
 
     TF1* func3 = new TF1("func3", "(0.5*[0]*(1+ TMath::Erf((x-[1])/[2])))", x3[0], x3[p-1]);
     func3->SetParameters(1, 2, 0.15);
     func3->SetLineColor(kRed+2);
     func3->SetLineWidth(1);
     func3->SetLineStyle(7);
-    gr3->Fit(func3);
+    TFitResultPtr r3 = gr3->Fit(func3, "S");
 
     TMultiGraph *mg = new TMultiGraph();
     mg->Add(gr1);
     mg->Add(gr2);
     mg->Add(gr3);
-    mg->SetTitle("Sub efficiency for 2S mini-module");
+    mg->SetTitle("");
     mg->Draw("AP");
+
+    Double_t plateau1   = r1->Value(0);
+    Double_t turn1   = r1->Value(1);
+    Double_t sigma1   = r1->Value(2);
+
+    Double_t plateau2   = r2->Value(0);
+    Double_t turn2   = r2->Value(1);
+    Double_t sigma2   = r2->Value(2);
+
+    Double_t plateau3   = r3->Value(0);
+    Double_t turn3   = r3->Value(1);
+    Double_t sigma3   = r3->Value(2);
 
     TAxis *xaxis = mg->GetXaxis();
     TAxis *yaxis = mg->GetYaxis();
-    xaxis->SetTitle("Simulated pT [GeV]");
-    xaxis->SetRangeUser(1.0, 3.2);
+    xaxis->SetLabelFont(42);
+	xaxis->SetLabelSize(0.04);
+    xaxis->SetTitle("pT [GeV]");
+    xaxis->SetTitleFont(22);
+	xaxis->SetTitleSize(0.05);
+	xaxis->SetTitleOffset(0.95);
+    xaxis->SetRangeUser(1.0, 3.5);
+    yaxis->SetLabelFont(42);
+	yaxis->SetLabelSize(0.04);
     yaxis->SetTitle("Stub efficiency");
+    yaxis->SetTitleFont(22);
+	yaxis->SetTitleSize(0.05);
+	yaxis->SetTitleOffset(0.9);
 
-    auto legend = new TLegend(0.1,0.7,0.35,0.9);
-    legend->SetHeader("Legend","C");
-    legend->AddEntry("gr1","Adam et al. 2020 - non-irradiated 2.75 mm","p");
-    legend->AddEntry("gr2","Adam et al. 2020 - irradiated 3.05 mm","p");
+    TF1* f1 = new TF1("f1", "x", 1.0, 3.5);
+    TGaxis* A1 = new TGaxis(1.0, yaxis->GetXmax(), 3.5, yaxis->GetXmax(), "f1", 510, "-");
+    A1->SetLabelFont(42);
+	A1->SetLabelSize(0.04);
+	A1->SetTitle("Angle d'incidence [deg]");
+	A1->SetTitleFont(22);
+	A1->SetTitleSize(0.05);
+	A1->SetTitleOffset(0.95);
+    A1->ChangeLabel(1, -1, -1, -1, -1, -1, "19.6");
+    A1->ChangeLabel(2, -1, -1, -1, -1, -1, "13.1");
+    A1->ChangeLabel(3, -1, -1, -1, -1, -1, "9.8");
+    A1->ChangeLabel(4, -1, -1, -1, -1, -1, "7.8");
+    A1->ChangeLabel(5, -1, -1, -1, -1, -1, "6.5");
+    A1->ChangeLabel(6, -1, -1, -1, -1, -1, "5.6");
+    A1->ChangeLabel(7, -1, -1, -1, -1, -1, "");
+	A1->Draw("SAME");
+
+    auto legend = new TLegend(0.6,0.1,0.9,0.4);
+    legend->AddEntry("gr1","Adam et al. - non-irr. 2.75 mm","p");
+    legend->AddEntry("gr2","Adam et al. - irr. 3.05 mm","p");
     legend->AddEntry("gr3","Geant4 - 2.75 mm","ep");
     legend->Draw();
 
     gPad->Modified();
+
+    c1->SaveAs("figure20_0.pdf");
+
+    SaveData(p, x3, y3, ey3, plateau1, plateau2, plateau3, turn1, turn2, turn3, sigma1, sigma2, sigma3);
 }

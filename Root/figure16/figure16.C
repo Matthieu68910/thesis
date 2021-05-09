@@ -4,7 +4,7 @@
 #include <random>
 
 std::default_random_engine generator;
-std::normal_distribution<double> distribution(0., 0.002891475); // µ = 0 e-, s = 2.13*375*3.62
+std::normal_distribution<double> distribution(0., 0.795); // µ = 0 e-, s = 2.13*375*3.62
 std::uniform_real_distribution<> distribution1(0.0, 1.0);
 
 bool CBC2(
@@ -15,7 +15,7 @@ bool CBC2(
 	vector<double> &res_B,
 	const int MAX_CLUSTER_WIDTH = 3,
 	const int CLUSTER_WINDOW = 5,
-	double THRESHOLD = 0.0222,
+	double THRESHOLD = 5.1975,
     double kill_value = 0.04331
 	){
 
@@ -31,7 +31,7 @@ bool CBC2(
 	// Loop on sensor A strips
 	for (int i = 0; i < NBR_STRIP; ++i)
     {
-    	double strip_energy = strip_A[i] + abs(distribution(generator));
+    	double strip_energy = (strip_A[i] / 0.00362) + abs(distribution(generator));
         //if(distribution1(generator) < kill_value){strip_energy = 0.;}
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
@@ -78,7 +78,7 @@ bool CBC2(
 	// Loop on sensor B strips
 	for (int i = 0; i < NBR_STRIP; ++i)
     {
-    	double strip_energy = strip_B[i] + abs(distribution(generator));
+    	double strip_energy = (strip_B[i] / 0.00362) + abs(distribution(generator));
         //if(distribution1(generator) < kill_value){strip_energy = 0.;}
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
@@ -153,7 +153,7 @@ bool CBC2(
         double pos_sensor = (clus_pos_A.at(b) - (NBR_STRIP / 2)) * 0.09;
         //cout << "pos_sensor = " << pos_sensor << endl;
         //cout << "x0 = " << x0 << endl;
-        if(abs(x0 - pos_sensor) <= 0.103923){match = true;}
+        if(abs(x0 - pos_sensor) <= 0.09){match = true;}
         //cout << "match : " << match << endl;
     }
 
@@ -195,39 +195,39 @@ void figure16() {
     const int NBR_BINS1 = 16;
 
     // G4
-    Double_t x1[NBR_BINS] = {	2.715,
-                                5.430,
-                                8.145,
-                                10.860,
-                                19.005,
-                                21.720,
-                                27.150,
-                                35.295,
-                                40.725,
-                                59.730,
-                                70.590,
-                                76.020,
-                                81.450,
-                                86.880}; // in keV !!!
+    Double_t x1[NBR_BINS] = {	0.6975,
+                                1.4475,
+                                2.1975,
+                                2.9475,
+                                5.1975,
+                                5.9475,
+                                7.4475,
+                                9.6975,
+                                11.1975,
+                                16.4475,
+                                19.4475,
+                                20.9475,
+                                22.4475,
+                                23.9475}; // in keV !!!
     Double_t y1[NBR_BINS] = {0.};
     Double_t ex1[NBR_BINS] = {0.};
     Double_t ey1[NBR_BINS] = {0.};
 
     // Adam
-    Double_t x2[NBR_BINS] = {   2.715,
-                                5.430,
-                                8.145,
-                                10.860,
-                                19.005,
-                                21.720,
-                                27.150,
-                                35.295,
-                                40.725,
-                                59.730,
-                                70.590,
-                                76.020,
-                                81.450,
-                                86.880}; // in keV !!!
+    Double_t x2[NBR_BINS] = {   0.6975,
+                                1.4475,
+                                2.1975,
+                                2.9475,
+                                5.1975,
+                                5.9475,
+                                7.4475,
+                                9.6975,
+                                11.1975,
+                                16.4475,
+                                19.4475,
+                                20.9475,
+                                22.4475,
+                                23.9475}; // in keV !!!
     Double_t y2[NBR_BINS] = {   0.60058,
                                 0.82031,
                                 0.91971,
@@ -272,22 +272,22 @@ void figure16() {
                                 0.038654};
 
     // Adam IRR
-    Double_t x3[NBR_BINS1] = {   2.715,
-                                5.430,
-                                8.145,
-                                10.860,
-                                16.290,
-                                19.005,
-                                21.720,
-                                32.692,
-                                35.295,
-                                40.725,
-                                51.585,
-                                70.590,
-                                70.590,
-                                76.020,
-                                81.450,
-                                86.880}; // in keV !!!
+    Double_t x3[NBR_BINS1] = {  0.6975,
+                                1.4475,
+                                2.1975,
+                                2.9475,
+                                4.4475,
+                                5.1975,
+                                5.9475,
+                                8.9783,
+                                9.6975,
+                                11.1975,
+                                14.1975,
+                                19.4475,
+                                19.4475,
+                                20.9475,
+                                22.4475,
+                                23.9475}; // in keV !!!
     Double_t y3[NBR_BINS1] = {  0.87545,
                                 0.96947,
                                 0.97383,
@@ -367,7 +367,7 @@ void figure16() {
     data->SetBranchAddress("x0", &x0);
 
     //****************** Create Histo ************************************//
-    auto c1 = new TCanvas("c1","c1",1920,1080);
+    auto c1 = new TCanvas("c1","c1",1000,600);
 	c1->SetTitle("Figure 1: threshold variation");
 	gStyle->SetOptStat(0);
 	gPad->SetGridx(1);
@@ -395,7 +395,7 @@ void figure16() {
             //std::vector<double> res_A2(10, 0);
             //std::vector<double> res_B2(10, 0);
 
-	        bool stub1 = CBC2(x0, strip_A, strip_B, res_A1, res_B1, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, x1[j]/1000);
+	        bool stub1 = CBC2(x0, strip_A, strip_B, res_A1, res_B1, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, x1[j]);
             //bool stub2 = CBC2(strip_A, strip_B, res_A2, res_B2, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, x2[j]/1000);
 
 	        if(res_A1.at(9) == 1)
@@ -435,6 +435,16 @@ void figure16() {
 		ey2[j] = deviation2;*/
 	}
 
+    for (int i = 0; i < NBR_BINS; ++i)
+    {
+        x1[i] *= 1000.;
+        x2[i] *= 1000.;
+    }
+    for (int i = 0; i < NBR_BINS1; ++i)
+    {
+        x3[i] *= 1000.;
+    }
+
     TGraphErrors *gr1 = new TGraphErrors(NBR_BINS,x1,y1,ex1,ey1);
     gr1->SetName("gr1");
     gr1->SetMarkerColor(kRed+2);
@@ -443,43 +453,68 @@ void figure16() {
 
     TGraphErrors *gr2 = new TGraphErrors(NBR_BINS,x2,y2,ex2,ey2);
     gr2->SetName("gr2");
-    gr2->SetMarkerColor(kBlue+2);
-    gr2->SetMarkerStyle(20);
+    gr2->SetMarkerColor(1);
+    gr2->SetMarkerStyle(21);
     gr2->SetMarkerSize(1.0);
 
     TGraphErrors *gr3 = new TGraphErrors(NBR_BINS1,x3,y3,ex3,ey3);
     gr3->SetName("gr3");
-    gr3->SetMarkerColor(kGreen+3);
-    gr3->SetMarkerStyle(20);
+    gr3->SetMarkerColor(1);
+    gr3->SetMarkerStyle(22);
     gr3->SetMarkerSize(1.0);
 
     TMultiGraph *mg = new TMultiGraph();
     mg->Add(gr1);
     mg->Add(gr2);
     mg->Add(gr3);
-    mg->SetTitle("Figure 16: threshold variation");
+    mg->SetTitle("");
     mg->Draw("AP");
 
     TAxis *xaxis = mg->GetXaxis();
     TAxis *yaxis = mg->GetYaxis();
-    xaxis->SetTitle("Threshold [keV]");
-    //xaxis->Set(25, 1.0, 3.5);
-    xaxis->SetRangeUser(0., 150.);
-
+    xaxis->SetMaxDigits(3);
+    xaxis->SetLabelFont(42);
+    xaxis->SetLabelSize(0.04);
+    xaxis->SetTitle("Seuil [e-]");
+    xaxis->SetTitleFont(22);
+    xaxis->SetTitleSize(0.05);
+    xaxis->SetTitleOffset(0.95);
+    xaxis->SetRangeUser(0., 25000);
+    yaxis->SetLabelFont(42);
+    yaxis->SetLabelSize(0.04);
     yaxis->SetTitle("Cluster efficiency");
-    yaxis->SetRangeUser(0., 1.2);
+    yaxis->SetTitleFont(22);
+    yaxis->SetTitleSize(0.05);
+    yaxis->SetTitleOffset(0.9);
 
     c1->RedrawAxis();
 
-    auto legend = new TLegend(0.7,0.9,0.9,0.75);
+    TF1* f1 = new TF1("f1", "x", 0, 25000);
+    TGaxis* A1 = new TGaxis(0., yaxis->GetXmax(), 25000, yaxis->GetXmax(), "f1", 510, "-");
+    A1->SetLabelFont(42);
+    A1->SetLabelSize(0.04);
+    A1->SetTitle("Seuil [keV]");
+    A1->SetTitleFont(22);
+    A1->SetTitleSize(0.05);
+    A1->SetTitleOffset(0.95);
+    A1->ChangeLabel(1, -1, -1, -1, -1, -1, "0.0");
+    A1->ChangeLabel(2, -1, -1, -1, -1, -1, "18.1");
+    A1->ChangeLabel(3, -1, -1, -1, -1, -1, "36.2");
+    A1->ChangeLabel(4, -1, -1, -1, -1, -1, "54.3");
+    A1->ChangeLabel(5, -1, -1, -1, -1, -1, "72.4");
+    A1->ChangeLabel(6, -1, -1, -1, -1, -1, "90.5");
+    //A1->ChangeLabel(7, -1, -1, -1, -1, -1, "1.4");
+    A1->Draw("SAME");
+
+    auto legend = new TLegend(0.1,0.4,0.4,0.1);
     legend->AddEntry("gr1","Geant4","ep");
     legend->AddEntry("gr2","Adam et al. - non-irr.","ep");
-    legend->AddEntry("gr3","Adam et al. - irradiated","ep");
+    legend->AddEntry("gr3","Adam et al. - irr.","ep");
     legend->Draw();
 
     gPad->Modified();
     //*********************** 
-
+    c1->SaveAs("figure16.pdf");
     // Close file when finished
     //f.Close();
 }

@@ -4,7 +4,7 @@
 #include <random>
 
 std::default_random_engine generator;
-std::normal_distribution<double> distribution(0.00362, 0.002891475); // µ = 1000 e-, s = 800 e-
+std::normal_distribution<double> distribution(0.00362, 0.795); // µ = 1000 e-, s = 800 e-
 
 bool CBC2(
 	const vector<double> &strip_A, 
@@ -13,7 +13,7 @@ bool CBC2(
 	vector<double> &res_B,
 	const int MAX_CLUSTER_WIDTH = 3,
 	const int CLUSTER_WINDOW = 5,
-	const double THRESHOLD = 0.0222
+	const double THRESHOLD = 5.1975
 	){
 
 	const int NBR_STRIP = strip_A.size();
@@ -26,7 +26,7 @@ bool CBC2(
 	// Loop on sensor A strips
 	for (int i = 0; i < NBR_STRIP; ++i)
     {
-    	double strip_energy = abs(strip_A[i] + distribution(generator));
+    	double strip_energy = (strip_A[i] / 0.00362) + abs(distribution(generator));
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -69,7 +69,7 @@ bool CBC2(
 	// Loop on sensor B strips
 	for (int i = 0; i < NBR_STRIP; ++i)
     {
-    	double strip_energy = abs(strip_B[i] + distribution(generator));
+    	double strip_energy = (strip_B[i] / 0.00362) + abs(distribution(generator));
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -154,6 +154,44 @@ bool CBC2(
     	}
     }
     return false;
+}
+
+void SaveData(
+	const int &k,
+	Double_t x[],
+	Double_t y1[],
+	Double_t ey1[],
+	Double_t y2[],
+	Double_t ey2[],
+	Double_t y3[],
+	Double_t ey3[]
+	){
+
+	// open file
+	ofstream myfile;
+    myfile.open ("figure18_data.txt");
+    myfile << "x\ty1\tey1\ty2\tey2\ty3\tey3\n";
+    for (int i = 0; i < k; ++i)
+    {
+    	myfile 	<< std::scientific 
+    			<< x[i] 
+    			<< "\t" 
+    			<< y1[i] 
+    			<< "\t" 
+    			<< ey1[i] 
+    			<< "\t" 
+    			<< y2[i] 
+    			<< "\t" 
+    			<< ey2[i]
+    			<< "\t" 
+    			<< y3[i] 
+    			<< "\t" 
+    			<< ey3[i]
+    			<< "\n";
+    }
+    myfile.close();
+
+    return;
 }
 
 void figure18() {
@@ -412,7 +450,7 @@ void figure18() {
     Double_t ey6[k] = {0.};
 
     //****************** Create Histo ************************************//
-    auto c1 = new TCanvas("c1","c1",1920,1080);
+    auto c1 = new TCanvas("c1","c1",1000,600);
 	c1->SetTitle("Mean cluster width for 2S mini-module");
 	gStyle->SetOptStat(0);
 	gPad->SetGridx(1);
@@ -437,7 +475,7 @@ void figure18() {
 	    const int NBR_STRIP = 254;
 	    const int MAX_CLUSTER_WIDTH = 3;
 	    const int CLUSTER_WINDOW = 5;
-	    const double THRESHOLD = 0.019005; // MeV -> = 6 * (1000 * 3.6 keV)
+	    const double THRESHOLD = 5.1975; // MeV -> = 6 * (1000 * 3.6 keV)
 	    
 	    Int_t nbrCAT, nbrCA, nbrCBT, nbrCB; // for A and B detectors
 	    Double_t mCWAT, mCWBT, mCWA, mCWB;
@@ -541,37 +579,37 @@ void figure18() {
     gr1->SetName("gr1");
     gr1->SetMarkerColor(12);
     gr1->SetMarkerStyle(24);
-    gr1->SetMarkerSize(1.2);
+    gr1->SetMarkerSize(1.);
 
     TGraphErrors *gr2 = new TGraphErrors(m,x2,y2,ex2,ey2); // Adam 2
     gr2->SetName("gr2");
     gr2->SetMarkerColor(12);
     gr2->SetMarkerStyle(25);
-    gr2->SetMarkerSize(1.2);
+    gr2->SetMarkerSize(1.);
 
     TGraphErrors *gr3 = new TGraphErrors(p,x3,y3,ex3,ey3); // Adam >2
     gr3->SetName("gr3");
     gr3->SetMarkerColor(12);
     gr3->SetMarkerStyle(26);
-    gr3->SetMarkerSize(1.2);
+    gr3->SetMarkerSize(1.);
 
     TGraphErrors *gr4 = new TGraphErrors(k,x4,y4,ex4,ey4); // Adam 1
     gr4->SetName("gr4");
-    gr4->SetMarkerColor(2);
+    gr4->SetMarkerColor(kRed+2);
     gr4->SetMarkerStyle(20);
-    gr4->SetMarkerSize(1.2);
+    gr4->SetMarkerSize(1.);
 
     TGraphErrors *gr5 = new TGraphErrors(k,x5,y5,ex5,ey5); // Adam 2
     gr5->SetName("gr5");
-    gr5->SetMarkerColor(4);
+    gr5->SetMarkerColor(kBlue+2);
     gr5->SetMarkerStyle(21);
-    gr5->SetMarkerSize(1.2);
+    gr5->SetMarkerSize(1.);
 
     TGraphErrors *gr6 = new TGraphErrors(k,x6,y6,ex6,ey6); // Adam >2
     gr6->SetName("gr6");
-    gr6->SetMarkerColor(3);
+    gr6->SetMarkerColor(kGreen+2);
     gr6->SetMarkerStyle(22);
-    gr6->SetMarkerSize(1.2);
+    gr6->SetMarkerSize(1.);
 
     TMultiGraph *mg = new TMultiGraph();
     mg->Add(gr1);
@@ -580,25 +618,55 @@ void figure18() {
     mg->Add(gr4);
     mg->Add(gr5);
     mg->Add(gr6);
-    mg->SetTitle("Cluster strips mutiplicity for 2S mini-module");
+    mg->SetTitle("");
     mg->Draw("AP");
 
     TAxis *xaxis = mg->GetXaxis();
     TAxis *yaxis = mg->GetYaxis();
-    xaxis->SetTitle("Incident angle [deg]");
-    xaxis->SetRangeUser(0, 15);
-    yaxis->SetTitle("Fraction of clusters");
-    yaxis->SetRangeUser(0.001, 1.5);
+    xaxis->SetLabelFont(42);
+	xaxis->SetLabelSize(0.04);
+    xaxis->SetTitle("Angle d'incidence [deg]");
+    xaxis->SetTitleFont(22);
+	xaxis->SetTitleSize(0.05);
+	xaxis->SetTitleOffset(0.95);
+    xaxis->SetRangeUser(0.5, 15);
+    yaxis->SetLabelFont(42);
+	yaxis->SetLabelSize(0.04);
+    yaxis->SetTitle("Fraction");
+    yaxis->SetTitleFont(22);
+	yaxis->SetTitleSize(0.05);
+	yaxis->SetTitleOffset(0.9);
+	//yaxis->SetRangeUser(0.002, 1.1);
 
-    auto legend = new TLegend(0.1,0.7,0.35,0.9);
-    legend->SetHeader("Legend","C");
-    legend->AddEntry("gr1","Adam et al. 2020 - 1 strip","p");
-    legend->AddEntry("gr2","Adam et al. 2020 - 2 strips","p");
-    legend->AddEntry("gr3","Adam et al. 2020 - >2 strips","p");
+    TF1* f1 = new TF1("f1", "x", 0.5, 15);
+    TGaxis* A1 = new TGaxis(0.5, yaxis->GetXmax(), 15.0, yaxis->GetXmax(), "f1", 510, "-");
+    A1->SetLabelFont(42);
+	A1->SetLabelSize(0.04);
+	A1->SetTitle("pT [GeV]");
+	A1->SetTitleFont(22);
+	A1->SetTitleSize(0.05);
+	A1->SetTitleOffset(0.95);
+    A1->ChangeLabel(1, -1, -1, -1, -1, -1, "9.8");
+    A1->ChangeLabel(2, -1, -1, -1, -1, -1, "4.9");
+    A1->ChangeLabel(3, -1, -1, -1, -1, -1, "3.3");
+    A1->ChangeLabel(4, -1, -1, -1, -1, -1, "2.5");
+    A1->ChangeLabel(5, -1, -1, -1, -1, -1, "2.0");
+    A1->ChangeLabel(6, -1, -1, -1, -1, -1, "1.6");
+    A1->ChangeLabel(7, -1, -1, -1, -1, -1, "1.4");
+	A1->Draw("SAME");
+
+    auto legend = new TLegend(0.65,0.45,0.9,0.7);
+    legend->AddEntry("gr1","Adam et al. - 1 strip","p");
+    legend->AddEntry("gr2","Adam et al. - 2 strips","p");
+    legend->AddEntry("gr3","Adam et al. - >2 strips","p");
     legend->AddEntry("gr4","Geant4 - 1 strip","ep");
     legend->AddEntry("gr5","Geant4 - 2 strips","ep");
     legend->AddEntry("gr6","Geant4 - >2 strips","ep");
     legend->Draw();
 
     gPad->Modified();
+
+    c1->SaveAs("figure18.pdf");
+
+    SaveData(k, x4, y4, ey4, y5, ey5, y6, ey6);
 }
