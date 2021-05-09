@@ -25,7 +25,7 @@ bool CBC2(
     // Loop on sensor A strips
     for (int i = 0; i < NBR_STRIP; ++i)
     {
-        double strip_energy = (strip_A[i] / 0.00362) + abs(distribution(generator));
+        double strip_energy = (strip_A[i] / 0.00362) + distribution(generator);
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -68,7 +68,7 @@ bool CBC2(
     // Loop on sensor B strips
     for (int i = 0; i < NBR_STRIP; ++i)
     {
-        double strip_energy = (strip_B[i] / 0.00362) + abs(distribution(generator));
+        double strip_energy = (strip_B[i] / 0.00362) + distribution(generator);
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -432,36 +432,36 @@ void figure20_0() {
     gr1->SetName("gr1");
     gr1->SetMarkerColor(13);
     gr1->SetMarkerStyle(24);
-    gr1->SetMarkerSize(1.);
+    gr1->SetMarkerSize(0.7);
 
     TGraphErrors *gr2 = new TGraphErrors(m,x2,y2,ex2,ey2); // irradiated
     gr2->SetName("gr2");
     gr2->SetMarkerColor(13);
     gr2->SetMarkerStyle(25);
-    gr2->SetMarkerSize(1.);
+    gr2->SetMarkerSize(0.7);
 
     TGraphErrors *gr3 = new TGraphErrors(p,x3,y3,ex3,ey3); // simulation
     gr3->SetName("gr3");
     gr3->SetMarkerColor(kRed+2);
     gr3->SetMarkerStyle(20);
-    gr3->SetMarkerSize(1.);
+    gr3->SetMarkerSize(0.7);
 
     TF1* func1 = new TF1("func1", "(0.5*[0]*(1+ TMath::Erf((x-[1])/[2])))", x1[0], x1[n-1]);
-    func1->SetParameters(0.98, 1.85, 0.15);
+    func1->SetParameters(0.98, 1.85, 0.10);
     func1->SetLineColor(13);
     func1->SetLineWidth(1);
     func1->SetLineStyle(7);
     TFitResultPtr r1 = gr1->Fit(func1, "S");
 
     TF1* func2 = new TF1("func2", "(0.5*[0]*(1+ TMath::Erf((x-[1])/[2])))", x2[0], x2[m-1]);
-    func2->SetParameters(0.95, 2.15, 0.15);
+    func2->SetParameters(0.95, 2.15, 0.10);
     func2->SetLineColor(13);
     func2->SetLineWidth(1);
     func2->SetLineStyle(7);
     TFitResultPtr r2 = gr2->Fit(func2, "S");
 
     TF1* func3 = new TF1("func3", "(0.5*[0]*(1+ TMath::Erf((x-[1])/[2])))", x3[0], x3[p-1]);
-    func3->SetParameters(1, 2, 0.15);
+    func3->SetParameters(0.99, 1.85, 0.10);
     func3->SetLineColor(kRed+2);
     func3->SetLineWidth(1);
     func3->SetLineStyle(7);
@@ -520,9 +520,9 @@ void figure20_0() {
 	A1->Draw("SAME");
 
     auto legend = new TLegend(0.6,0.1,0.9,0.4);
-    legend->AddEntry("gr1","Adam et al. - non-irr. 2.75 mm","p");
-    legend->AddEntry("gr2","Adam et al. - irr. 3.05 mm","p");
-    legend->AddEntry("gr3","Geant4 - 2.75 mm","ep");
+    legend->AddEntry("gr1","Adam et al. - non-irr.","p");
+    legend->AddEntry("gr2","Adam et al. - irr.","p");
+    legend->AddEntry("gr3","Geant4 - 2.63 mm","ep");
     legend->Draw();
 
     gPad->Modified();
