@@ -46,7 +46,7 @@ PhysicsListMessenger::PhysicsListMessenger(PhysicsList* pPhys)
   fPhysDir->SetGuidance("physics list commands");
 
   fListCmd = new G4UIcmdWithAString("/testem/phys/addPhysics",this);  
-  fListCmd->SetGuidance("Add modula physics list.");
+  fListCmd->SetGuidance("Add modular physics list.");
   fListCmd->SetParameterName("PList",false);
   fListCmd->AvailableForStates(G4State_PreInit);
   fListCmd->SetToBeBroadcasted(false);      

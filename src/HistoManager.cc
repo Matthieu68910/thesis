@@ -43,20 +43,11 @@ void HistoManager::Book()
   //
   //analysis->SetNtupleDirectoryName("ntuple");
   analysis->CreateNtuple("data", "Primary Particle Tuple");
-  analysis->CreateNtupleDColumn("x_i");         //column 0
-  analysis->CreateNtupleDColumn("y_i");         //column 1
-  analysis->CreateNtupleDColumn("z_i");         //column 2
+  analysis->CreateNtupleDColumn("x0");         //column 0
+  analysis->CreateNtupleDColumn("y0");         //column 1
+  analysis->CreateNtupleDColumn("z0");         //column 2
   analysis->CreateNtupleDColumn("theta_i");     //column 3
-  analysis->CreateNtupleDColumn("phi_i");       //column 4
-  analysis->CreateNtupleDColumn("E_i");         //column 5
-  analysis->CreateNtupleDColumn("x_0");         //column 6
-  analysis->CreateNtupleDColumn("y_0");         //column 7
-  analysis->CreateNtupleDColumn("x_A");         //column 8
-  analysis->CreateNtupleDColumn("y_A");         //column 9
-  analysis->CreateNtupleDColumn("z_A");         //column 10
-  analysis->CreateNtupleDColumn("x_B");         //column 11
-  analysis->CreateNtupleDColumn("y_B");         //column 12
-  analysis->CreateNtupleDColumn("z_B");         //column 13
+  analysis->CreateNtupleDColumn("momentum");     //column 4
 
   if (strip_nbr == 0) {
     const B1DetectorConstruction* detectorConstruction

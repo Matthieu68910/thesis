@@ -37,6 +37,7 @@
 class G4ParticleGun;
 class G4Event;
 class G4Box;
+class B1PrimaryGeneratorMessenger;
 
 /// The primary generator action class with particle gun.
 
@@ -44,24 +45,29 @@ class B1PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
   public:
     B1PrimaryGeneratorAction();    
-    virtual ~B1PrimaryGeneratorAction();
+   ~B1PrimaryGeneratorAction();
 
     // method from the base class
-    virtual void GeneratePrimaries(G4Event*);         
+  public:
+    void SetTransverseMomentum(G4double val) {pTMomentum = val;}
+    void SetTMRandom(G4bool val) {RdmPT = val;}
+    void SetMinValue(G4double val) {min_pT = val;}
+    void SetMaxValue(G4double val) {max_pT = val;}
+    virtual
+    void GeneratePrimaries(G4Event*);
   
     // method to access particle gun
-    const G4ParticleGun* GetParticleGun() const { return fParticleGun; }
+    const G4ParticleGun* GetParticleGun() const {return fParticleGun;}
   
   private:
     G4ParticleGun*  fParticleGun; // pointer to G4 gun class
-    G4Box* fEnvelopeBox;
     G4double space;
-    G4double posAB;
-    G4double distance;
-    G4double rayon;
     G4double pTMomentum;
-    G4double masse;
-    const G4double c_speed;
+    G4bool RdmPT;
+    G4double min_pT;
+    G4double max_pT;
+
+    B1PrimaryGeneratorMessenger* fGunMessenger;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

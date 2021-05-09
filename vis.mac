@@ -1,4 +1,4 @@
-/vis/open OGL 600x600-0+0
+/vis/open OGL 1920x1080-0+0
 /vis/viewer/set/autoRefresh false
 /vis/verbose errors
 /vis/drawVolume
@@ -14,7 +14,9 @@
 /vis/scene/endOfEventAction accumulate
 /vis/set/textLayout    # Revert to normal (left adjusted) layout
 /vis/set/textColour    # Revert to default text colour (blue)
-/vis/scene/add/axes
+#/vis/scene/add/axes
+#/vis/scene/add/magneticField 10
+/vis/scene/add/electricField 10
 /vis/set/colour red
 /vis/set/lineWidth 2
 /vis/scene/add/frame   # Simple frame around the view
@@ -25,4 +27,9 @@
 /vis/viewer/set/hiddenMarker true
 /vis/viewer/set/viewpointThetaPhi 90 90
 /vis/viewer/set/autoRefresh true
+#
+#/vis/filtering/trajectories/create/attributeFilter
+#/vis/filtering/trajectories/attributeFilter-0/setAttribute IMag
+#/vis/filtering/trajectories/attributeFilter-0/addInterval 3.6 eV 10 GeV
+#
 /vis/verbose warnings

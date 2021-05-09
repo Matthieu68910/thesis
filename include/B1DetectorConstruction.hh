@@ -40,6 +40,8 @@ class G4LogicalVolume;
 class G4UniformMagField;
 class G4ChordFinder;
 class G4GenericMessenger;
+class B1Field;
+class B1WorldField;
 
 /// Detector construction class to define materials and geometry.
 
@@ -53,17 +55,25 @@ class B1DetectorConstruction : public G4VUserDetectorConstruction
     virtual G4VPhysicalVolume* Construct();
     virtual void ConstructSDandField();
     
-    G4double GetSpace() const { return space; }
-    G4double GetPosAB() const { return posAB; }
-    G4int GetStripNumber() const {return strip_nbr; }
+    G4double    GetSpace() const { return space; }
+    G4double    GetPosAB() const { return posAB; }
+    G4double    GetBackPlane() const { return backplane; }
+    G4int       GetStripNumber() const {return strip_nbr; }
 
   protected:
-    G4double  space;
-    G4double posAB;
-    G4int strip_nbr;
+    G4double    space;
+    G4double    posAB;
+    G4int       strip_nbr;
+    G4double    backplane;
 
   private:
-    static G4ThreadLocal G4FieldManager* fFieldMgr;
+    G4LogicalVolume* logicSiUp;
+    G4LogicalVolume* logicSiDo;
+    G4LogicalVolume* logicWorld;
+
+    static G4ThreadLocal B1Field* fFieldUp;
+    static G4ThreadLocal B1Field* fFieldDo;
+    static G4ThreadLocal B1WorldField* fFieldWorld;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
