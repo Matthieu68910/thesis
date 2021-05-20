@@ -25,7 +25,7 @@ bool CBC2(
     // Loop on sensor A strips
     for (int i = 0; i < NBR_STRIP; ++i)
     {
-        double strip_energy = (strip_A[i] / 0.00362) + distribution(generator);
+        double strip_energy = (strip_A[i] / 0.00362) + abs(distribution(generator));
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -68,7 +68,7 @@ bool CBC2(
     // Loop on sensor B strips
     for (int i = 0; i < NBR_STRIP; ++i)
     {
-        double strip_energy = (strip_B[i] / 0.00362) + distribution(generator);
+        double strip_energy = (strip_B[i] / 0.00362) + abs(distribution(generator));
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {

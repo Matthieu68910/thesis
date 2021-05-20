@@ -85,8 +85,8 @@ void B1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     space = detectorConstruction->GetSpace();
   }
 
-  G4double x0 = 900*um * (G4UniformRand()-0.5) - (tan(theta_i) * space); //360*um * (G4UniformRand()-0.5)
-  G4double y0 = 900*um * (G4UniformRand()-0.5);
+  G4double x0 = 11430.*um * (G4UniformRand()-0.5) - (tan(theta_i) * space); //360*um * (G4UniformRand()-0.5)
+  G4double y0 = 11430.*um * (G4UniformRand()-0.5);
 
   fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, -(space + 1.*um)));
 

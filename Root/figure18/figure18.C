@@ -4,7 +4,7 @@
 #include <random>
 
 std::default_random_engine generator;
-std::normal_distribution<double> distribution(0.00362, 0.795); // µ = 1000 e-, s = 800 e-
+std::normal_distribution<double> distribution(0., 0.795); // µ = 1000 e-, s = 800 e-
 
 bool CBC2(
 	const vector<double> &strip_A, 

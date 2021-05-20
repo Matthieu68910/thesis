@@ -4,8 +4,7 @@
 #include <random>
 
 std::default_random_engine generator;
-std::normal_distribution<double> distribution(0., 0.002891475); // µ = 0 e-, s = 2.13*375*3.62
-std::uniform_real_distribution<> distribution1(0.0, 1.0);
+std::normal_distribution<double> distribution(0., 0.795); // µ = 0 e-, s = 2.13*375*3.62
 
 bool CBC2(
     const double &x0,
@@ -16,7 +15,7 @@ bool CBC2(
 	vector<double> &res_B,
 	const int MAX_CLUSTER_WIDTH = 3,
 	const int CLUSTER_WINDOW = 5,
-	double THRESHOLD = 0.0222,
+	double THRESHOLD = 5.1975,
     double kill_value = 0.04331
 	){
 
@@ -32,7 +31,7 @@ bool CBC2(
 	// Loop on sensor A strips
 	for (int i = 0; i < NBR_STRIP; ++i)
     {
-    	double strip_energy = strip_A[i] + abs(distribution(generator));
+    	double strip_energy = (strip_A[i] / 0.00362) + abs(distribution(generator));
         //if(distribution1(generator) < kill_value){strip_energy = 0.;}
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
@@ -79,7 +78,7 @@ bool CBC2(
 	// Loop on sensor B strips
 	for (int i = 0; i < NBR_STRIP; ++i)
     {
-    	double strip_energy = strip_B[i] + abs(distribution(generator));
+    	double strip_energy = (strip_B[i] / 0.00362) + abs(distribution(generator));
         //if(distribution1(generator) < kill_value){strip_energy = 0.;}
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
@@ -393,7 +392,7 @@ void figure19() {
     Double_t ey1[index] = {0.};
 
     //****************** Create Histo ************************************//
-    auto c1 = new TCanvas("c1","c1",1920,1080);
+    auto c1 = new TCanvas("c1","c1",1000,600);
 	c1->SetTitle("Figure 1: threshold variation");
 	gStyle->SetOptStat(0);
 	gPad->SetGridx(1);
@@ -418,7 +417,7 @@ void figure19() {
         const int NBR_STRIP = 254;
         const int MAX_CLUSTER_WIDTH = 5;
         const int CLUSTER_WINDOW = 5;
-        const double THRESHOLD = 0.019005; // (14 * 375 * 3.62) / 1000000
+        const double THRESHOLD = 5.1975; // (14 * 375 * 3.62) / 1000000
 
         Int_t nbrCAT, nbrCA, nbrCBT, nbrCB; // for A and B detectors
         Double_t mCWAT, mCWBT, mCWA, mCWB;

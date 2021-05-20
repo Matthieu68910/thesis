@@ -73,8 +73,8 @@ numbers1 = [15.074491,
 
 # numbers.sort()
 
-for x in range(len(numbers1)):
-    print("/generator/momentum/SetMomentum " + str(round(numbers1[x], 5)))
-    print("/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/Data_figure17-19/data_" + str(x))
+for x in range(len(numbers)):
+    print("/generator/momentum/SetMomentum " + str(round(numbers[x], 5)))
+    print("/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/Data_figure20/data_" + str(x))
     print("/run/beamOn 100000")
 

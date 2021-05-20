@@ -1,3 +1,4 @@
+****************************************
 Minimizer is Minuit / Migrad
 Chi2                      = 2.965393e-03
 NDf                       =           21
@@ -16,10 +17,10 @@ NCalls                    =           62
 p0                        = 9.606317e-01   +/-   4.829723e-03
 p1                        = 2.139471e+00   +/-   2.155518e-03
 p2                        = 1.776862e-01   +/-   4.954474e-03
- FCN=873.842 FROM MIGRAD    STATUS=CONVERGED      73 CALLS          74 TOTAL
-                     EDM=5.86597e-11    STRATEGY= 1      ERROR MATRIX ACCURATE 
+ FCN=2503.8 FROM MIGRAD    STATUS=CONVERGED      74 CALLS          75 TOTAL
+                     EDM=1.34133e-09    STRATEGY= 1      ERROR MATRIX ACCURATE 
   EXT PARAMETER                                   STEP         FIRST   
   NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
-   1  p0           9.92690e-01   2.56911e-04   3.59163e-06   3.12612e-02
-   2  p1           1.87527e+00   5.33646e-04   7.60992e-06   8.63577e-03
-   3  p2           1.44540e-01   7.23703e-04   1.02382e-05  -9.12515e-03
+   1  p0           9.92090e-01   1.77350e-04   4.27524e-06   2.47072e-01
+   2  p1           1.87810e+00   3.73055e-04   8.54638e-06  -4.82711e-02
+   3  p2           1.36317e-01   4.63640e-04   1.06376e-05  -5.44867e-02

@@ -6,7 +6,6 @@
 
 std::default_random_engine generator;
 std::normal_distribution<double> distribution(0., 0.795); // µ = 0 e-, s = 2.13*375*3.62
-std::uniform_real_distribution<> distribution1(0.0, 1.0);
 
 bool CBC2(
 	const vector<double> &strip_A, 
@@ -387,7 +386,7 @@ void figure17() {
 	    auto data = f.Get<TTree>("data");
 
 	    // Get the number of entries in TTree
-	    const int ENTRIES = data->GetEntries() / 10;
+	    const int ENTRIES = data->GetEntries();
 	    //cout << std::scientific << "Number of entries: " << ENTRIES << endl;
 
 	    //**************** Set BranchAddress for datas recovery ***************
