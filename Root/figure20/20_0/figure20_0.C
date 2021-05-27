@@ -3,34 +3,34 @@
 #include <iostream>
 
 std::default_random_engine generator;
-std::normal_distribution<double> distribution(0.0, 0.795); // µ = 1000 e-, s = 800 e-
+std::normal_distribution<double> distribution(0.0, 0.795); // 2.12 V(CTH) * 375 e- = 795 e- = 0.795 ke-
 
 bool CBC2(
-    const vector<double> &strip_A, 
-    const vector<double> &strip_B, 
+    const vector<double> &strip_A, // vector for sensor A strips' data
+    const vector<double> &strip_B, // vector for sensor B strips' data
     vector<double> &res_A, // [0:4]-> 1-5 strip wide clusters,[5]-> number of clusters (tot), [6]-> mean cluster width (tot), [7:8]-> accepted
     vector<double> &res_B,
     const int MAX_CLUSTER_WIDTH = 3,
     const int CLUSTER_WINDOW = 5,
-    const double THRESHOLD = 5.1975
+    const double THRESHOLD = 5.1975 // (119.86 - 106) * 375 e- = 5197.5 e- = 5.1975 ke-
     ){
 
-    const int NBR_STRIP = strip_A.size();
+    const int NBR_STRIP = strip_A.size(); // get number of strips
 
     // Clusters in sensor A
-    std::vector<double> clus_pos_A;
-    std::vector<double> clus_size_A;
-    bool inside = false;
-    int size = 0;
+    std::vector<double> clus_pos_A; // create vector for clusters position
+    std::vector<double> clus_size_A; // create vector for clusters size
+    bool inside = false; // is inside a cluster?
+    int size = 0; // size of the cluster we are in
     // Loop on sensor A strips
     for (int i = 0; i < NBR_STRIP; ++i)
     {
-        double strip_energy = (strip_A[i] / 0.00362) + abs(distribution(generator));
-        if (strip_energy < THRESHOLD && !inside)        
+        double strip_energy = (strip_A[i] / 0.00362) + abs(distribution(generator)); // change MeV in ke-, and apply noise
+        if (strip_energy < THRESHOLD && !inside)       
         {} else if (strip_energy < THRESHOLD && inside)
         {
             clus_size_A.push_back(size);
-            if(size <= 5) res_A.at(size - 1) += 1;
+            if(size <= 5) res_A.at(size - 1) += 1; // fill stats for cluster size
             clus_pos_A.push_back(floor((i - 1) - (size / 2) + 0.5));
             size = 0;
             inside = false;
@@ -502,7 +502,7 @@ void figure20_0() {
 	yaxis->SetTitleSize(0.05);
 	yaxis->SetTitleOffset(0.9);
 
-    TF1* f1 = new TF1("f1", "x", 1.0, 3.5);
+    TF1* f1 = new TF1("f1", "x", 1.0, 3.5); // 3.5
     TGaxis* A1 = new TGaxis(1.0, yaxis->GetXmax(), 3.5, yaxis->GetXmax(), "f1", 510, "-");
     A1->SetLabelFont(42);
 	A1->SetLabelSize(0.04);
