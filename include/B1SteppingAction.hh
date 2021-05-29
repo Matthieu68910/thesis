@@ -53,6 +53,7 @@ class B1SteppingAction : public G4UserSteppingAction
 
   private:
     B1EventAction*  fEventAction;
+    G4double space;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

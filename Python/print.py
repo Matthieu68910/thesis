@@ -74,6 +74,6 @@ numbers20 = [   1.20000,
 
 for x in range(len(numbers17)):
     print("/generator/momentum/SetMomentum " + str(round(numbers17[x], 5)))
-    print("/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/Data_figure17-19-newCC/data_" + str(x))
+    print("/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/Data_figure17-19/data_" + str(x))
     print("/run/beamOn 50000")
 

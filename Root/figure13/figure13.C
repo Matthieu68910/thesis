@@ -29,7 +29,7 @@ bool CBC2(
 	// Loop on sensor A strips
 	for (int i = 0; i < NBR_STRIP; ++i)
     {
-    	double strip_energy = (strip_A[i] / 0.00362) + distribution(generator);
+    	double strip_energy = (strip_A[i] / 0.00362) + abs(distribution(generator));
         //if(distribution1(generator) < kill_value){strip_energy = 0.;}
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
@@ -76,7 +76,7 @@ bool CBC2(
 	// Loop on sensor B strips
 	for (int i = 0; i < NBR_STRIP; ++i)
     {
-    	double strip_energy = (strip_B[i] / 0.00362) + distribution(generator);
+    	double strip_energy = (strip_B[i] / 0.00362) + abs(distribution(generator));
         //if(distribution1(generator) < kill_value){strip_energy = 0.;}
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
@@ -172,7 +172,7 @@ void figure13() {
 	// data for Adam2020
 
 	// open file
-    TFile *f = TFile::Open("/media/matthieu/ssd1/Geant4/Data/Data_figure13-16-newCC/data.root", "read");
+    TFile *f = TFile::Open("/media/matthieu/ssd1/Geant4/Data/Data_figure13-16/data100k_pions_newCC.root", "read");
 
     //************* variable ***************//
     const int NBR_STRIP = 254;
