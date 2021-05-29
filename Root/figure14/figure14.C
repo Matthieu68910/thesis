@@ -42,7 +42,7 @@ bool CBC2(
         // noise value deternmination
         std::normal_distribution<double> dist1(0., noise);
         // noise creation
-        double strip_energy = (strip_A[i] / 0.0039) + abs(dist1(generator));
+        double strip_energy = (strip_A[i] / 0.00386) + abs(dist1(generator));
         //if(distribution1(generator) < kill_value){strip_energy = 0.;}
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
@@ -102,7 +102,7 @@ bool CBC2(
         // noise value deternmination
         std::normal_distribution<double> dist1(0., noise);
         // noise creation
-        double strip_energy = (strip_B[i] / 0.0039) + abs(dist1(generator));
+        double strip_energy = (strip_B[i] / 0.00386) + abs(dist1(generator));
         //if(distribution1(generator) < kill_value){strip_energy = 0.;}
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
@@ -422,8 +422,8 @@ void figure14() {
     for (int j = 0; j < NBR_BINS; ++j)
     {
 	    // Create vectors for stat
-	    std::vector<double> nbr_hitsA(10, 0);
-	    std::vector<double> nbr_hitsB(10, 0);
+	    std::vector<double> nbr_hitsA(100, 0);
+	    std::vector<double> nbr_hitsB(100, 0);
 
 	    //****************** Main loop over all entries **********************//
 	    int count_loop = 0;
@@ -441,21 +441,21 @@ void figure14() {
 	        bool stub1 = CBC2(strip_A, strip_B, res_A1, res_B1, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, x1[j]);
             bool stub2 = CBC2(strip_A, strip_B, res_A2, res_B2, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, x2[j]);
 
-	        nbr_hitsA.at(loop_number) += (double) res_A1.at(5) / (ENTRIES / 10);
+	        nbr_hitsA.at(loop_number) += (double) res_A1.at(5) / (ENTRIES / 100);
 
-	        nbr_hitsB.at(loop_number) += (double) res_B2.at(5) / (ENTRIES / 10);
+	        nbr_hitsB.at(loop_number) += (double) res_B2.at(5) / (ENTRIES / 100);
 
 	        count_loop += 1;
-	        if (count_loop == ENTRIES / 10)
+	        if (count_loop == ENTRIES / 100)
 	        {
 	        	count_loop = 0;
 	        	loop_number += 1;
 	        }
 	    }
 	    double variance1 = 0., deviation1 = 0., average1 = 0.;
-		average1 = std::accumulate(nbr_hitsA.begin(), nbr_hitsA.end(), 0.0) / 10;
-		for (int i = 0; i < 10; ++i){variance1 += pow((nbr_hitsA.at(i) - average1), 2);}
-		variance1 /= 9;
+		average1 = std::accumulate(nbr_hitsA.begin(), nbr_hitsA.end(), 0.0) / 100;
+		for (int i = 0; i < 100; ++i){variance1 += pow((nbr_hitsA.at(i) - average1), 2);}
+		variance1 /= 99;
 		deviation1 = sqrt(variance1);
 		
 
@@ -463,9 +463,9 @@ void figure14() {
 		ey1[j] = deviation1;
 
 		double variance2 = 0., deviation2 = 0., average2 = 0.;
-		average2 = std::accumulate(nbr_hitsB.begin(), nbr_hitsB.end(), 0.0) / 10;
-		for (int i = 0; i < 10; ++i){variance2 += pow((nbr_hitsB.at(i) - average2), 2);}
-		variance2 /= 9;
+		average2 = std::accumulate(nbr_hitsB.begin(), nbr_hitsB.end(), 0.0) / 100;
+		for (int i = 0; i < 100; ++i){variance2 += pow((nbr_hitsB.at(i) - average2), 2);}
+		variance2 /= 99;
 		deviation2 = sqrt(variance2);
 		cout << std::scientific << x1[j] << "\t" << average1 << "\t" << deviation1 << "\t" << average2 << "\t" << deviation2 << endl;
 
@@ -579,7 +579,7 @@ void figure14() {
     gPad->Modified();
     //*********************** 
 
-    c1->SaveAs("figure14-3-9.pdf");
+    c1->SaveAs("figure14_386.pdf");
     // Close file when finished
     //f.Close();
 }

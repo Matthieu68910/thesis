@@ -182,44 +182,11 @@ bool CBC2(
     return false;
 }
 
-void SaveData(
-	const int &k,
-	Double_t x[],
-	Double_t y[],
-	Double_t ey[],
-	Double_t p1,
-	Double_t p2,
-	Double_t p3,
-	Double_t t1,
-	Double_t t2,
-	Double_t t3,
-	Double_t s1,
-	Double_t s2,
-	Double_t s3
-	){
 
-	// open file
-	ofstream myfile;
-    myfile.open ("figure20_0_data.txt");
-    myfile << "x\ty\tey\n";
-    for (int i = 0; i < k; ++i)
-    {
-    	myfile << std::scientific << x[i] << "\t" << y[i] << "\t" << ey[i] << "\n";
-    }
-    myfile << std::scientific << "serie\t" << "param0\t" << "param1\t" << "param2\n";
-    myfile << std::scientific << "Adam\t" << p1 << "\t" << t1 << "\t" << s1 << "\n";
-    myfile << std::scientific << "Adam-irr\t" << p2 << "\t" << t2 << "\t" << s2 << "\n";
-    myfile << std::scientific << "Geant4\t" << p3 << "\t" << t3 << "\t" << s3 << "\n";
-    myfile.close();
-
-    return;
-}
-
-void figure20_0() {
-	// data for Adam2020
-	const Int_t n = 24; // Adam2020 non-irradiated
+void figure20_5() {
+	const Int_t n = 24; // data for Adam2020
  
-	Double_t x1[n] = {	1.32089, 
+	Double_t x1[n] = {	1.32089,
 						1.48578,
 						1.57853,
 						1.71422,
@@ -307,220 +274,258 @@ void figure20_0() {
     Double_t ex2[m] = {0.};
     Double_t ey2[m] = {0.};
 
-    const Int_t p = 25; // // Simulation
- 
-    Double_t x3[p] = {  1.32089,
-                        1.48578,
-                        1.57853,
-                        1.71422,
-                        1.79152,
-                        1.87568,
-                        1.93064,
-                        1.98904,
-                        2.13847,
-                        2.42703,
-                        2.51978,
-                        2.80491,
-                        2.97495,
-                        3.16560,
-                        4.26316,
-                        4.66851,
-                        5.15975,
-                        6.32257,
-                        6.32257,
-                        7.25867,
-                        9.79902,
-                        10.88800,
-                        12.24830,
-                        13.06420,
-                        15.07380};
-    Double_t y3[p] = {0.};
-    Double_t ex3[p] = {0.};
-    Double_t ey3[p] = {0.};
+    //************* variable ***************//
+    const int NBR_STRIP = 254;
 
-	//****************** Create Histo ************************************//
+    const int MAX_CLUSTER_WIDTH = 3;
+    const int CLUSTER_WINDOW =5;
+    const double THRESHOLD = 5.1975; // MeV -> = 3 * (1000 * 3.62 keV)
+
+    const int NBR_BINS = 200;
+
+    Double_t momentum;
+
+    //****************** Create Histo ************************************//
     auto c1 = new TCanvas("c1","c1",1000,600);
-    c1->SetTitle("Cluster efficiency for 2S mini-module");
+    c1->SetTitle("");
     gStyle->SetOptStat(0);
     gPad->SetGridx(1);
     gPad->SetGridy(1);
 
-    gPad->SetTitle("Cluster efficiency for 2S mini-module");
+    TH1* h1 = new TH1D("h1", "", NBR_BINS, 1.0, 3.5);
+    h1->SetName("h1");
+    TH1* h2 = new TH1D("h2", "", NBR_BINS, 1.0, 3.5);
+    h2->SetName("h2");
+    TH1* h3 = new TH1D("h3", "", NBR_BINS, 1.0, 3.5);
+    h3->SetName("h3");
 
-    // loop on all files
-    for (int j = 0; j < p; ++j)
+    gPad->SetTitle("");
+
+    // Create vectors for bin content
+    std::vector<double> nbr_stub1(NBR_BINS+2, 0);
+    std::vector<double> nbr_event1(NBR_BINS+2, 0);
+    std::vector<double> nbr_stub2(NBR_BINS+2, 0);
+    std::vector<double> nbr_event2(NBR_BINS+2, 0);
+    std::vector<double> nbr_stub3(NBR_BINS+2, 0);
+    std::vector<double> nbr_event3(NBR_BINS+2, 0);
+
+    /********************************************************************************************/
+    // open file
+    TFile *f = TFile::Open("/media/matthieu/ssd1/Geant4/Data/Data_figure20-1/data1M.root", "read");
+    auto data = f->Get<TTree>("data");
+    const int ENTRIES = data->GetEntries();
+    std::vector<double> strip_A(NBR_STRIP, 0);
+    std::vector<double> strip_B(NBR_STRIP, 0);
+    for (int i = 0; i < NBR_STRIP; ++i)
     {
-        //CopyFile(j);
+        string strip_name = "s" + std::to_string(i);
+        char const *pchar = strip_name.c_str();
+        data->SetBranchAddress(pchar, &strip_B.at(i));
+    }
+    for (int i = NBR_STRIP; i < (2*NBR_STRIP); ++i)
+    {
+        string strip_name = "s" + std::to_string(i);
+        char const *pchar = strip_name.c_str();
+        data->SetBranchAddress(pchar, &strip_A.at(i-NBR_STRIP));
+    }
+    data->SetBranchAddress("momentum", &momentum);
+    //****************** Main loop over all entries **********************//
+    int count_loop = 0;
+    double percentage = 0.;
+    for (int k = 0; k < ENTRIES; k++)
+    {
+        data->GetEntry(k);
+        std::vector<double> res_A(9, 0);
+        std::vector<double> res_B(9, 0);
 
-        string file_path = "/media/matthieu/ssd1/Geant4/Data/Data_figure20/data_";
-        file_path += std::to_string(j);
-        file_path += ".root";
-        char const *pchar = file_path.c_str();
-        TFile f(pchar, "read");
-        //cout << "File " << j << " opened:" << endl;
+        bool stub = CBC2(strip_A, strip_B, res_A, res_B, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, THRESHOLD);
 
-        //************* variable ***************//
-        const int NBR_STRIP = 254;
-        const int MAX_CLUSTER_WIDTH = 3;
-        const int CLUSTER_WINDOW = 5;
-        const double THRESHOLD = 5.1975; // MeV -> = 6 * (1000 * 3.6 keV)
-        
-        Int_t nbrCAT, nbrCA, nbrCBT, nbrCB; // for A and B detectors
-        Double_t mCWAT, mCWBT, mCWA, mCWB;
-        Int_t CA1, CA2, CA3, CA4, CA5;
-        Int_t CB1, CB2, CB3, CB4, CB5;
-        Double_t momentum;
+        if(stub){nbr_stub1.at(h1->FindBin(momentum)) += 1.;}
+        nbr_event1.at(h1->FindBin(momentum)) += 1.;
 
-        //************ Get the TTree ******************************************
-        auto data = f.Get<TTree>("data");
-
-        // Get the number of entries in TTree
-        const int ENTRIES = data->GetEntries();
-        //cout << std::scientific << "Number of entries: " << ENTRIES << endl;
-
-        //**************** Set BranchAddress for datas recovery ***************
-        // for strips
-        std::vector<double> strip_A(NBR_STRIP, 0);
-        std::vector<double> strip_B(NBR_STRIP, 0);
-
-        for (int i = 0; i < NBR_STRIP; ++i)
+        count_loop += 1;
+        if (count_loop == ENTRIES / 100)
         {
-            string strip_name = "s" + std::to_string(i);
-            char const *pchar = strip_name.c_str();
-            data->SetBranchAddress(pchar, &strip_B.at(i));
+        	count_loop = 0;
+        	percentage += 0.333333333;
+        	cout << percentage << " %" << endl;
         }
-        for (int i = NBR_STRIP; i < (2*NBR_STRIP); ++i)
+    }
+    double error = 0., content = 0.;
+    for (int i = 1; i <= NBR_BINS; ++i)
+    {
+    	content = nbr_stub1.at(i) / nbr_event1.at(i);
+    	h1->SetBinContent(i, content);
+    }
+    f->Close();
+    /**********************************************************************************************/
+    // open file
+    TFile *f2 = TFile::Open("/media/matthieu/ssd1/Geant4/Data/Data_figure20-1/data1M-260.root", "read");
+    auto data2 = f2->Get<TTree>("data");
+    const int ENTRIES2 = data2->GetEntries();
+    std::vector<double> strip_A2(NBR_STRIP, 0);
+    std::vector<double> strip_B2(NBR_STRIP, 0);
+    for (int i = 0; i < NBR_STRIP; ++i)
+    {
+        string strip_name = "s" + std::to_string(i);
+        char const *pchar = strip_name.c_str();
+        data2->SetBranchAddress(pchar, &strip_B2.at(i));
+    }
+    for (int i = NBR_STRIP; i < (2*NBR_STRIP); ++i)
+    {
+        string strip_name = "s" + std::to_string(i);
+        char const *pchar = strip_name.c_str();
+        data2->SetBranchAddress(pchar, &strip_A2.at(i-NBR_STRIP));
+    }
+    data2->SetBranchAddress("momentum", &momentum);
+    //****************** Main loop over all entries **********************//
+    count_loop = 0;
+    for (int k = 0; k < ENTRIES2; k++)
+    {
+        data2->GetEntry(k);
+        std::vector<double> res_A2(9, 0);
+        std::vector<double> res_B2(9, 0);
+
+        bool stub = CBC2(strip_A2, strip_B2, res_A2, res_B2, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, THRESHOLD);
+
+        if(stub){nbr_stub2.at(h2->FindBin(momentum)) += 1.;}
+        nbr_event2.at(h2->FindBin(momentum)) += 1.;
+
+        count_loop += 1;
+        if (count_loop == ENTRIES2 / 100)
         {
-            string strip_name = "s" + std::to_string(i);
-            char const *pchar = strip_name.c_str();
-            data->SetBranchAddress(pchar, &strip_A.at(i-NBR_STRIP));
+            count_loop = 0;
+            percentage += 0.333333333;
+            cout << percentage << " %" << endl;
         }
+    }
+    error = 0.;
+    content = 0.;
+    for (int i = 1; i <= NBR_BINS; ++i)
+    {
+        content = nbr_stub2.at(i) / nbr_event2.at(i);
+        h2->SetBinContent(i, content);
+    }
+    f2->Close();
+    /************************************************************************************************************/
+    // open file
+    TFile *f3 = TFile::Open("/media/matthieu/ssd1/Geant4/Data/Data_figure20-1/data1M-250.root", "read");
+    auto data3 = f3->Get<TTree>("data");
+    const int ENTRIES3 = data3->GetEntries();
+    std::vector<double> strip_A3(NBR_STRIP, 0);
+    std::vector<double> strip_B3(NBR_STRIP, 0);
+    for (int i = 0; i < NBR_STRIP; ++i)
+    {
+        string strip_name = "s" + std::to_string(i);
+        char const *pchar = strip_name.c_str();
+        data3->SetBranchAddress(pchar, &strip_B3.at(i));
+    }
+    for (int i = NBR_STRIP; i < (2*NBR_STRIP); ++i)
+    {
+        string strip_name = "s" + std::to_string(i);
+        char const *pchar = strip_name.c_str();
+        data3->SetBranchAddress(pchar, &strip_A3.at(i-NBR_STRIP));
+    }
+    data3->SetBranchAddress("momentum", &momentum);
+    //****************** Main loop over all entries **********************//
+    count_loop = 0;
+    for (int k = 0; k < ENTRIES3; k++)
+    {
+        data3->GetEntry(k);
+        std::vector<double> res_A3(9, 0);
+        std::vector<double> res_B3(9, 0);
 
-        //****************** Main loop over all entries **********************//
-        int count_loop = 0;
-        bool stop = true;
-        double nbr_stub = 0.;
-        std::vector<double> efficiencies;
-        for (int k = 0; k < ENTRIES; k++)
+        bool stub = CBC2(strip_A3, strip_B3, res_A3, res_B3, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, THRESHOLD);
+
+        if(stub){nbr_stub3.at(h3->FindBin(momentum)) += 1.;}
+        nbr_event3.at(h3->FindBin(momentum)) += 1.;
+
+        count_loop += 1;
+        if (count_loop == ENTRIES3 / 100)
         {
-            // fill variables with datas from entry i
-            data->GetEntry(k);
-
-            std::vector<double> res_A(9, 0);
-            std::vector<double> res_B(9, 0);
-
-            bool stub = CBC2(strip_A, strip_B, res_A, res_B, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, THRESHOLD);
-
-            if(stub){nbr_stub += 1.;}
-
-            count_loop += 1;
-            if (count_loop == ENTRIES /100)
-            {
-                count_loop = 0;
-                efficiencies.push_back((double) nbr_stub / (ENTRIES / 100));
-                //cout << mean_cluster_width << endl;
-                nbr_stub = 0.;
-            }
+            count_loop = 0;
+            percentage += 0.333333333;
+            cout << percentage << " %" << endl;
         }
-        //********************* fig 17 computation and printing **********************************//
-        // for A
-        double variance = 0., deviation = 0., average = 0.;
-        average = std::accumulate(efficiencies.begin(), efficiencies.end(), 0.0) / 100;
-        for (int i = 0; i < 100; ++i){variance += pow((efficiencies.at(i) - average), 2);}
-        variance /= 99;
-        deviation = sqrt(variance);
-        cout << std::scientific << "File " << j << " stub efficiency:\t" << average << "\t+/- " << deviation << endl;
+    }
+    error = 0.;
+    content = 0.;
+    for (int i = 1; i <= NBR_BINS; ++i)
+    {
+        content = nbr_stub3.at(i) / nbr_event3.at(i);
+        h3->SetBinContent(i, content);
+    }
+    f3->Close();
+    /*******************************************************************************************************/
+    
+    h1->SetLineColor(kGreen+2);
+    h1->SetLineWidth(1);
+    //h1->SetLineStyle(9);
+    h1->Draw("SAME");
 
-        //*********************** 
-        y3[j] = average;
-        ey3[j] = deviation;
+    h2->SetLineColor(kBlue+2);
+    h2->SetLineWidth(1);
+    //h1->SetLineStyle(9);
+    h2->Draw("SAME");
 
-        // Close file when finished
-        f.Close();
-    }   
-    // Fill graphs
+    h3->SetLineColor(kMagenta+2);
+    h3->SetLineWidth(1);
+    //h1->SetLineStyle(9);
+    h3->Draw("SAME");
+
     TGraphErrors *gr1 = new TGraphErrors(n,x1,y1,ex1,ey1); // non-irradiated
     gr1->SetName("gr1");
     gr1->SetMarkerColor(12);
     gr1->SetMarkerStyle(24);
     gr1->SetMarkerSize(0.7);
+    gr1->Draw("SAME P");
 
     TGraphErrors *gr2 = new TGraphErrors(m,x2,y2,ex2,ey2); // irradiated
     gr2->SetName("gr2");
     gr2->SetMarkerColor(12);
     gr2->SetMarkerStyle(25);
     gr2->SetMarkerSize(0.7);
+    gr2->Draw("SAME P");
 
-    TGraphErrors *gr3 = new TGraphErrors(p,x3,y3,ex3,ey3); // simulation
-    gr3->SetName("gr3");
-    gr3->SetMarkerColor(kRed+2);
-    gr3->SetMarkerStyle(20);
-    gr3->SetMarkerSize(0.7);
-
-    TF1* func1 = new TF1("func1", "(0.5*[0]*(1+ TMath::Erf((x-[1])/[2])))", x1[0], x1[n-1]);
-    func1->SetParameters(0.98, 1.85, 0.10);
-    func1->SetLineColor(12);
+    TF1* func1 = new TF1("func1", "([0]/(1+ TMath::Exp(-[1]*(x-[2]))))", x1[0], x1[n-1]);
+    func1->SetParameters(1, 15, 2);
+    func1->SetLineColor(13);
     func1->SetLineWidth(1);
     func1->SetLineStyle(7);
-    TFitResultPtr r1 = gr1->Fit(func1, "S");
+    gr1->Fit(func1);
 
-    TF1* func2 = new TF1("func2", "(0.5*[0]*(1+ TMath::Erf((x-[1])/[2])))", x2[0], x2[m-1]);
-    func2->SetParameters(0.95, 2.15, 0.10);
-    func2->SetLineColor(12);
+    TF1* func2 = new TF1("func2", "([0]/(1+ TMath::Exp(-[1]*(x-[2]))))", x2[0], x2[m-1]);
+    func2->SetParameters(1, 15, 2);
+    func2->SetLineColor(13);
     func2->SetLineWidth(1);
     func2->SetLineStyle(7);
-    TFitResultPtr r2 = gr2->Fit(func2, "S");
+    gr2->Fit(func2);
 
-    TF1* func3 = new TF1("func3", "(0.5*[0]*(1+ TMath::Erf((x-[1])/[2])))", x3[0], x3[p-1]);
-    func3->SetParameters(0.99, 1.85, 0.10);
-    func3->SetLineColor(kRed+2);
-    func3->SetLineWidth(1);
-    func3->SetLineStyle(7);
-    TFitResultPtr r3 = gr3->Fit(func3, "S");
-
-    TMultiGraph *mg = new TMultiGraph();
-    mg->Add(gr1);
-    mg->Add(gr2);
-    mg->Add(gr3);
-    mg->SetTitle("");
-    mg->Draw("AP");
-
-    Double_t plateau1   = r1->Value(0);
-    Double_t turn1   = r1->Value(1);
-    Double_t sigma1   = r1->Value(2);
-
-    Double_t plateau2   = r2->Value(0);
-    Double_t turn2   = r2->Value(1);
-    Double_t sigma2   = r2->Value(2);
-
-    Double_t plateau3   = r3->Value(0);
-    Double_t turn3   = r3->Value(1);
-    Double_t sigma3   = r3->Value(2);
-
-    TAxis *xaxis = mg->GetXaxis();
-    TAxis *yaxis = mg->GetYaxis();
+    TAxis *xaxis = h1->GetXaxis();
+    TAxis *yaxis = h1->GetYaxis();
     xaxis->SetLabelFont(42);
-	xaxis->SetLabelSize(0.04);
+    xaxis->SetLabelSize(0.04);
     xaxis->SetTitle("pT [GeV]");
     xaxis->SetTitleFont(22);
-	xaxis->SetTitleSize(0.05);
-	xaxis->SetTitleOffset(0.95);
+    xaxis->SetTitleSize(0.05);
+    xaxis->SetTitleOffset(0.95);
     xaxis->SetRangeUser(1.0, 3.5);
     yaxis->SetLabelFont(42);
-	yaxis->SetLabelSize(0.04);
+    yaxis->SetLabelSize(0.04);
     yaxis->SetTitle("Stub efficiency");
     yaxis->SetTitleFont(22);
-	yaxis->SetTitleSize(0.05);
-	yaxis->SetTitleOffset(0.9);
+    yaxis->SetTitleSize(0.05);
+    yaxis->SetTitleOffset(0.9);
+    yaxis->SetRangeUser(0., 1.05);
 
     TF1* f1 = new TF1("f1", "x", 1.0, 3.5); // 3.5
-    TGaxis* A1 = new TGaxis(1.0, yaxis->GetXmax(), 3.5, yaxis->GetXmax(), "f1", 510, "-");
+    TGaxis* A1 = new TGaxis(1.0, 1.05, 3.5, 1.05, "f1", 510, "-");
     A1->SetLabelFont(42);
-	A1->SetLabelSize(0.04);
-	A1->SetTitle("Angle d'incidence [deg]");
-	A1->SetTitleFont(22);
-	A1->SetTitleSize(0.05);
-	A1->SetTitleOffset(0.95);
+    A1->SetLabelSize(0.04);
+    A1->SetTitle("Angle d'incidence [deg]");
+    A1->SetTitleFont(22);
+    A1->SetTitleSize(0.05);
+    A1->SetTitleOffset(0.95);
     A1->ChangeLabel(1, -1, -1, -1, -1, -1, "19.6");
     A1->ChangeLabel(2, -1, -1, -1, -1, -1, "13.1");
     A1->ChangeLabel(3, -1, -1, -1, -1, -1, "9.8");
@@ -528,17 +533,21 @@ void figure20_0() {
     A1->ChangeLabel(5, -1, -1, -1, -1, -1, "6.5");
     A1->ChangeLabel(6, -1, -1, -1, -1, -1, "5.6");
     A1->ChangeLabel(7, -1, -1, -1, -1, -1, "");
-	A1->Draw("SAME");
+    A1->Draw("SAME");
 
-    auto legend = new TLegend(0.6,0.1,0.9,0.4);
-    legend->AddEntry("gr1","Adam et al. - non-irr.","p");
-    legend->AddEntry("gr2","Adam et al. - irr.","p");
-    legend->AddEntry("gr3","Geant4 - 2.63 mm","ep");
+    c1->RedrawAxis();
+
+    auto legend = new TLegend(0.65,0.1,0.9,0.35);
+    legend->AddEntry("gr1","Adam et al. 2020 - non-irradiated","p");
+    legend->AddEntry("gr2","Adam et al. 2020 - irradiated","p");
+    legend->AddEntry("h1","Geant4: W = 270 um","l");
+    legend->AddEntry("h2","Geant4: W = 260 um","l");
+    legend->AddEntry("h3","Geant4: W = 250 um","l");
     legend->Draw();
 
     gPad->Modified();
-
-    c1->SaveAs("figure20_0.pdf");
-
-    SaveData(p, x3, y3, ey3, plateau1, plateau2, plateau3, turn1, turn2, turn3, sigma1, sigma2, sigma3);
+    //*********************** 
+    c1->SaveAs("figure20_5.pdf");
+    // Close file when finished
+    //f.Close();
 }

@@ -45,8 +45,8 @@
 B1EventAction::B1EventAction(B1RunAction* runAction)
 : G4UserEventAction(),
   fRunAction(runAction),
-  fCollID_cryst(-1)
-{} 
+  EdepVector(0.)
+{}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -56,8 +56,12 @@ B1EventAction::~B1EventAction()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void B1EventAction::BeginOfEventAction(const G4Event*)
-{    
-
+{
+    if(EdepVector.size() == 0){
+        for (long unsigned int i = 0; i < 508; ++i) {
+            EdepVector.push_back(0.);
+        }
+    }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -66,28 +70,13 @@ void B1EventAction::EndOfEventAction(const G4Event* evt)
 {
   G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
 
-  //Hits collections
-
-  G4HCofThisEvent* HCE = evt->GetHCofThisEvent();
-  if(!HCE) return;
-
-  // Get hits collections IDs
-  if (fCollID_cryst < 0) {
-    G4SDManager* SDMan = G4SDManager::GetSDMpointer();
-    fCollID_cryst = SDMan->GetCollectionID("stripDetector/edep");
+  for(long unsigned int i = 0; i < EdepVector.size(); i++){
+      if(EdepVector.at(i) != 0.){
+          analysisManager->FillNtupleDColumn(i + 5, EdepVector.at(i));
+          EdepVector.at(i) = 0.;
+      }
   }
 
-  //Energy in crystals : identify 'good events'
-  G4THitsMap<G4double>* evtMap = (G4THitsMap<G4double>*)(HCE->GetHC(fCollID_cryst));
-
-  std::map<G4int,G4double*>::iterator itr;
-  for (itr = evtMap->GetMap()->begin(); itr != evtMap->GetMap()->end(); itr++) {
-    G4int copyNb  = (itr->first);
-    G4double edep = *(itr->second);
-
-    fRunAction->AddEdep(copyNb, edep);
-    analysisManager->FillNtupleDColumn(copyNb + 5, edep);
-  }
   analysisManager->AddNtupleRow();
 }
 

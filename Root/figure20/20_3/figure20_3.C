@@ -3,34 +3,48 @@
 #include <iostream>
 
 std::default_random_engine generator;
-std::normal_distribution<double> distribution(0.00362, 0.00220994475); // µ = 1000 e-, s = 800 e-
+std::uniform_real_distribution<> distribution1(0.0, 1.0);
 
 bool CBC2(
-    const vector<double> &strip_A, 
-    const vector<double> &strip_B, 
+    const vector<double> &strip_A, // vector for sensor A strips' data
+    const vector<double> &strip_B, // vector for sensor B strips' data
     vector<double> &res_A, // [0:4]-> 1-5 strip wide clusters,[5]-> number of clusters (tot), [6]-> mean cluster width (tot), [7:8]-> accepted
     vector<double> &res_B,
     const int MAX_CLUSTER_WIDTH = 3,
     const int CLUSTER_WINDOW = 5,
-    const double THRESHOLD = 0.0222
+    const double THRESHOLD = 5.1975 // (119.86 - 106) * 375 e- = 5197.5 e- = 5.1975 ke-
     ){
 
-    const int NBR_STRIP = strip_A.size();
+    const int NBR_STRIP = strip_A.size(); // get number of strips
 
+    double noise = 0.;
     // Clusters in sensor A
-    std::vector<double> clus_pos_A;
-    std::vector<double> clus_size_A;
-    bool inside = false;
-    int size = 0;
+    std::vector<double> clus_pos_A; // create vector for clusters position
+    std::vector<double> clus_size_A; // create vector for clusters size
+    bool inside = false; // is inside a cluster?
+    int size = 0; // size of the cluster we are in
     // Loop on sensor A strips
     for (int i = 0; i < NBR_STRIP; ++i)
     {
-        double strip_energy = abs(strip_A[i] + distribution(generator));
-        if (strip_energy < THRESHOLD && !inside)        
+        // noise parameters determination
+        if (distribution1(generator) >= 0.5)
+        {
+            std::normal_distribution<double> dist(1.36, 0.06);
+            noise = abs(dist(generator)) * 0.375;
+        } else
+        {
+            std::normal_distribution<double> dist(2.38, 0.6);
+            noise = abs(dist(generator)) * 0.375;
+        }
+        // noise value deternmination
+        std::normal_distribution<double> dist1(0., noise);
+        // noise creation
+        double strip_energy = (strip_A[i] / 0.00362) + abs(dist1(generator)); // change MeV in ke-, and apply noise
+        if (strip_energy < THRESHOLD && !inside)       
         {} else if (strip_energy < THRESHOLD && inside)
         {
             clus_size_A.push_back(size);
-            if(size <= 5) res_A.at(size - 1) += 1;
+            if(size <= 5) res_A.at(size - 1) += 1; // fill stats for cluster size
             clus_pos_A.push_back(floor((i - 1) - (size / 2) + 0.5));
             size = 0;
             inside = false;
@@ -68,7 +82,20 @@ bool CBC2(
     // Loop on sensor B strips
     for (int i = 0; i < NBR_STRIP; ++i)
     {
-        double strip_energy = abs(strip_B[i] + distribution(generator));
+        // noise parameters determination
+        if (distribution1(generator) >= 0.5)
+        {
+            std::normal_distribution<double> dist(1.36, 0.06);
+            noise = abs(dist(generator)) * 0.375;
+        } else
+        {
+            std::normal_distribution<double> dist(2.38, 0.6);
+            noise = abs(dist(generator)) * 0.375;
+        }
+        // noise value deternmination
+        std::normal_distribution<double> dist1(0., noise);
+        // noise creation
+        double strip_energy = (strip_B[i] / 0.00362) + abs(dist1(generator));
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -156,7 +183,7 @@ bool CBC2(
 }
 
 
-void figure4_3() {
+void figure20_3() {
 	const Int_t n = 24; // data for Adam2020
  
 	Double_t x1[n] = {	1.32089,
@@ -252,27 +279,27 @@ void figure4_3() {
 
     const int MAX_CLUSTER_WIDTH = 3;
     const int CLUSTER_WINDOW =5;
-    const double THRESHOLD = 0.0222; // MeV -> = 3 * (1000 * 3.62 keV)
+    const double THRESHOLD = 5.1975; // MeV -> = 3 * (1000 * 3.62 keV)
 
     const int NBR_BINS = 200;
 
     Double_t momentum;
 
     //****************** Create Histo ************************************//
-    auto c1 = new TCanvas("c1","c1",1920,1080);
-    c1->SetTitle("Stub efficiency for 2S mini-module");
+    auto c1 = new TCanvas("c1","c1",1000,600);
+    c1->SetTitle("");
     gStyle->SetOptStat(0);
     gPad->SetGridx(1);
     gPad->SetGridy(1);
 
-    TH1* h1 = new TH1D("h1", "Stub efficiency 1", NBR_BINS, 1.0, 3.5);
+    TH1* h1 = new TH1D("h1", "", NBR_BINS, 1.0, 3.5);
     h1->SetName("h1");
-    TH1* h2 = new TH1D("h2", "Stub efficiency 2", NBR_BINS, 1.0, 3.5);
+    TH1* h2 = new TH1D("h2", "", NBR_BINS, 1.0, 3.5);
     h2->SetName("h2");
-    TH1* h3 = new TH1D("h3", "Stub efficiency 3", NBR_BINS, 1.0, 3.5);
+    TH1* h3 = new TH1D("h3", "", NBR_BINS, 1.0, 3.5);
     h3->SetName("h3");
 
-    gPad->SetTitle("Stub efficiency for 2S mini-module");
+    gPad->SetTitle("");
 
     // Create vectors for bin content
     std::vector<double> nbr_stub1(NBR_BINS+2, 0);
@@ -284,7 +311,7 @@ void figure4_3() {
 
     /********************************************************************************************/
     // open file
-    TFile *f = TFile::Open("/media/matthieu/ssd1/Geant4/Data/DataSet_6/data1.root", "read");
+    TFile *f = TFile::Open("/media/matthieu/ssd1/Geant4/Data/Data_figure20-1/data1M.root", "read");
     auto data = f->Get<TTree>("data");
     const int ENTRIES = data->GetEntries();
     std::vector<double> strip_A(NBR_STRIP, 0);
@@ -333,7 +360,7 @@ void figure4_3() {
     f->Close();
     /**********************************************************************************************/
     // open file
-    TFile *f2 = TFile::Open("/media/matthieu/ssd1/Geant4/Data/DataSet_6/data2.root", "read");
+    TFile *f2 = TFile::Open("/media/matthieu/ssd1/Geant4/Data/Data_figure20-1/data1M-253.root", "read");
     auto data2 = f2->Get<TTree>("data");
     const int ENTRIES2 = data2->GetEntries();
     std::vector<double> strip_A2(NBR_STRIP, 0);
@@ -382,7 +409,7 @@ void figure4_3() {
     f2->Close();
     /************************************************************************************************************/
     // open file
-    TFile *f3 = TFile::Open("/media/matthieu/ssd1/Geant4/Data/DataSet_6/data3.root", "read");
+    TFile *f3 = TFile::Open("/media/matthieu/ssd1/Geant4/Data/Data_figure20-1/data1M-273.root", "read");
     auto data3 = f3->Get<TTree>("data");
     const int ENTRIES3 = data3->GetEntries();
     std::vector<double> strip_A3(NBR_STRIP, 0);
@@ -448,16 +475,16 @@ void figure4_3() {
 
     TGraphErrors *gr1 = new TGraphErrors(n,x1,y1,ex1,ey1); // non-irradiated
     gr1->SetName("gr1");
-    gr1->SetMarkerColor(13);
+    gr1->SetMarkerColor(12);
     gr1->SetMarkerStyle(24);
-    gr1->SetMarkerSize(1.2);
+    gr1->SetMarkerSize(0.7);
     gr1->Draw("SAME P");
 
     TGraphErrors *gr2 = new TGraphErrors(m,x2,y2,ex2,ey2); // irradiated
     gr2->SetName("gr2");
-    gr2->SetMarkerColor(13);
+    gr2->SetMarkerColor(12);
     gr2->SetMarkerStyle(25);
-    gr2->SetMarkerSize(1.2);
+    gr2->SetMarkerSize(0.7);
     gr2->Draw("SAME P");
 
     TF1* func1 = new TF1("func1", "([0]/(1+ TMath::Exp(-[1]*(x-[2]))))", x1[0], x1[n-1]);
@@ -476,26 +503,51 @@ void figure4_3() {
 
     TAxis *xaxis = h1->GetXaxis();
     TAxis *yaxis = h1->GetYaxis();
-    xaxis->SetTitle("Emulated pT [GeV]");
-    //xaxis->Set(25, 1.0, 3.5);
+    xaxis->SetLabelFont(42);
+    xaxis->SetLabelSize(0.04);
+    xaxis->SetTitle("pT [GeV]");
+    xaxis->SetTitleFont(22);
+    xaxis->SetTitleSize(0.05);
+    xaxis->SetTitleOffset(0.95);
     xaxis->SetRangeUser(1.0, 3.5);
-
+    yaxis->SetLabelFont(42);
+    yaxis->SetLabelSize(0.04);
     yaxis->SetTitle("Stub efficiency");
-    yaxis->SetRangeUser(0., 1.1);
+    yaxis->SetTitleFont(22);
+    yaxis->SetTitleSize(0.05);
+    yaxis->SetTitleOffset(0.9);
+    yaxis->SetRangeUser(0., 1.05);
+
+    TF1* f1 = new TF1("f1", "x", 1.0, 3.5); // 3.5
+    TGaxis* A1 = new TGaxis(1.0, 1.05, 3.5, 1.05, "f1", 510, "-");
+    A1->SetLabelFont(42);
+    A1->SetLabelSize(0.04);
+    A1->SetTitle("Angle d'incidence [deg]");
+    A1->SetTitleFont(22);
+    A1->SetTitleSize(0.05);
+    A1->SetTitleOffset(0.95);
+    A1->ChangeLabel(1, -1, -1, -1, -1, -1, "19.6");
+    A1->ChangeLabel(2, -1, -1, -1, -1, -1, "13.1");
+    A1->ChangeLabel(3, -1, -1, -1, -1, -1, "9.8");
+    A1->ChangeLabel(4, -1, -1, -1, -1, -1, "7.8");
+    A1->ChangeLabel(5, -1, -1, -1, -1, -1, "6.5");
+    A1->ChangeLabel(6, -1, -1, -1, -1, -1, "5.6");
+    A1->ChangeLabel(7, -1, -1, -1, -1, -1, "");
+    A1->Draw("SAME");
 
     c1->RedrawAxis();
 
     auto legend = new TLegend(0.65,0.1,0.9,0.35);
     legend->AddEntry("gr1","Adam et al. 2020 - non-irradiated","p");
     legend->AddEntry("gr2","Adam et al. 2020 - irradiated","p");
-    legend->AddEntry("h1","Geant4: d = 2.750 mm","l");
-    legend->AddEntry("h2","Geant4: d = 2.650 mm","l");
-    legend->AddEntry("h3","Geant4: d = 2.550 mm","l");
+    legend->AddEntry("h1","Geant4: d = 2.63 mm","l");
+    legend->AddEntry("h2","Geant4: d = 2.53 mm","l");
+    legend->AddEntry("h3","Geant4: d = 2.73 mm","l");
     legend->Draw();
 
     gPad->Modified();
     //*********************** 
-
+    c1->SaveAs("figure20_3.pdf");
     // Close file when finished
     //f.Close();
 }

@@ -32,6 +32,7 @@
 
 #include "G4UserEventAction.hh"
 #include "globals.hh"
+#include <vector>
 
 class B1RunAction;
 
@@ -46,17 +47,14 @@ class B1EventAction : public G4UserEventAction
 
     virtual void BeginOfEventAction(const G4Event* event);
     virtual void EndOfEventAction(const G4Event* event);
+    void AddEnergy(G4int strip, G4double edep){EdepVector.at(strip) += edep;}
 
-    void AddEdep(G4int strip, G4double edep);
 
   private:
+    std::vector<double> EdepVector;
     B1RunAction* fRunAction;
-    G4int fCollID_cryst;
-    G4double lowerLimit;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
-
-    

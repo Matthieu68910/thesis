@@ -32,13 +32,15 @@
 
 #include "G4UserSteppingAction.hh"
 #include "globals.hh"
+#include "B1EventAction.hh"
+#include <vector>
 
 class B1EventAction;
 
 class G4LogicalVolume;
 
 /// Stepping action class
-/// 
+///
 
 class B1SteppingAction : public G4UserSteppingAction
 {
@@ -51,6 +53,7 @@ class B1SteppingAction : public G4UserSteppingAction
 
   private:
     B1EventAction*  fEventAction;
+    G4double space;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -561,7 +561,7 @@ void figure18() {
 	        if(!isnan(res_A.at(5))){total_clusters += res_A.at(5);}
 
 	        count_loop += 1;
-	        if (count_loop == ENTRIES /10)
+	        if (count_loop == ENTRIES /100)
 	        {
 	            count_loop = 0;
 	            fracC1.push_back((double) nbr_cluster_1 / total_clusters);
@@ -574,25 +574,25 @@ void figure18() {
 	    //********************* fig 17 computation and printing **********************************//
 	    // for A
 	    double variance, deviation, average;
-	    average = std::accumulate(fracC1.begin(), fracC1.end(), 0.0) / 10;
-	    for (int i = 0; i < 10; ++i){variance += pow((fracC1.at(i) - average), 2);}
-	    variance /= 9;
+	    average = std::accumulate(fracC1.begin(), fracC1.end(), 0.0) / 100;
+	    for (int i = 0; i < 100; ++i){variance += pow((fracC1.at(i) - average), 2);}
+	    variance /= 99;
 	    deviation = sqrt(variance);
 	    cout << std::scientific << "File " << j << " CW1:\t" << average << "\t" << deviation << endl;
 	    y4[j] = average;
 	    ey4[j] = deviation;
 
-	    average = std::accumulate(fracC2.begin(), fracC2.end(), 0.0) / 10;
-	    for (int i = 0; i < 10; ++i){variance += pow((fracC2.at(i) - average), 2);}
-	    variance /= 9;
+	    average = std::accumulate(fracC2.begin(), fracC2.end(), 0.0) / 100;
+	    for (int i = 0; i < 100; ++i){variance += pow((fracC2.at(i) - average), 2);}
+	    variance /= 99;
 	    deviation = sqrt(variance);
 	    cout << std::scientific << "File " << j << " CW2:\t" << average << "\t" << deviation << endl;
 	    y5[j] = average;
 	    ey5[j] = deviation;
 
-	    average = std::accumulate(fracC3.begin(), fracC3.end(), 0.0) / 10;
-	    for (int i = 0; i < 10; ++i){variance += pow((fracC3.at(i) - average), 2);}
-	    variance /= 9;
+	    average = std::accumulate(fracC3.begin(), fracC3.end(), 0.0) / 100;
+	    for (int i = 0; i < 100; ++i){variance += pow((fracC3.at(i) - average), 2);}
+	    variance /= 99;
 	    deviation = sqrt(variance);
 	    cout << std::scientific << "File " << j << " CW3p:\t" << average << "\t" << deviation << endl;
 	    y6[j] = average;

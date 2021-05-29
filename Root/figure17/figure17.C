@@ -442,7 +442,7 @@ void figure17() {
 	    bool stop = true;
 	    double cluster_width = 0.;
 	    double nbr_clusters = 0.;
-	    std::vector<double> mClusWidth(10, 0);
+	    std::vector<double> mClusWidth(100, 0);
 	    for (int k = 0; k < ENTRIES; k++)
 	    {
 	        // fill variables with datas from entry i
@@ -475,7 +475,7 @@ void figure17() {
 	        }*/
 
 	        count_loop += 1;
-	        if (count_loop == ENTRIES /10)
+	        if (count_loop == ENTRIES /100)
 	        {
 	            count_loop = 0;
 	            if(!isnan(cluster_width))
@@ -494,9 +494,9 @@ void figure17() {
 	    //********************* fig 17 computation and printing **********************************//
 	    // for A
 	    double variance, deviation, average;
-	    average = std::accumulate(mClusWidth.begin(), mClusWidth.end(), 0.0) / 10;
-	    for (int i = 0; i < 10; ++i){variance += pow((mClusWidth.at(i) - average), 2);}
-	    variance /= 9;
+	    average = std::accumulate(mClusWidth.begin(), mClusWidth.end(), 0.0) / 100;
+	    for (int i = 0; i < 100; ++i){variance += pow((mClusWidth.at(i) - average), 2);}
+	    variance /= 99;
 	    deviation = sqrt(variance);
 	    cout << std::scientific << "File " << j << " mean cluster width:\t" << average << "\t" << deviation << endl;
 

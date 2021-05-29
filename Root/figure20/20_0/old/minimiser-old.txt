@@ -17,12 +17,11 @@ NCalls                    =           62
 p0                        = 9.606317e-01   +/-   4.829723e-03
 p1                        = 2.139471e+00   +/-   2.155518e-03
 p2                        = 1.776862e-01   +/-   4.954474e-03
- FCN=59.5838 FROM MIGRAD    STATUS=CONVERGED      63 CALLS          64 TOTAL
-                     EDM=5.49218e-07    STRATEGY= 1      ERROR MATRIX ACCURATE 
+ FCN=151.423 FROM MIGRAD    STATUS=CONVERGED      72 CALLS          73 TOTAL
+                     EDM=3.78664e-10    STRATEGY= 1      ERROR MATRIX ACCURATE 
   EXT PARAMETER                                   STEP         FIRST   
   NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
-   1  p0           9.93058e-01   6.24771e-04   2.36360e-06   1.45677e+00
-   2  p1           1.87765e+00   2.16740e-03   8.05197e-06  -8.30494e-02
-   3  p2           1.47070e-01   3.25230e-03   1.20850e-05  -1.66824e-01
-
+   1  p0           9.92353e-01   6.26073e-04   3.70320e-06   3.79320e-02
+   2  p1           1.87386e+00   1.33310e-03   7.85035e-06  -7.33048e-04
+   3  p2           1.43267e-01   1.86724e-03   1.09776e-05  -9.63931e-03
 
