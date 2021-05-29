@@ -3,7 +3,7 @@
 #include <iostream>
 
 std::default_random_engine generator;
-std::normal_distribution<double> distribution(0.0, 0.795); // 2.12 V(CTH) * 375 e- = 795 e- = 0.795 ke-
+std::uniform_real_distribution<> distribution1(0.0, 1.0);
 
 bool CBC2(
     const vector<double> &strip_A, // vector for sensor A strips' data
@@ -17,6 +17,7 @@ bool CBC2(
 
     const int NBR_STRIP = strip_A.size(); // get number of strips
 
+    double noise = 0.;
     // Clusters in sensor A
     std::vector<double> clus_pos_A; // create vector for clusters position
     std::vector<double> clus_size_A; // create vector for clusters size
@@ -25,7 +26,20 @@ bool CBC2(
     // Loop on sensor A strips
     for (int i = 0; i < NBR_STRIP; ++i)
     {
-        double strip_energy = (strip_A[i] / 0.00362) + abs(distribution(generator)); // change MeV in ke-, and apply noise
+        // noise parameters determination
+        if (distribution1(generator) >= 0.5)
+        {
+            std::normal_distribution<double> dist(1.36, 0.06);
+            noise = abs(dist(generator)) * 0.375;
+        } else
+        {
+            std::normal_distribution<double> dist(2.38, 0.6);
+            noise = abs(dist(generator)) * 0.375;
+        }
+        // noise value deternmination
+        std::normal_distribution<double> dist1(0., noise);
+        // noise creation
+        double strip_energy = (strip_A[i] / 0.00362) + abs(dist1(generator)); // change MeV in ke-, and apply noise
         if (strip_energy < THRESHOLD && !inside)       
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -68,7 +82,20 @@ bool CBC2(
     // Loop on sensor B strips
     for (int i = 0; i < NBR_STRIP; ++i)
     {
-        double strip_energy = (strip_B[i] / 0.00362) + abs(distribution(generator));
+        // noise parameters determination
+        if (distribution1(generator) >= 0.5)
+        {
+            std::normal_distribution<double> dist(1.36, 0.06);
+            noise = abs(dist(generator)) * 0.375;
+        } else
+        {
+            std::normal_distribution<double> dist(2.38, 0.6);
+            noise = abs(dist(generator)) * 0.375;
+        }
+        // noise value deternmination
+        std::normal_distribution<double> dist1(0., noise);
+        // noise creation
+        double strip_energy = (strip_B[i] / 0.00362) + abs(dist1(generator));
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -430,13 +457,13 @@ void figure20_0() {
     // Fill graphs
     TGraphErrors *gr1 = new TGraphErrors(n,x1,y1,ex1,ey1); // non-irradiated
     gr1->SetName("gr1");
-    gr1->SetMarkerColor(13);
+    gr1->SetMarkerColor(12);
     gr1->SetMarkerStyle(24);
     gr1->SetMarkerSize(0.7);
 
     TGraphErrors *gr2 = new TGraphErrors(m,x2,y2,ex2,ey2); // irradiated
     gr2->SetName("gr2");
-    gr2->SetMarkerColor(13);
+    gr2->SetMarkerColor(12);
     gr2->SetMarkerStyle(25);
     gr2->SetMarkerSize(0.7);
 
@@ -448,14 +475,14 @@ void figure20_0() {
 
     TF1* func1 = new TF1("func1", "(0.5*[0]*(1+ TMath::Erf((x-[1])/[2])))", x1[0], x1[n-1]);
     func1->SetParameters(0.98, 1.85, 0.10);
-    func1->SetLineColor(13);
+    func1->SetLineColor(12);
     func1->SetLineWidth(1);
     func1->SetLineStyle(7);
     TFitResultPtr r1 = gr1->Fit(func1, "S");
 
     TF1* func2 = new TF1("func2", "(0.5*[0]*(1+ TMath::Erf((x-[1])/[2])))", x2[0], x2[m-1]);
     func2->SetParameters(0.95, 2.15, 0.10);
-    func2->SetLineColor(13);
+    func2->SetLineColor(12);
     func2->SetLineWidth(1);
     func2->SetLineStyle(7);
     TFitResultPtr r2 = gr2->Fit(func2, "S");

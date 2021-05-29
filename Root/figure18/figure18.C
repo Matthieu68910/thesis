@@ -4,7 +4,7 @@
 #include <random>
 
 std::default_random_engine generator;
-std::normal_distribution<double> distribution(0., 0.795); // µ = 1000 e-, s = 800 e-
+std::uniform_real_distribution<> distribution1(0.0, 1.0);
 
 bool CBC2(
 	const vector<double> &strip_A, 
@@ -18,6 +18,7 @@ bool CBC2(
 
 	const int NBR_STRIP = strip_A.size();
 
+	double noise = 0.;
 	// Clusters in sensor A
 	std::vector<double> clus_pos_A;
 	std::vector<double> clus_size_A;
@@ -26,7 +27,20 @@ bool CBC2(
 	// Loop on sensor A strips
 	for (int i = 0; i < NBR_STRIP; ++i)
     {
-    	double strip_energy = (strip_A[i] / 0.00362) + abs(distribution(generator));
+    	// noise parameters determination
+        if (distribution1(generator) >= 0.5)
+        {
+            std::normal_distribution<double> dist(1.36, 0.06);
+            noise = abs(dist(generator)) * 0.375;
+        } else
+        {
+            std::normal_distribution<double> dist(2.38, 0.6);
+            noise = abs(dist(generator)) * 0.375;
+        }
+        // noise value deternmination
+        std::normal_distribution<double> dist1(0., noise);
+        // noise creation
+    	double strip_energy = (strip_A[i] / 0.00362) + abs(dist1(generator));
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -69,7 +83,20 @@ bool CBC2(
 	// Loop on sensor B strips
 	for (int i = 0; i < NBR_STRIP; ++i)
     {
-    	double strip_energy = (strip_B[i] / 0.00362) + abs(distribution(generator));
+    	// noise parameters determination
+        if (distribution1(generator) >= 0.5)
+        {
+            std::normal_distribution<double> dist(1.36, 0.06);
+            noise = abs(dist(generator)) * 0.375;
+        } else
+        {
+            std::normal_distribution<double> dist(2.38, 0.6);
+            noise = abs(dist(generator)) * 0.375;
+        }
+        // noise value deternmination
+        std::normal_distribution<double> dist1(0., noise);
+        // noise creation
+    	double strip_energy = (strip_B[i] / 0.00362) + abs(dist1(generator));
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {

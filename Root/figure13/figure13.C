@@ -4,7 +4,6 @@
 #include <random>
 
 std::default_random_engine generator;
-std::normal_distribution<double> distribution(0., 0.795); // µ = 0 e-, s = 2.12*375
 std::uniform_real_distribution<> distribution1(0.0, 1.0);
 
 bool CBC2(
@@ -20,6 +19,7 @@ bool CBC2(
 
 	const int NBR_STRIP = strip_A.size();
 
+    double noise = 0.;
 	// Clusters in sensor A
 	std::vector<double> clus_pos_A;
 	std::vector<double> clus_size_A;
@@ -29,7 +29,20 @@ bool CBC2(
 	// Loop on sensor A strips
 	for (int i = 0; i < NBR_STRIP; ++i)
     {
-    	double strip_energy = (strip_A[i] / 0.00362) + abs(distribution(generator));
+        // noise parameters determination
+        if (distribution1(generator) >= 0.5)
+        {
+            std::normal_distribution<double> dist(1.36, 0.06);
+            noise = abs(dist(generator)) * 0.375;
+        } else
+        {
+            std::normal_distribution<double> dist(2.38, 0.6);
+            noise = abs(dist(generator)) * 0.375;
+        }
+        // noise value deternmination
+        std::normal_distribution<double> dist1(0., noise);
+        // noise creation
+    	double strip_energy = (strip_A[i] / 0.00362) + abs(dist1(generator));
         //if(distribution1(generator) < kill_value){strip_energy = 0.;}
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
@@ -76,7 +89,20 @@ bool CBC2(
 	// Loop on sensor B strips
 	for (int i = 0; i < NBR_STRIP; ++i)
     {
-    	double strip_energy = (strip_B[i] / 0.00362) + abs(distribution(generator));
+        // noise parameters determination
+        if (distribution1(generator) >= 0.5)
+        {
+            std::normal_distribution<double> dist(1.36, 0.06);
+            noise = abs(dist(generator)) * 0.375;
+        } else
+        {
+            std::normal_distribution<double> dist(2.38, 0.6);
+            noise = abs(dist(generator)) * 0.375;
+        }
+        // noise value deternmination
+        std::normal_distribution<double> dist1(0., noise);
+        // noise creation
+    	double strip_energy = (strip_B[i] / 0.00362) + abs(dist1(generator));
         //if(distribution1(generator) < kill_value){strip_energy = 0.;}
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
@@ -361,8 +387,8 @@ void figure13() {
     auto data = f->Get<TTree>("data");
 
     // Get the number of entries in TTree
-    const int ENTRIES = data->GetEntries();
-    //cout << std::scientific << "Number of entries: " << ENTRIES << endl;
+    const int ENTRIES = data->GetEntries() / 10;
+    cout << std::scientific << "Number of entries: " << ENTRIES << endl;
 
     //**************** Set BranchAddress for datas recovery ***************
     // for strips
@@ -459,6 +485,30 @@ void figure13() {
         x6[i] *= 1000.;
     }
 
+    TGraphErrors *gr3 = new TGraphErrors(NBR_BINS,x3,y3,ex3,ey3);
+    gr3->SetName("gr3");
+    gr3->SetMarkerColor(12);
+    gr3->SetMarkerStyle(20);
+    gr3->SetMarkerSize(1.0);
+
+    TGraphErrors *gr4 = new TGraphErrors(NBR_BINS,x4,y4,ex4,ey4);
+    gr4->SetName("gr4");
+    gr4->SetMarkerColor(12);
+    gr4->SetMarkerStyle(25);
+    gr4->SetMarkerSize(1.0);
+
+    TGraphErrors *gr5 = new TGraphErrors(NBR_BINS_IRR,x5,y5,ex5,ey5);
+    gr5->SetName("gr5");
+    gr5->SetMarkerColor(12);
+    gr5->SetMarkerStyle(22);
+    gr5->SetMarkerSize(1.0);
+
+    TGraphErrors *gr6 = new TGraphErrors(NBR_BINS_IRR,x6,y6,ex6,ey6);
+    gr6->SetName("gr6");
+    gr6->SetMarkerColor(12);
+    gr6->SetMarkerStyle(26);
+    gr6->SetMarkerSize(1.0);
+
     TGraphErrors *gr1 = new TGraphErrors(NBR_BINS,x1,y1,ex1,ey1);
     gr1->SetName("gr1");
     gr1->SetMarkerColor(kRed+2);
@@ -471,45 +521,22 @@ void figure13() {
     gr2->SetMarkerStyle(25);
     gr2->SetMarkerSize(1.0);
 
-    TGraphErrors *gr3 = new TGraphErrors(NBR_BINS,x3,y3,ex3,ey3);
-    gr3->SetName("gr3");
-    gr3->SetMarkerColor(1);
-    gr3->SetMarkerStyle(20);
-    gr3->SetMarkerSize(1.0);
-
-    TGraphErrors *gr4 = new TGraphErrors(NBR_BINS,x4,y4,ex4,ey4);
-    gr4->SetName("gr4");
-    gr4->SetMarkerColor(1);
-    gr4->SetMarkerStyle(25);
-    gr4->SetMarkerSize(1.0);
-
-    TGraphErrors *gr5 = new TGraphErrors(NBR_BINS_IRR,x5,y5,ex5,ey5);
-    gr5->SetName("gr5");
-    gr5->SetMarkerColor(1);
-    gr5->SetMarkerStyle(22);
-    gr5->SetMarkerSize(1.0);
-
-    TGraphErrors *gr6 = new TGraphErrors(NBR_BINS_IRR,x6,y6,ex6,ey6);
-    gr6->SetName("gr6");
-    gr6->SetMarkerColor(1);
-    gr6->SetMarkerStyle(26);
-    gr6->SetMarkerSize(1.0);
-
     TMultiGraph *mg = new TMultiGraph();
-    mg->Add(gr1);
-    mg->Add(gr2);
     mg->Add(gr3);
     mg->Add(gr4);
     mg->Add(gr5);
     mg->Add(gr6);
+    mg->Add(gr1);
+    mg->Add(gr2);
     mg->SetTitle("");
     mg->Draw("AP");
 
     TAxis *xaxis = mg->GetXaxis();
     TAxis *yaxis = mg->GetYaxis();
+    xaxis->SetMaxDigits(3);
     xaxis->SetLabelFont(42);
     xaxis->SetLabelSize(0.04);
-    xaxis->SetTitle("Seuil [e-]");
+    xaxis->SetTitle("Seuil [e]");
     xaxis->SetTitleFont(22);
     xaxis->SetTitleSize(0.05);
     xaxis->SetTitleOffset(0.95);
