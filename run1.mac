@@ -1,5 +1,5 @@
 /run/setCut 1 um
-/run/numberOfThreads 12
+/run/numberOfThreads 1
 /run/initialize
 /control/verbose 1 		# max 2
 /run/verbose 1 			# max 2
@@ -7,11 +7,11 @@
 /tracking/verbose 0             # max 5
 /analysis/ntuple/setActivationToAll  true
 #
-/random/setSeeds 5463285 7562145
-/generator/momentum/SetRandom true
-/generator/momentum/SetRandomMinValue 1.0
-/generator/momentum/SetRandomMaxValue 3.5
+#/random/setSeeds 5463285 7562145
+#/generator/momentum/SetRandom true
+#/generator/momentum/SetRandomMinValue 1.0
+#/generator/momentum/SetRandomMaxValue 3.5
 #
-/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/Data_figure20-1/data1M-250
-/run/beamOn 1000000
+#/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/Data_figure20-1/data1M-250
+/run/beamOn 1
 ##################################################

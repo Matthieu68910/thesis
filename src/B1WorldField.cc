@@ -34,8 +34,7 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B1WorldField::B1WorldField() : G4ElectroMagneticField(),
-    Bx1(0), By1(0.*tesla), Bz1(0), Ex1(0), Ey1(0), Ez1(0)
+B1WorldField::B1WorldField() : G4ElectroMagneticField()
 {
 }
 
@@ -52,12 +51,12 @@ void B1WorldField::GetFieldValue( const G4double Point[4], G4double* Bfield ) co
   // Point[0],Point[1],Point[2] are x-, y-, z-cordinates, Point[3] is time
 
 
-  Bfield[0]=Bx1;
-  Bfield[1]=By1;
-  Bfield[2]=Bz1;
-  Bfield[3]=Ex1;
-  Bfield[4]=Ey1;
-  Bfield[5]=Ez1;
+  Bfield[0]=0;
+  Bfield[1]=0.*tesla;
+  Bfield[2]=0;
+  Bfield[3]=0;
+  Bfield[4]=0;
+  Bfield[5]= 0. * volt/m;
 
 
   return;

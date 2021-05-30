@@ -39,14 +39,13 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B1Field::B1Field() : G4ElectroMagneticField(),
-    backplane(0)
+B1Field::B1Field() : G4ElectroMagneticField(), backplane(0)
 {
     if(backplane == 0.){
-        const B1DetectorConstruction* detectorConstruction
-              = static_cast<const B1DetectorConstruction*>
-                (G4RunManager::GetRunManager()->GetUserDetectorConstruction());
-        backplane = detectorConstruction->GetBackPlane();
+            const B1DetectorConstruction* detectorConstruction
+                  = static_cast<const B1DetectorConstruction*>
+                    (G4RunManager::GetRunManager()->GetUserDetectorConstruction());
+            backplane = detectorConstruction->GetBackPlane();
     }
 }
 
@@ -62,30 +61,28 @@ void B1Field::GetFieldValue( const G4double Point[4], G4double* Bfield ) const
 {
   // Point[0],Point[1],Point[2] are x-, y-, z-cordinates, Point[3] is time
 
-
-
-  if(Point[2] >= 0)     // Ez1(-9.0E+5*volt/m)
+  if(Point[2] >= 0)
   {
-      Bfield[0]=0.;
-      Bfield[1]=0.;
-      Bfield[2]=0.;
-      Bfield[3]=0.;
-      Bfield[4]=0.;
-      Bfield[5]= - (4.6394E+9 * ((Point[2] - backplane + 0.0585) / 1000)) * volt/m;
-      //G4cout << "    calc = " << G4BestUnit((Point[2] - backplane + 0.0585), "Length") << G4endl;
-  } else                // Ez1(9.0E+5*volt/m)
+      Bfield[0]=0;
+      Bfield[1]=0.*tesla;
+      Bfield[2]=0;
+      Bfield[3]=0;
+      Bfield[4]=0;
+      Bfield[5]= - (4.6394E+9 * ((Point[2] - backplane + 0.0585) / 1000)) * volt/m; // E+9
+  }
+  else
   {
-      Bfield[0]=0.;
-      Bfield[1]=0.;
-      Bfield[2]=0.;
-      Bfield[3]=0.;
-      Bfield[4]=0.;
-      Bfield[5]= (4.6394E+9 * ((0.0585 - (Point[2] + backplane)) / 1000)) * volt/m;
-      //G4cout << "    calc = " << G4BestUnit((0.0585 - (Point[2] + backplane)), "Length") << G4endl;
+      Bfield[0]=0;
+      Bfield[1]=0.*tesla;
+      Bfield[2]=0;
+      Bfield[3]=0;
+      Bfield[4]=0;
+      Bfield[5]= (4.6394E+9 * ((abs(Point[2]) - backplane + 0.0585) / 1000)) * volt/m;
   }
 
-  //G4cout << "z = " << G4BestUnit(Point[2], "Length") << " Field = " << G4BestUnit(Bfield[5], "Electric field") << G4endl;
-  //G4cout << "    bkpl = " << G4BestUnit(backplane, "Length") << G4endl;
+  //G4cout << "Electric Field = " << G4BestUnit(Bfield[5], "Electric field") << G4endl;
+
+
 
   return;
 }

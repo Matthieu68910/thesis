@@ -108,7 +108,7 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
   G4double strip_width = 90.*um;
   G4double strip_thickness = 270.*um;
   strip_nbr = 254; // 1016 for full sensor !!! change in line 44 !!!
-  G4double strip_length = 5*cm;// strip_nbr * strip_width;
+  G4double strip_length = strip_nbr * strip_width;// strip_nbr * strip_width;
 
   // silicon backplane
   G4double Si_bp_thickness = 30.*um;
@@ -430,7 +430,7 @@ void B1DetectorConstruction::ConstructSDandField()
       G4FieldManager* WorldFieldManager = new G4FieldManager;
       WorldFieldManager->SetDetectorField(fFieldWorld);
 
-      G4MagIntegratorStepper* stepper = new G4DormandPrince745(equation0,8);
+      G4MagIntegratorStepper* stepper = new G4ClassicalRK4(equation0,12); // G4DormandPrince745(equation0,8);
 
       G4double minStep           = 100.*nm;
 
@@ -463,6 +463,8 @@ void B1DetectorConstruction::ConstructSDandField()
 
       G4bool allLocal = true;
       logicWorld->SetFieldManager(WorldFieldManager, allLocal);
+
+      WorldFieldManager->SetChordFinder(chordFinder);
   }
 
 
@@ -475,7 +477,7 @@ void B1DetectorConstruction::ConstructSDandField()
       G4FieldManager* SiUpFieldManager = new G4FieldManager;
       SiUpFieldManager->SetDetectorField(fFieldUp);
 
-      G4MagIntegratorStepper* stepper = new G4DormandPrince745(equation1,8);
+      G4MagIntegratorStepper* stepper = new G4ClassicalRK4(equation1,12);
 
       G4double minStep           = 100*nm;
 
@@ -504,10 +506,10 @@ void B1DetectorConstruction::ConstructSDandField()
       fieldPropagator->SetMinimumEpsilonStep(epsMin);
       fieldPropagator->SetMaximumEpsilonStep(epsMax);
 
-      SiUpFieldManager->SetChordFinder(chordFinder);
-
       G4bool allLocal = true;
       logicSiUp->SetFieldManager(SiUpFieldManager, allLocal);
+
+      SiUpFieldManager->SetChordFinder(chordFinder);
   }
 
   if(!fFieldDo){
@@ -519,7 +521,7 @@ void B1DetectorConstruction::ConstructSDandField()
       G4FieldManager* SiDoFieldManager = new G4FieldManager;
       SiDoFieldManager->SetDetectorField(fFieldDo);
 
-      G4MagIntegratorStepper* stepper = new G4DormandPrince745(equation2,8);
+      G4MagIntegratorStepper* stepper = new G4ClassicalRK4(equation2,12);
 
       G4double minStep           = 100.*nm;
 
@@ -548,10 +550,10 @@ void B1DetectorConstruction::ConstructSDandField()
       fieldPropagator->SetMinimumEpsilonStep(epsMin);
       fieldPropagator->SetMaximumEpsilonStep(epsMax);
 
-      SiDoFieldManager->SetChordFinder(chordFinder);
-
       G4bool allLocal = true;
       logicSiDo->SetFieldManager(SiDoFieldManager, allLocal);
+
+      SiDoFieldManager->SetChordFinder(chordFinder);
   }
   //**********************************************************//
 }
