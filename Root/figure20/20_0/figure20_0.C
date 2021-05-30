@@ -5,6 +5,219 @@
 std::default_random_engine generator;
 std::uniform_real_distribution<> distribution1(0.0, 1.0);
 
+bool CBC3(
+    const vector<double> &strip_A, 
+    const vector<double> &strip_B, 
+    vector<double> &res,                    // global results for sensors (stubs, bend)
+                                                // [0]  -> nbr stubs
+                                                // [1]  -> mean bend information
+    vector<double> &res_A,                  // results for sensor A
+                                                // [0:4]-> 1-5 strip wide clusters
+                                                // [5]  -> number of clusters (tot)
+                                                // [6]  -> mean cluster width (tot)
+                                                // [7:8]-> idem accepted
+                                                // [9]  -> nbr hits
+    vector<double> &res_B,                  // results for sensor B
+                                                // [0:4]-> 1-5 strip wide clusters
+                                                // [5]  -> number of clusters (tot)
+                                                // [6]  -> mean cluster width (tot)
+                                                // [7:8]-> idem accepted
+                                                // [9]  -> nbr hits
+    const int MAX_CLUSTER_WIDTH = 4,        // max 4
+    const double CLUSTER_WINDOW = 7.,       // max +- 7 en 1/2 strip
+    const double THRESHOLD = 0,             // default to 0 (in killo-electrons)   
+    double NOISE = 1.,                      // noise in killo-elctrons
+    double PAIR_CREATION_ENERGY = 0.00362   // pair creation energy in keV            
+    ){
+
+    // find number of strips
+    const int NBR_STRIP = strip_A.size();
+
+    // noise distribution deternmination
+    std::normal_distribution<double> dist1(0., NOISE);
+
+    // Clusters in sensor A
+    std::vector<double> clus_pos_A;
+    std::vector<double> clus_size_A;
+    bool inside = false;
+    int size = 0;
+    int nbr_hits_A = 0;
+
+    // Loop on sensor A strips
+    for (int i = 0; i < NBR_STRIP; ++i)
+    {
+        // convert strip signal to killo-electrons and add noise 
+        double strip_energy = (strip_A[i] / PAIR_CREATION_ENERGY) + abs(dist1(generator));
+
+        // cluster finding logic
+        if (strip_energy < THRESHOLD && !inside)        
+        {
+            // do nothing
+        } 
+        else if (strip_energy < THRESHOLD && inside)
+        {
+            clus_size_A.push_back(size);
+            if(size <= 5) res_A.at(size - 1) += 1;
+            clus_pos_A.push_back((double) (i - 1) - ((double) size / 2) + 0.5);
+            size = 0;
+            inside = false;
+        } 
+        else if (strip_energy >= THRESHOLD && !inside)
+        {
+            nbr_hits_A += 1;
+            size = 1;
+            inside = true;
+            if (i == (NBR_STRIP - 1))
+            {
+                clus_size_A.push_back(1);
+                res_A.at(0) += 1;
+                clus_pos_A.push_back((double) i);
+                size = 0;
+                inside = false;
+            }
+        } 
+        else if (strip_energy >= THRESHOLD && inside)
+        {
+            nbr_hits_A += 1;
+            size += 1;
+            if (i == (NBR_STRIP - 1))
+            {
+                clus_size_A.push_back(size);
+                if(size <= 5) res_A.at(size - 1) += 1;
+                clus_pos_A.push_back((double) i - ((double) size / 2) + 0.5);
+                size = 0;
+                inside = false;
+            }
+        }
+    }
+
+    // Clusters in sensor B
+    std::vector<double> clus_pos_B;
+    std::vector<double> clus_size_B;
+    inside = false;
+    size = 0;
+    int nbr_hits_B = 0;
+
+    // Loop on sensor B strips
+    for (int i = 0; i < NBR_STRIP; ++i)
+    {
+        // convert strip signal to killo-electrons and add noise 
+        double strip_energy = (strip_B[i] / PAIR_CREATION_ENERGY) + abs(dist1(generator));
+
+        // cluster finding logic
+        if (strip_energy < THRESHOLD && !inside)        
+        {
+            // do nothing
+        } 
+        else if (strip_energy < THRESHOLD && inside)
+        {
+            clus_size_B.push_back(size);
+            if(size <= 5) res_B.at(size - 1) += 1;
+            clus_pos_B.push_back((double) (i - 1) - ((double) size / 2) + 0.5);
+            size = 0;
+            inside = false;
+        } 
+        else if (strip_energy >= THRESHOLD && !inside)
+        {
+            nbr_hits_B += 1;
+            size = 1;
+            inside = true;
+            if (i == (NBR_STRIP - 1))
+            {
+                clus_size_B.push_back(1);
+                res_B.at(0) += 1;
+                clus_pos_B.push_back((double) i);
+                size = 0;
+                inside = false;
+            }
+        } 
+        else if (strip_energy >= THRESHOLD && inside)
+        {
+            nbr_hits_B += 1;
+            size += 1;
+            if (i == (NBR_STRIP - 1))
+            {
+                clus_size_B.push_back(size);
+                if(size <= 5) res_B.at(size - 1) += 1;
+                clus_pos_B.push_back((double) i - ((double) size / 2) + 0.5);
+                size = 0;
+                inside = false;
+            }
+        }
+    }
+
+    // fill results (tot)
+    if(clus_pos_A.size() != 0){res_A.at(5) = clus_pos_A.size();}else{res_A.at(5) = 0;}
+    if(clus_pos_B.size() != 0){res_B.at(5) = clus_pos_B.size();}else{res_B.at(5) = 0;}
+    if(clus_size_A.size() != 0){res_A.at(6) = std::accumulate(clus_size_A.begin(), clus_size_A.end(), 0.0) / clus_size_A.size();}else{res_A.at(6) = 0;}
+    if(clus_size_B.size() != 0){res_B.at(6) = std::accumulate(clus_size_B.begin(), clus_size_B.end(), 0.0) / clus_size_B.size();}else{res_B.at(6) = 0;}
+
+    // Clean clusters in both sensors depending on MAX_CLUSTER_WIDTH
+    // for A
+    for (int i = clus_size_A.size() - 1; i >= 0; --i)
+    {
+        if (clus_size_A.at(i) > MAX_CLUSTER_WIDTH)
+        {   
+            clus_size_A.erase(clus_size_A.begin() + i);
+            clus_pos_A.erase(clus_pos_A.begin() + i);
+        }
+    }
+    // for B
+    for (int i = clus_size_B.size() - 1; i >= 0; --i)
+    {
+        if (clus_size_B.at(i) > MAX_CLUSTER_WIDTH)
+        {   
+            clus_size_B.erase(clus_size_B.begin() + i);
+            clus_pos_B.erase(clus_pos_B.begin() + i);
+        }
+    }
+
+    // fill results (accepted)
+    res_A.at(7) = clus_pos_A.size();
+    res_B.at(7) = clus_pos_B.size();
+    res_A.at(8) = std::accumulate(clus_size_A.begin(), clus_size_A.end(), 0.0) / clus_size_A.size();
+    res_B.at(8) = std::accumulate(clus_size_B.begin(), clus_size_B.end(), 0.0) / clus_size_B.size();
+    res_A.at(9) = nbr_hits_A;
+    res_B.at(9) = nbr_hits_B;
+
+    // return false if no possible stub
+    if (clus_pos_A.size() == 0 || clus_pos_B.size() == 0)
+    {
+        res.at(0) = 0.;
+        res.at(1) = 0.;
+        return false;
+    }
+
+    // stub finding logic
+    std::vector<double> stub_pos;
+    std::vector<double> stub_bend;
+
+    // loop over all identified clusters
+    for (int i = 0; i < clus_pos_A.size(); ++i) // for each seed in sensor A ....
+    {
+        for (int j = 0; j < clus_pos_B.size(); ++j) // .... look for correlation in sensor B.
+        {
+            if (abs(clus_pos_A.at(i) - clus_pos_B.at(j)) <= CLUSTER_WINDOW)  // correlation only if inside window
+            {
+                stub_pos.push_back(clus_pos_A.at(i));
+                stub_bend.push_back(abs((double) clus_pos_A.at(i) - clus_pos_B.at(j)));
+            }
+        }
+    }
+    if (stub_pos.size() != 0)   
+    {
+        res.at(0) = stub_pos.size();
+        res.at(1) = std::accumulate(stub_bend.begin(), stub_bend.end(), 0.0) / stub_pos.size();
+        return true;
+    } 
+    else
+    {
+        res.at(0) = 0.;
+        res.at(1) = 0.;
+        return false;
+    }
+}
+
 bool CBC2(
     const vector<double> &strip_A, // vector for sensor A strips' data
     const vector<double> &strip_B, // vector for sensor B strips' data
@@ -12,12 +225,16 @@ bool CBC2(
     vector<double> &res_B,
     const int MAX_CLUSTER_WIDTH = 3,
     const int CLUSTER_WINDOW = 5,
-    const double THRESHOLD = 5.1975 // (119.86 - 106) * 375 e- = 5197.5 e- = 5.1975 ke-
+    const double THRESHOLD = 5.1975, // (119.86 - 106) * 375 e- = 5197.5 e- = 5.1975 ke-             // default to 0 (in killo-electrons)   
+    double NOISE = 1.,                      // noise in killo-elctrons
+    double PAIR_CREATION_ENERGY = 0.00362   // pair creation energy in keV
     ){
 
     const int NBR_STRIP = strip_A.size(); // get number of strips
 
-    double noise = 0.;
+    // noise distribution deternmination
+    std::normal_distribution<double> dist1(0., NOISE);
+
     // Clusters in sensor A
     std::vector<double> clus_pos_A; // create vector for clusters position
     std::vector<double> clus_size_A; // create vector for clusters size
@@ -26,20 +243,9 @@ bool CBC2(
     // Loop on sensor A strips
     for (int i = 0; i < NBR_STRIP; ++i)
     {
-        // noise parameters determination
-        if (distribution1(generator) >= 0.5)
-        {
-            std::normal_distribution<double> dist(1.36, 0.06);
-            noise = abs(dist(generator)) * 0.375;
-        } else
-        {
-            std::normal_distribution<double> dist(2.38, 0.6);
-            noise = abs(dist(generator)) * 0.375;
-        }
-        // noise value deternmination
-        std::normal_distribution<double> dist1(0., noise);
-        // noise creation
-        double strip_energy = (strip_A[i] / 0.00362) + abs(dist1(generator)); // change MeV in ke-, and apply noise
+        // convert strip signal to killo-electrons and add noise 
+        double strip_energy = (strip_A[i] / PAIR_CREATION_ENERGY) + abs(dist1(generator));
+
         if (strip_energy < THRESHOLD && !inside)       
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -82,20 +288,9 @@ bool CBC2(
     // Loop on sensor B strips
     for (int i = 0; i < NBR_STRIP; ++i)
     {
-        // noise parameters determination
-        if (distribution1(generator) >= 0.5)
-        {
-            std::normal_distribution<double> dist(1.36, 0.06);
-            noise = abs(dist(generator)) * 0.375;
-        } else
-        {
-            std::normal_distribution<double> dist(2.38, 0.6);
-            noise = abs(dist(generator)) * 0.375;
-        }
-        // noise value deternmination
-        std::normal_distribution<double> dist1(0., noise);
-        // noise creation
-        double strip_energy = (strip_B[i] / 0.00362) + abs(dist1(generator));
+        // convert strip signal to killo-electrons and add noise 
+        double strip_energy = (strip_B[i] / PAIR_CREATION_ENERGY) + abs(dist1(generator));
+
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
         {
@@ -184,32 +379,40 @@ bool CBC2(
 
 void SaveData(
 	const int &k,
-	Double_t x[],
-	Double_t y[],
-	Double_t ey[],
+	Double_t x1[],
+	Double_t y1[],
+	Double_t ey1[],
+    const int &l,
+    Double_t x2[],
+    Double_t y2[],
+    Double_t ey2[],
 	Double_t p1,
 	Double_t p2,
 	Double_t p3,
+    Double_t p4,
 	Double_t t1,
 	Double_t t2,
 	Double_t t3,
+    Double_t t4,
 	Double_t s1,
 	Double_t s2,
-	Double_t s3
+	Double_t s3,
+    Double_t s4
 	){
 
 	// open file
 	ofstream myfile;
-    myfile.open ("figure20_0_data.txt");
-    myfile << "x\ty\tey\n";
+    myfile.open ("figure20_0-Comp-data.txt");
+    myfile << "x1\ty1\tey1\nx2\ty2\tey2";
     for (int i = 0; i < k; ++i)
     {
-    	myfile << std::scientific << x[i] << "\t" << y[i] << "\t" << ey[i] << "\n";
+    	myfile << std::scientific << x1[i] << "\t" << y1[i] << "\t" << ey1[i] << x2[i] << "\t" << y2[i] << "\t" << ey2[i] << "\n";
     }
     myfile << std::scientific << "serie\t" << "param0\t" << "param1\t" << "param2\n";
     myfile << std::scientific << "Adam\t" << p1 << "\t" << t1 << "\t" << s1 << "\n";
     myfile << std::scientific << "Adam-irr\t" << p2 << "\t" << t2 << "\t" << s2 << "\n";
-    myfile << std::scientific << "Geant4\t" << p3 << "\t" << t3 << "\t" << s3 << "\n";
+    myfile << std::scientific << "CBC2\t" << p3 << "\t" << t3 << "\t" << s3 << "\n";
+    myfile << std::scientific << "CBC3\t" << p4 << "\t" << t4 << "\t" << s4 << "\n";
     myfile.close();
 
     return;
@@ -307,7 +510,7 @@ void figure20_0() {
     Double_t ex2[m] = {0.};
     Double_t ey2[m] = {0.};
 
-    const Int_t p = 25; // // Simulation
+    const Int_t p = 25; // // Simulation CBC2
  
     Double_t x3[p] = {  1.32089,
                         1.48578,
@@ -337,6 +540,37 @@ void figure20_0() {
     Double_t y3[p] = {0.};
     Double_t ex3[p] = {0.};
     Double_t ey3[p] = {0.};
+
+    const Int_t q = 25; // // Simulation CBC3
+ 
+    Double_t x4[q] = {  1.32089,
+                        1.48578,
+                        1.57853,
+                        1.71422,
+                        1.79152,
+                        1.87568,
+                        1.93064,
+                        1.98904,
+                        2.13847,
+                        2.42703,
+                        2.51978,
+                        2.80491,
+                        2.97495,
+                        3.16560,
+                        4.26316,
+                        4.66851,
+                        5.15975,
+                        6.32257,
+                        6.32257,
+                        7.25867,
+                        9.79902,
+                        10.88800,
+                        12.24830,
+                        13.06420,
+                        15.07380};
+    Double_t y4[q] = {0.};
+    Double_t ex4[q] = {0.};
+    Double_t ey4[q] = {0.};
 
 	//****************** Create Histo ************************************//
     auto c1 = new TCanvas("c1","c1",1000,600);
@@ -399,41 +633,59 @@ void figure20_0() {
         //****************** Main loop over all entries **********************//
         int count_loop = 0;
         bool stop = true;
-        double nbr_stub = 0.;
-        std::vector<double> efficiencies;
+        double nbr_stub1 = 0., nbr_stub2 = 0.;
+        std::vector<double> efficiencies1;
+        std::vector<double> efficiencies2;
         for (int k = 0; k < ENTRIES; k++)
         {
             // fill variables with datas from entry i
             data->GetEntry(k);
 
-            std::vector<double> res_A(9, 0);
-            std::vector<double> res_B(9, 0);
+            std::vector<double> res_A1(9, 0);
+            std::vector<double> res_B1(9, 0);
 
-            bool stub = CBC2(strip_A, strip_B, res_A, res_B, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, THRESHOLD);
+            bool stub1 = CBC2(strip_A, strip_B, res_A1, res_B1, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, THRESHOLD);
 
-            if(stub){nbr_stub += 1.;}
+            if(stub1){nbr_stub1 += 1.;}
+
+            std::vector<double> res(2, 0);
+            std::vector<double> res_A2(10, 0);
+            std::vector<double> res_B2(10, 0);
+
+            bool stub2 = CBC3(strip_A, strip_B, res, res_A2, res_B2, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, THRESHOLD);
+
+            if(stub2){nbr_stub2 += 1.;}
 
             count_loop += 1;
             if (count_loop == ENTRIES /100)
             {
                 count_loop = 0;
-                efficiencies.push_back((double) nbr_stub / (ENTRIES / 100));
+                efficiencies1.push_back((double) nbr_stub1 / (ENTRIES / 100));
+                efficiencies2.push_back((double) nbr_stub2 / (ENTRIES / 100));
                 //cout << mean_cluster_width << endl;
-                nbr_stub = 0.;
+                nbr_stub1 = nbr_stub2 = 0.;
             }
         }
         //********************* fig 17 computation and printing **********************************//
-        // for A
-        double variance = 0., deviation = 0., average = 0.;
-        average = std::accumulate(efficiencies.begin(), efficiencies.end(), 0.0) / 100;
-        for (int i = 0; i < 100; ++i){variance += pow((efficiencies.at(i) - average), 2);}
-        variance /= 99;
-        deviation = sqrt(variance);
-        cout << std::scientific << "File " << j << " stub efficiency:\t" << average << "\t+/- " << deviation << endl;
+        // for CBC2
+        double variance1 = 0., deviation1 = 0., average1 = 0.;
+        average1 = std::accumulate(efficiencies1.begin(), efficiencies1.end(), 0.0) / 100;
+        for (int i = 0; i < 100; ++i){variance1 += pow((efficiencies1.at(i) - average1), 2);}
+        variance1 /= 99;
+        deviation1 = sqrt(variance1);
+        cout << std::scientific << "File " << j << " stub efficiency CBC2:\t" << average1 << "\t+/- " << deviation1 << endl;
+        y3[j] = average1;
+        ey3[j] = deviation1;
 
-        //*********************** 
-        y3[j] = average;
-        ey3[j] = deviation;
+        // for CBC3
+        double variance2 = 0., deviation2 = 0., average2 = 0.;
+        average2 = std::accumulate(efficiencies2.begin(), efficiencies2.end(), 0.0) / 100;
+        for (int i = 0; i < 100; ++i){variance2 += pow((efficiencies2.at(i) - average2), 2);}
+        variance2 /= 99;
+        deviation2 = sqrt(variance2);
+        cout << std::scientific << "File " << j << " stub efficiency CBC3:\t" << average2 << "\t+/- " << deviation2 << endl;
+        y4[j] = average2;
+        ey4[j] = deviation2;
 
         // Close file when finished
         f.Close();
@@ -451,11 +703,17 @@ void figure20_0() {
     gr2->SetMarkerStyle(25);
     gr2->SetMarkerSize(0.7);
 
-    TGraphErrors *gr3 = new TGraphErrors(p,x3,y3,ex3,ey3); // simulation
+    TGraphErrors *gr3 = new TGraphErrors(p,x3,y3,ex3,ey3); // simulation CBC2
     gr3->SetName("gr3");
     gr3->SetMarkerColor(kRed+2);
     gr3->SetMarkerStyle(20);
     gr3->SetMarkerSize(0.7);
+
+    TGraphErrors *gr4 = new TGraphErrors(q,x4,y4,ex4,ey4); // simulation CBC3
+    gr4->SetName("gr4");
+    gr4->SetMarkerColor(kBlue+2);
+    gr4->SetMarkerStyle(20);
+    gr4->SetMarkerSize(0.7);
 
     TF1* func1 = new TF1("func1", "(0.5*[0]*(1+ TMath::Erf((x-[1])/[2])))", x1[0], x1[n-1]);
     func1->SetParameters(0.98, 1.85, 0.10);
@@ -478,10 +736,18 @@ void figure20_0() {
     func3->SetLineStyle(7);
     TFitResultPtr r3 = gr3->Fit(func3, "S");
 
+    TF1* func4 = new TF1("func4", "(0.5*[0]*(1+ TMath::Erf((x-[1])/[2])))", x4[0], x4[p-1]);
+    func4->SetParameters(0.99, 1.85, 0.10);
+    func4->SetLineColor(kBlue+2);
+    func4->SetLineWidth(1);
+    func4->SetLineStyle(7);
+    TFitResultPtr r4 = gr4->Fit(func4, "S");
+
     TMultiGraph *mg = new TMultiGraph();
     mg->Add(gr1);
     mg->Add(gr2);
     mg->Add(gr3);
+    mg->Add(gr4);
     mg->SetTitle("");
     mg->Draw("AP");
 
@@ -496,6 +762,10 @@ void figure20_0() {
     Double_t plateau3   = r3->Value(0);
     Double_t turn3   = r3->Value(1);
     Double_t sigma3   = r3->Value(2);
+
+    Double_t plateau4   = r4->Value(0);
+    Double_t turn4   = r4->Value(1);
+    Double_t sigma4   = r4->Value(2);
 
     TAxis *xaxis = mg->GetXaxis();
     TAxis *yaxis = mg->GetYaxis();
@@ -533,12 +803,13 @@ void figure20_0() {
     auto legend = new TLegend(0.6,0.1,0.9,0.4);
     legend->AddEntry("gr1","Adam et al. - non-irr.","p");
     legend->AddEntry("gr2","Adam et al. - irr.","p");
-    legend->AddEntry("gr3","Geant4 - 2.63 mm","ep");
+    legend->AddEntry("gr3","Geant4 - CBC2","ep");
+    legend->AddEntry("gr4","Geant4 - CBC3","ep");
     legend->Draw();
 
     gPad->Modified();
 
-    c1->SaveAs("figure20_0.pdf");
+    c1->SaveAs("figure20_0-Comp.pdf");
 
-    SaveData(p, x3, y3, ey3, plateau1, plateau2, plateau3, turn1, turn2, turn3, sigma1, sigma2, sigma3);
+    SaveData(p, x3, y3, ey3, q, x4, y4, ey4, plateau1, plateau2, plateau3, plateau4, turn1, turn2, turn3, turn4, sigma1, sigma2, sigma3, sigma4);
 }
