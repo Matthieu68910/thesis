@@ -219,202 +219,24 @@ bool CBC3(
     }
 }
 
-bool CBC2(
-	const vector<double> &strip_A, 
-	const vector<double> &strip_B, 
-	vector<double> &res_A, // [0:4]-> 1-5 strip wide clusters,[5]-> number of clusters (tot), [6]-> mean cluster width (tot), [7:8]-> accepted, [9] -> nbr hits
-	vector<double> &res_B,
-	const int MAX_CLUSTER_WIDTH = 3,
-	const int CLUSTER_WINDOW = 5,
-	double THRESHOLD = 5.1975
-    //double kill_value = 0.04331
-	){
-
-	const int NBR_STRIP = strip_A.size();
-
-    double noise = 0.;
-	// Clusters in sensor A
-	std::vector<double> clus_pos_A;
-	std::vector<double> clus_size_A;
-	bool inside = false;
-	int size = 0;
-    int nbr_hits_A = 0;
-	// Loop on sensor A strips
-	for (int i = 0; i < NBR_STRIP; ++i)
-    {
-        // noise parameters determination
-        if (distribution1(generator) >= 0.5)
-        {
-            std::normal_distribution<double> dist(1.36, 0.06);
-            noise = abs(dist(generator)) * 0.375;
-        } else
-        {
-            std::normal_distribution<double> dist(2.38, 0.6);
-            noise = abs(dist(generator)) * 0.375;
-        }
-        // noise value deternmination
-        std::normal_distribution<double> dist1(0., noise);
-        // noise creation
-    	double strip_energy = (strip_A[i] / 0.00362) + abs(dist1(generator));
-        //if(distribution1(generator) < kill_value){strip_energy = 0.;}
-        if (strip_energy < THRESHOLD && !inside)        
-        {} else if (strip_energy < THRESHOLD && inside)
-        {
-	        clus_size_A.push_back(size);
-	        if(size <= 5) res_A.at(size - 1) += 1;
-	        clus_pos_A.push_back(floor((i - 1) - (size / 2) + 0.5));
-	        size = 0;
-	        inside = false;
-        } else if (strip_energy >= THRESHOLD && !inside)
-        {
-            nbr_hits_A += 1;
-            size = 1;
-            inside = true;
-            if (i == (NBR_STRIP - 1))
-            {
-                clus_size_A.push_back(1);
-                res_A.at(0) += 1;
-                clus_pos_A.push_back(i);
-                size = 0;
-                inside = false;
-            }
-        } else if (strip_energy >= THRESHOLD && inside)
-        {
-            nbr_hits_A += 1;
-            size += 1;
-            if (i == (NBR_STRIP - 1))
-            {
-                clus_size_A.push_back(size);
-                if(size <= 5) res_A.at(size - 1) += 1;
-                clus_pos_A.push_back(floor(i - (size / 2) + 0.5));
-                size = 0;
-                inside = false;
-            }
-        }
-    }
-
-    // Clusters in sensor B
-	std::vector<double> clus_pos_B;
-	std::vector<double> clus_size_B;
-	inside = false;
-	size = 0;
-    int nbr_hits_B = 0;
-	// Loop on sensor B strips
-	for (int i = 0; i < NBR_STRIP; ++i)
-    {
-        // noise parameters determination
-        if (distribution1(generator) >= 0.5)
-        {
-            std::normal_distribution<double> dist(1.36, 0.06);
-            noise = abs(dist(generator)) * 0.375;
-        } else
-        {
-            std::normal_distribution<double> dist(2.38, 0.6);
-            noise = abs(dist(generator)) * 0.375;
-        }
-        // noise value deternmination
-        std::normal_distribution<double> dist1(0., noise);
-        // noise creation
-    	double strip_energy = (strip_B[i] / 0.00362) + abs(dist1(generator));
-        //if(distribution1(generator) < kill_value){strip_energy = 0.;}
-        if (strip_energy < THRESHOLD && !inside)        
-        {} else if (strip_energy < THRESHOLD && inside)
-        {
-	        clus_size_B.push_back(size);
-	        if(size <= 5) res_B.at(size - 1) += 1;
-	        clus_pos_B.push_back(floor((i - 1) - (size / 2) + 0.5));
-	        size = 0;
-	        inside = false;
-        } else if (strip_energy >= THRESHOLD && !inside)
-        {
-            nbr_hits_B += 1;
-            size = 1;
-            inside = true;
-            if (i == (NBR_STRIP - 1))
-            {
-                clus_size_B.push_back(1);
-                res_B.at(0) += 1;
-                clus_pos_B.push_back(i);
-                size = 0;
-                inside = false;
-            }
-        } else if (strip_energy >= THRESHOLD && inside)
-        {
-            nbr_hits_B += 1;
-            size += 1;
-            if (i == (NBR_STRIP - 1))
-            {
-                clus_size_B.push_back(size);
-                if(size <= 5) res_B.at(size - 1) += 1;
-                clus_pos_B.push_back(floor(i - (size / 2) + 0.5));
-                size = 0;
-                inside = false;
-            }
-        }
-    }
-
-    // fill results (tot)
-    if(clus_pos_A.size() != 0){res_A.at(5) = clus_pos_A.size();}else{res_A.at(5) = 0;}
-    if(clus_pos_B.size() != 0){res_B.at(5) = clus_pos_B.size();}else{res_B.at(5) = 0;}
-    if(clus_size_A.size() != 0){res_A.at(6) = std::accumulate(clus_size_A.begin(), clus_size_A.end(), 0.0) / clus_size_A.size();}else{res_A.at(6) = 0;}
-    if(clus_size_B.size() != 0){res_B.at(6) = std::accumulate(clus_size_B.begin(), clus_size_B.end(), 0.0) / clus_size_B.size();}else{res_B.at(6) = 0;}
-
-    // Clean clusters in both sensors depending on MAX_CLUSTER_WIDTH
-    // for A
-    for (int i = clus_size_A.size() - 1; i >= 0; --i)
-    {
-    	if (clus_size_A.at(i) > MAX_CLUSTER_WIDTH)
-    	{	
-    		clus_size_A.erase(clus_size_A.begin() + i);
-    		clus_pos_A.erase(clus_pos_A.begin() + i);
-    	}
-    }
-    // for B
-    for (int i = clus_size_B.size() - 1; i >= 0; --i)
-    {
-    	if (clus_size_B.at(i) > MAX_CLUSTER_WIDTH)
-    	{	
-    		clus_size_B.erase(clus_size_B.begin() + i);
-    		clus_pos_B.erase(clus_pos_B.begin() + i);
-    	}
-    }
-
-    // fill results (accepted)
-    res_A.at(7) = clus_pos_A.size();
-    res_B.at(7) = clus_pos_B.size();
-    res_A.at(8) = std::accumulate(clus_size_A.begin(), clus_size_A.end(), 0.0) / clus_size_A.size();
-    res_B.at(8) = std::accumulate(clus_size_B.begin(), clus_size_B.end(), 0.0) / clus_size_B.size();
-    res_A.at(9) = nbr_hits_A;
-    res_B.at(9) = nbr_hits_B;
-
-    // return false if no possible stub
-    if (clus_pos_A.size() == 0 || clus_pos_B.size() == 0)
-    {
-    	return false;
-    }
-
-    // stub finding logic
-    for (int i = 0; i < clus_pos_A.size(); ++i)
-    {
-    	for (int j = 0; j < clus_pos_B.size(); ++j)
-    	{
-    		if (abs(clus_pos_A.at(i) - clus_pos_B.at(j)) <= CLUSTER_WINDOW)
-    		{
-    			return true;
-    		}
-    	}
-    }
-    return false;
-}
-
-void figure13() {
+void figure14_full() {
 	// data for Adam2020
+
+	// open file
+    TFile *f = TFile::Open("/media/matthieu/ssd1/Geant4/Full-size/Data_figure13-16/data500k_pB.root", "read");
+
+    //************* variable ***************//
+    const int NBR_STRIP = 1016;
+
+    const int MAX_CLUSTER_WIDTH = 3;
+    const double CLUSTER_WINDOW = 3.5;
+
     const int NBR_BINS = 14;
     const int NBR_BINS_IRR = 16;
 
     // array creation
     Double_t x1[NBR_BINS] = {	5.21850,
-    							0.69750,
+                                0.69750,
                                 1.46438,
                                 2.23125,
                                 2.95800,
@@ -431,25 +253,25 @@ void figure13() {
     Double_t ex1[NBR_BINS] = {0.};
     Double_t ey1[NBR_BINS] = {0.};
 
-    Double_t x2[NBR_BINS] = {   5.25863,
-    							0.73800,
-                                1.50488,
-                                2.23125,
-                                2.99813,                               
-                                5.98538,
-                                7.47874,
-                                9.73916,
-                                11.23268,
-                                16.49768,
-                                19.50739,
-                                21.00090,
-                                22.49438,
-                                23.98785}; // in keV !!!
+    Double_t x2[NBR_BINS] = {   5.20875,
+                                0.70200,
+                                1.46175,
+                                2.22150,
+                                2.95538,
+                                5.96850,
+                                7.46201,
+                                9.71539,
+                                11.20890,
+                                16.44934,
+                                19.46258,
+                                20.95609,
+                                22.44960,
+                                23.96933}; // in keV !!!
     Double_t y2[NBR_BINS] = {0.};
     Double_t ex2[NBR_BINS] = {0.};
     Double_t ey2[NBR_BINS] = {0.};
 
-    // adam D0
+    // mini D0
     Double_t x3[NBR_BINS] = {   0.69750,
                                 1.46438,
                                 2.23125,
@@ -464,54 +286,106 @@ void figure13() {
                                 20.97015,
                                 22.45403,
                                 23.94750}; // in keV !!!
-    Double_t y3[NBR_BINS] = {   38.080700,
-                                20.937800,
-                                4.368410,
-                                1.542830,
-                                1.157780,
-                                1.144010,
-                                1.116960,
-                                1.090560,
-                                1.077590,
-                                0.944719,
-                                0.717475,
-                                0.581773,
-                                0.466412,
-                                0.362798};
-    Double_t ex3[NBR_BINS] = {0.};
-    Double_t ey3[NBR_BINS] = {0.};
+    Double_t y3[NBR_BINS] = {   5.304240E+01,
+                                1.447108E+01,
+                                3.758250E+00,
+                                1.521740E+00,
+                                1.005530E+00,
+                                1.004260E+00,
+                                1.004260E+00,
+                                1.005110E+00,
+                                1.005480E+00,
+                                1.001780E+00,
+                                9.111300E-01,
+                                7.841300E-01,
+                                6.302000E-01,
+                                4.845400E-01};
+    Double_t ex3[NBR_BINS] = {  4.7600E-02,
+                                3.5791E-02,
+                                1.2624E-02,
+                                3.9674E-03,
+                                5.4579E-04,
+                                7.1833E-04,
+                                7.6333E-04,
+                                9.3862E-04,
+                                9.5079E-04,
+                                9.3429E-04,
+                                2.5966E-03,
+                                3.7336E-03,
+                                4.0991E-03,
+                                5.7941E-03};
+    Double_t ey3[NBR_BINS] = {  4.7600E-02,
+                                3.5791E-02,
+                                1.2624E-02,
+                                3.9674E-03,
+                                5.4579E-04,
+                                7.1833E-04,
+                                7.6333E-04,
+                                9.3862E-04,
+                                9.5079E-04,
+                                9.3429E-04,
+                                2.5966E-03,
+                                3.7336E-03,
+                                4.0991E-03,
+                                5.7941E-03};
 
-    // adam D1
-    Double_t x4[NBR_BINS] = {   0.73800,
-                                1.50488,
-                                2.23125,
-                                2.99813,
-                                5.25863,
-                                5.98538,
-                                7.47874,
-                                9.73916,
-                                11.23268,
-                                16.49768,
-                                19.50739,
-                                21.00090,
-                                22.49438,
-                                23.98785}; // in keV !!!
-    Double_t y4[NBR_BINS] = {   41.406900,
-                                19.959500,
-                                3.438860,
-                                1.470740,
-                                1.200090,
-                                1.185810,
-                                1.144010,
-                                1.116960,
-                                1.103680,
-                                0.972574,
-                                0.734848,
-                                0.599618,
-                                0.472025,
-                                0.376055};
-    Double_t ex4[NBR_BINS] = {0.};
-    Double_t ey4[NBR_BINS] = {0.};
+    // mini D1
+    Double_t x4[NBR_BINS] = {   0.70200,
+                                1.46175,
+                                2.22150,
+                                2.95538,
+                                5.20875,
+                                5.96850,
+                                7.46201,
+                                9.71539,
+                                11.20890,
+                                16.44934,
+                                19.46258,
+                                20.95609,
+                                22.44960,
+                                23.96933}; // in keV !!!
+    Double_t y4[NBR_BINS] = {   5.27400E+01,
+                                1.45488E+01,
+                                3.82115E+00,
+                                1.53091E+00,
+                                1.01646E+00,
+                                1.01533E+00,
+                                1.01590E+00,
+                                1.01684E+00,
+                                1.01710E+00,
+                                1.01164E+00,
+                                9.21890E-01,
+                                7.96770E-01,
+                                6.42580E-01,
+                                4.92550E-01};
+    Double_t ex4[NBR_BINS] = {  4.1274E-02,
+                                3.3467E-02,
+                                1.1268E-02,
+                                8.7958E-03,
+                                8.0305E-04,
+                                1.1314E-03,
+                                1.1652E-03,
+                                9.8342E-04,
+                                1.1314E-03,
+                                1.1664E-03,
+                                3.7687E-03,
+                                3.4095E-03,
+                                3.4065E-03,
+                                3.0877E-03};
+    Double_t ey4[NBR_BINS] = {  4.1274E-02,
+                                3.3467E-02,
+                                1.1268E-02,
+                                8.7958E-03,
+                                8.0305E-04,
+                                1.1314E-03,
+                                1.1652E-03,
+                                9.8342E-04,
+                                1.1314E-03,
+                                1.1664E-03,
+                                3.7687E-03,
+                                3.4095E-03,
+                                3.4065E-03,
+                                3.0877E-03};
 
     // adam D0_IRR
     Double_t x5[NBR_BINS_IRR] = {   0.70275,
@@ -530,22 +404,22 @@ void figure13() {
                                     20.96933,
                                     22.47173,
                                     23.97413}; // in keV !!!
-    Double_t y5[NBR_BINS_IRR] = {   30.1215000,
-                                    6.7070400,
-                                    1.9182700,
-                                    1.1759900,
-                                    0.9366170,
-                                    0.8848140,
-                                    0.8264180,
-                                    0.6433920,
-                                    0.6147630,
-                                    0.5424320,
-                                    0.3899660,
-                                    0.1416410,
-                                    0.1412730,
-                                    0.1090240,
-                                    0.0858497,
-                                    0.0668366};
+    Double_t y5[NBR_BINS_IRR] = {   25.7860000,
+									5.5754500,
+									1.3866300,
+									0.8155560,
+									0.7533410,
+									0.7484100,
+									0.7257880,
+									0.6025730,
+									0.5778540,
+									0.5144990,
+									0.3679600,
+									0.1341110,
+									0.1313330,
+									0.1017400,
+									0.0804747,
+									0.0628790};
     Double_t ex5[NBR_BINS_IRR] = {0.};
     Double_t ey5[NBR_BINS_IRR] = {0.};
 
@@ -566,41 +440,32 @@ void figure13() {
                                     20.97015,
                                     22.44750,
                                     23.94750}; // in keV !!!
-    Double_t y6[NBR_BINS_IRR] = {   29.2426000,
-                                    6.1077500,
-                                    1.7713900,
-                                    1.1762000,
-                                    0.9612890,
-                                    0.8955480,
-                                    0.8407000,
-                                    0.6526200,
-                                    0.6244690,
-                                    0.5483190,
-                                    0.3952350,
-                                    0.1473400,
-                                    0.1482370,
-                                    0.1148180,
-                                    0.0918478,
-                                    0.0727227};
+    Double_t y6[NBR_BINS_IRR] = {   25.3367000,
+									5.0908500,
+									1.2586000,
+									0.8018850,
+									0.7596600,
+									0.7528420,
+									0.7327520,
+									0.6063620,
+									0.5848840,
+									0.5155280,
+									0.3760190,
+									0.1394780,
+									0.1369850,
+									0.1064240,
+									0.0849478,
+									0.0671969};
     Double_t ex6[NBR_BINS_IRR] = {0.};
     Double_t ey6[NBR_BINS_IRR] = {0.};
-
-    // open file 1
-    TFile *f = TFile::Open("/media/matthieu/ssd1/Geant4/Full-size/Data_figure13-16/data500k_sB.root", "read");
-
-    //************* variable ***************//
-    const int NBR_STRIP = 1016;
-
-    const int MAX_CLUSTER_WIDTH = 3;
-    const double CLUSTER_WINDOW = 3.5;
 
 
     //************ Get the TTree ******************************************
     auto data = f->Get<TTree>("data");
 
     // Get the number of entries in TTree
-    const int ENTRIES = data->GetEntries();
-    cout << std::scientific << "Number of entries: " << ENTRIES << endl;
+    const int ENTRIES = data->GetEntries() / 50;
+    //cout << std::scientific << "Number of entries: " << ENTRIES << endl;
 
     //**************** Set BranchAddress for datas recovery ***************
     // for strips
@@ -622,7 +487,7 @@ void figure13() {
     // for other datas (pT)
 
     //****************** Create Histo ************************************//
-    auto c1 = new TCanvas("c1","c1",1000,600);
+    auto c1 = new TCanvas("c1","c1", 1000, 600);
 	c1->SetTitle("Figure 1: threshold variation");
 	gStyle->SetOptStat(0);
 	gPad->SetGridx(1);
@@ -655,9 +520,9 @@ void figure13() {
 	        bool stub1 = CBC3(strip_A, strip_B, resA, res_A1, res_B1, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, x1[j]);
             bool stub2 = CBC3(strip_A, strip_B, resB, res_A2, res_B2, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, x2[j]);
 
-	        nbr_hitsA.at(loop_number) += (double) res_A1.at(9) / (ENTRIES / 25);
+	        nbr_hitsA.at(loop_number) += (double) res_A1.at(5) / (ENTRIES / 25);
 
-	        nbr_hitsB.at(loop_number) += (double) res_B2.at(9) / (ENTRIES / 25);
+	        nbr_hitsB.at(loop_number) += (double) res_B2.at(5) / (ENTRIES / 25);
 
 	        count_loop += 1;
 	        if (count_loop == ENTRIES / 25)
@@ -699,30 +564,6 @@ void figure13() {
         x6[i] *= 1000.;
     }
 
-    TGraphErrors *gr3 = new TGraphErrors(NBR_BINS,x3,y3,ex3,ey3);
-    gr3->SetName("gr3");
-    gr3->SetMarkerColor(12);
-    gr3->SetMarkerStyle(20);
-    gr3->SetMarkerSize(1.0);
-
-    TGraphErrors *gr4 = new TGraphErrors(NBR_BINS,x4,y4,ex4,ey4);
-    gr4->SetName("gr4");
-    gr4->SetMarkerColor(12);
-    gr4->SetMarkerStyle(25);
-    gr4->SetMarkerSize(1.0);
-
-    TGraphErrors *gr5 = new TGraphErrors(NBR_BINS_IRR,x5,y5,ex5,ey5);
-    gr5->SetName("gr5");
-    gr5->SetMarkerColor(12);
-    gr5->SetMarkerStyle(22);
-    gr5->SetMarkerSize(1.0);
-
-    TGraphErrors *gr6 = new TGraphErrors(NBR_BINS_IRR,x6,y6,ex6,ey6);
-    gr6->SetName("gr6");
-    gr6->SetMarkerColor(12);
-    gr6->SetMarkerStyle(26);
-    gr6->SetMarkerSize(1.0);
-
     TGraphErrors *gr1 = new TGraphErrors(NBR_BINS,x1,y1,ex1,ey1);
     gr1->SetName("gr1");
     gr1->SetMarkerColor(kBlue+2);
@@ -735,11 +576,35 @@ void figure13() {
     gr2->SetMarkerStyle(25);
     gr2->SetMarkerSize(1.0);
 
+    TGraphErrors *gr3 = new TGraphErrors(NBR_BINS,x3,y3,ex3,ey3);
+    gr3->SetName("gr3");
+    gr3->SetMarkerColor(12);
+    gr3->SetMarkerStyle(20);
+    gr3->SetMarkerSize(1.0);
+
+    TGraphErrors *gr4 = new TGraphErrors(NBR_BINS,x4,y4,ex4,ey4);
+    gr4->SetName("gr4");
+    gr4->SetMarkerColor(12);
+    gr4->SetMarkerStyle(25);
+    gr4->SetMarkerSize(1.0);
+
+    /*TGraphErrors *gr5 = new TGraphErrors(NBR_BINS_IRR,x5,y5,ex5,ey5);
+    gr5->SetName("gr5");
+    gr5->SetMarkerColor(12);
+    gr5->SetMarkerStyle(22);
+    gr5->SetMarkerSize(1.0);
+
+    TGraphErrors *gr6 = new TGraphErrors(NBR_BINS_IRR,x6,y6,ex6,ey6);
+    gr6->SetName("gr6");
+    gr6->SetMarkerColor(12);
+    gr6->SetMarkerStyle(26);
+    gr6->SetMarkerSize(1.0);*/
+
     TMultiGraph *mg = new TMultiGraph();
     mg->Add(gr3);
     mg->Add(gr4);
-    mg->Add(gr5);
-    mg->Add(gr6);
+    //mg->Add(gr5);
+    //mg->Add(gr6);
     mg->Add(gr1);
     mg->Add(gr2);
     mg->SetTitle("");
@@ -757,7 +622,7 @@ void figure13() {
     xaxis->SetRangeUser(0., 25000);
     yaxis->SetLabelFont(42);
     yaxis->SetLabelSize(0.04);
-    yaxis->SetTitle("Nombre moyen de hit/evenement");
+    yaxis->SetTitle("Nombre moyen de cluster/evenement");
     yaxis->SetTitleFont(22);
     yaxis->SetTitleSize(0.05);
     yaxis->SetTitleOffset(0.9);
@@ -782,18 +647,18 @@ void figure13() {
     A1->Draw("SAME");
 
     auto legend = new TLegend(0.55,0.9,0.9,0.6);
-    legend->AddEntry("gr1","Geant4 - top sensor","ep");
-    legend->AddEntry("gr2","Geant4 - bottom sensor","ep");
-    legend->AddEntry("gr3","Adam et al. - top sensor","p");
-    legend->AddEntry("gr4","Adam et al. - bottom sensor","p");
-    legend->AddEntry("gr5","Adam et al. - top sensor irr.","p");
-    legend->AddEntry("gr6","Adam et al. - bottom sensor irr.","p");
+    legend->AddEntry("gr1","Grand module - capteur sup.","ep");
+    legend->AddEntry("gr2","Grand module - capteur inf.","ep");
+    legend->AddEntry("gr3","Mini module - capteur sup.","ep");
+    legend->AddEntry("gr4","Mini module - capteur inf.","ep");
+    //legend->AddEntry("gr5","Adam et al. - top sensor irr.","p");
+    //legend->AddEntry("gr6","Adam et al. - bottom sensor irr.","p");
     legend->Draw();
 
     gPad->Modified();
     //*********************** 
 
-    c1->SaveAs("figure13.pdf");
+    c1->SaveAs("figure14_sB.pdf");
     // Close file when finished
     //f.Close();
 }

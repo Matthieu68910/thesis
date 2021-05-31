@@ -65,19 +65,19 @@ void B1Field::GetFieldValue( const G4double Point[4], G4double* Bfield ) const
   {
       Bfield[0]=0;
       Bfield[1]=0.*tesla;
-      Bfield[2]=0;
+      Bfield[2]=0.*tesla;
       Bfield[3]=0;
       Bfield[4]=0;
-      Bfield[5]= - (4.6394E+9 * ((Point[2] - backplane + 0.0585) / 1000)) * volt/m; // E+9
+      Bfield[5]= - (4.6394E+9 * ((Point[2] - backplane + 0.0073) / 1000)) * volt/m;
   }
   else
   {
       Bfield[0]=0;
       Bfield[1]=0.*tesla;
-      Bfield[2]=0;
+      Bfield[2]=0.*tesla;
       Bfield[3]=0;
       Bfield[4]=0;
-      Bfield[5]= (4.6394E+9 * ((abs(Point[2]) - backplane + 0.0585) / 1000)) * volt/m;
+      Bfield[5]= (4.6394E+9 * ((abs(Point[2]) - backplane + 0.0073) / 1000)) * volt/m;
   }
 
   //G4cout << "Electric Field = " << G4BestUnit(Bfield[5], "Electric field") << G4endl;

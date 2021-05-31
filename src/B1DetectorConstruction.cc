@@ -47,7 +47,7 @@ B1DetectorConstruction::B1DetectorConstruction()
   space(0),
   backplane(0),
   posAB(0),
-  strip_nbr(254),
+  strip_nbr(1016),
   logicSiUp(nullptr),
   logicSiDo(nullptr),
   logicWorld(nullptr)
@@ -106,8 +106,8 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
 
   // strips
   G4double strip_width = 90.*um;
-  G4double strip_thickness = 270.*um;
-  strip_nbr = 254; // 1016 for full sensor !!! change in line 44 !!!
+  G4double strip_thickness = 290.*um;
+  strip_nbr = 1016; // 1016 for full sensor !!! change in line 44 !!!
   G4double strip_length = strip_nbr * strip_width;// strip_nbr * strip_width;
 
   // silicon backplane
@@ -117,7 +117,7 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
   G4double Al_bp_thickness = 1.*um;
 
   // sensors separation and tilt
-  posAB = 2.63*mm / 2; // from mid-plane to center 1.375 * 2 = 2.75 mm if |-<-| |->-| (375 -> 370 -> 365) 2245 if |<--| |-->|
+  posAB = 1.8*mm / 2; // from mid-plane to center 1.375 * 2 = 2.75 mm if |-<-| |->-| (375 -> 370 -> 365) 2245 if |<--| |-->|
   G4double sensor_sep = 2*posAB; //2*posAB - Si_bp_thickness - Al_bp_thickness
 
   G4RotationMatrix tilt1  = G4RotationMatrix();

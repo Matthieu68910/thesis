@@ -407,7 +407,7 @@ bool CBC2(
     return false;
 }
 
-void figure13() {
+void figure13_full() {
 	// data for Adam2020
     const int NBR_BINS = 14;
     const int NBR_BINS_IRR = 16;
@@ -449,7 +449,7 @@ void figure13() {
     Double_t ex2[NBR_BINS] = {0.};
     Double_t ey2[NBR_BINS] = {0.};
 
-    // adam D0
+    // mini D0
     Double_t x3[NBR_BINS] = {   0.69750,
                                 1.46438,
                                 2.23125,
@@ -464,24 +464,50 @@ void figure13() {
                                 20.97015,
                                 22.45403,
                                 23.94750}; // in keV !!!
-    Double_t y3[NBR_BINS] = {   38.080700,
-                                20.937800,
-                                4.368410,
-                                1.542830,
-                                1.157780,
-                                1.144010,
-                                1.116960,
-                                1.090560,
-                                1.077590,
-                                0.944719,
-                                0.717475,
-                                0.581773,
-                                0.466412,
-                                0.362798};
-    Double_t ex3[NBR_BINS] = {0.};
-    Double_t ey3[NBR_BINS] = {0.};
+    Double_t y3[NBR_BINS] = {   7.5297E+01,
+                                1.5462E+01,
+                                3.8727E+00,
+                                1.5864E+00,
+                                1.0592E+00,
+                                1.0561E+00,
+                                1.0520E+00,
+                                1.0457E+00,
+                                1.0414E+00,
+                                1.0260E+00,
+                                9.3023E-01,
+                                8.0097E-01,
+                                6.4472E-01,
+                                4.9725E-01};
+    Double_t ex3[NBR_BINS] = {  6.8419E-02,
+                                3.8917E-02,
+                                1.3207E-02,
+                                2.8257E-03,
+                                4.3582E-03,
+                                3.9951E-03,
+                                3.6330E-03,
+                                3.2396E-03,
+                                2.7113E-03,
+                                2.0714E-03,
+                                3.5712E-03,
+                                4.2978E-03,
+                                4.2723E-03,
+                                5.3577E-03};
+    Double_t ey3[NBR_BINS] = {  6.8419E-02,
+                                3.8917E-02,
+                                1.3207E-02,
+                                2.8257E-03,
+                                4.3582E-03,
+                                3.9951E-03,
+                                3.6330E-03,
+                                3.2396E-03,
+                                2.7113E-03,
+                                2.0714E-03,
+                                3.5712E-03,
+                                4.2978E-03,
+                                4.2723E-03,
+                                5.3577E-03};
 
-    // adam D1
+    // mini D1
     Double_t x4[NBR_BINS] = {   0.73800,
                                 1.50488,
                                 2.23125,
@@ -496,22 +522,48 @@ void figure13() {
                                 21.00090,
                                 22.49438,
                                 23.98785}; // in keV !!!
-    Double_t y4[NBR_BINS] = {   41.406900,
-                                19.959500,
-                                3.438860,
-                                1.470740,
-                                1.200090,
-                                1.185810,
-                                1.144010,
-                                1.116960,
-                                1.103680,
-                                0.972574,
-                                0.734848,
-                                0.599618,
-                                0.472025,
-                                0.376055};
-    Double_t ex4[NBR_BINS] = {0.};
-    Double_t ey4[NBR_BINS] = {0.};
+    Double_t y4[NBR_BINS] = {   6.9227E+01,
+                                1.4333E+01,
+                                3.9022E+00,
+                                1.5733E+00,
+                                1.0953E+00,
+                                1.0914E+00,
+                                1.0846E+00,
+                                1.0730E+00,
+                                1.0653E+00,
+                                1.0419E+00,
+                                9.4280E-01,
+                                8.1304E-01,
+                                6.5610E-01,
+                                5.0615E-01};
+    Double_t ex4[NBR_BINS] = {  3.8383E-02,
+                                3.7105E-02,
+                                1.3618E-02,
+                                8.3900E-03,
+                                3.8670E-03,
+                                4.0727E-03,
+                                4.1107E-03,
+                                3.9636E-03,
+                                4.0933E-03,
+                                2.9672E-03,
+                                5.1590E-03,
+                                4.4475E-03,
+                                3.6359E-03,
+                                2.8838E-03};
+    Double_t ey4[NBR_BINS] = {  3.8383E-02,
+                                3.7105E-02,
+                                1.3618E-02,
+                                8.3900E-03,
+                                3.8670E-03,
+                                4.0727E-03,
+                                4.1107E-03,
+                                3.9636E-03,
+                                4.0933E-03,
+                                2.9672E-03,
+                                5.1590E-03,
+                                4.4475E-03,
+                                3.6359E-03,
+                                2.8838E-03};
 
     // adam D0_IRR
     Double_t x5[NBR_BINS_IRR] = {   0.70275,
@@ -586,7 +638,7 @@ void figure13() {
     Double_t ey6[NBR_BINS_IRR] = {0.};
 
     // open file 1
-    TFile *f = TFile::Open("/media/matthieu/ssd1/Geant4/Full-size/Data_figure13-16/data500k_sB.root", "read");
+    TFile *f = TFile::Open("/media/matthieu/ssd1/Geant4/Full-size/Data_figure13-16/data500k_pB.root", "read");
 
     //************* variable ***************//
     const int NBR_STRIP = 1016;
@@ -599,7 +651,7 @@ void figure13() {
     auto data = f->Get<TTree>("data");
 
     // Get the number of entries in TTree
-    const int ENTRIES = data->GetEntries();
+    const int ENTRIES = data->GetEntries() / 50;
     cout << std::scientific << "Number of entries: " << ENTRIES << endl;
 
     //**************** Set BranchAddress for datas recovery ***************
@@ -711,7 +763,7 @@ void figure13() {
     gr4->SetMarkerStyle(25);
     gr4->SetMarkerSize(1.0);
 
-    TGraphErrors *gr5 = new TGraphErrors(NBR_BINS_IRR,x5,y5,ex5,ey5);
+    /*9TGraphErrors *gr5 = new TGraphErrors(NBR_BINS_IRR,x5,y5,ex5,ey5);
     gr5->SetName("gr5");
     gr5->SetMarkerColor(12);
     gr5->SetMarkerStyle(22);
@@ -721,7 +773,7 @@ void figure13() {
     gr6->SetName("gr6");
     gr6->SetMarkerColor(12);
     gr6->SetMarkerStyle(26);
-    gr6->SetMarkerSize(1.0);
+    gr6->SetMarkerSize(1.0);*/
 
     TGraphErrors *gr1 = new TGraphErrors(NBR_BINS,x1,y1,ex1,ey1);
     gr1->SetName("gr1");
@@ -738,8 +790,8 @@ void figure13() {
     TMultiGraph *mg = new TMultiGraph();
     mg->Add(gr3);
     mg->Add(gr4);
-    mg->Add(gr5);
-    mg->Add(gr6);
+    //mg->Add(gr5);
+    //mg->Add(gr6);
     mg->Add(gr1);
     mg->Add(gr2);
     mg->SetTitle("");
@@ -782,18 +834,18 @@ void figure13() {
     A1->Draw("SAME");
 
     auto legend = new TLegend(0.55,0.9,0.9,0.6);
-    legend->AddEntry("gr1","Geant4 - top sensor","ep");
-    legend->AddEntry("gr2","Geant4 - bottom sensor","ep");
-    legend->AddEntry("gr3","Adam et al. - top sensor","p");
-    legend->AddEntry("gr4","Adam et al. - bottom sensor","p");
-    legend->AddEntry("gr5","Adam et al. - top sensor irr.","p");
-    legend->AddEntry("gr6","Adam et al. - bottom sensor irr.","p");
+    legend->AddEntry("gr1","Grand module - capteur sup.","ep");
+    legend->AddEntry("gr2","Grand module - capteur inf.","ep");
+    legend->AddEntry("gr3","Mini module - capteur sup.","ep");
+    legend->AddEntry("gr4","Mini module - capteur inf.","ep");
+    //legend->AddEntry("gr5","Adam et al. - top sensor irr.","p");
+    //legend->AddEntry("gr6","Adam et al. - bottom sensor irr.","p");
     legend->Draw();
 
     gPad->Modified();
     //*********************** 
 
-    c1->SaveAs("figure13.pdf");
+    c1->SaveAs("figure13-full.pdf");
     // Close file when finished
     //f.Close();
 }

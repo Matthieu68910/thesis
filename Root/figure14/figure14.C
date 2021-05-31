@@ -6,53 +6,64 @@
 std::default_random_engine generator;
 std::uniform_real_distribution<> distribution1(0.0, 1.0);
 
-bool CBC2(
+bool CBC3(
     const vector<double> &strip_A, 
     const vector<double> &strip_B, 
-    vector<double> &res_A, // [0:4]-> 1-5 strip wide clusters,[5]-> number of clusters (tot), [6]-> mean cluster width (tot), [7:8]-> accepted, [9] -> nbr hits
-    vector<double> &res_B,
-    const int MAX_CLUSTER_WIDTH = 3,
-    const int CLUSTER_WINDOW = 5,
-    double THRESHOLD = 5.1975
-    //double kill_value = 0.04331
+    vector<double> &res,                    // global results for sensors (stubs, bend)
+                                                // [0]  -> nbr stubs
+                                                // [1]  -> mean bend information
+    vector<double> &res_A,                  // results for sensor A
+                                                // [0:4]-> 1-5 strip wide clusters
+                                                // [5]  -> number of clusters (tot)
+                                                // [6]  -> mean cluster width (tot)
+                                                // [7:8]-> idem accepted
+                                                // [9]  -> nbr hits
+    vector<double> &res_B,                  // results for sensor B
+                                                // [0:4]-> 1-5 strip wide clusters
+                                                // [5]  -> number of clusters (tot)
+                                                // [6]  -> mean cluster width (tot)
+                                                // [7:8]-> idem accepted
+                                                // [9]  -> nbr hits
+    const int MAX_CLUSTER_WIDTH = 4,        // max 4
+    const double CLUSTER_WINDOW = 7.,           // max +- 7 en 1/2 strip
+    const double THRESHOLD = 0,                   // default to 0 (in killo-electrons)   
+    double NOISE = 1.,                      // noise in killo-elctrons
+    double PAIR_CREATION_ENERGY = 0.00362   // pair creation energy in keV            
     ){
 
+    // find number of strips
     const int NBR_STRIP = strip_A.size();
 
-    double noise = 0.;
+    // noise distribution deternmination
+    std::normal_distribution<double> dist1(0., NOISE);
+
     // Clusters in sensor A
     std::vector<double> clus_pos_A;
     std::vector<double> clus_size_A;
     bool inside = false;
     int size = 0;
     int nbr_hits_A = 0;
+
     // Loop on sensor A strips
     for (int i = 0; i < NBR_STRIP; ++i)
     {
-        // noise parameters determination
-        if (distribution1(generator) >= 0.5)
-        {
-            std::normal_distribution<double> dist(1.36, 0.06);
-            noise = abs(dist(generator)) * 0.375;
-        } else
-        {
-            std::normal_distribution<double> dist(2.38, 0.6);
-            noise = abs(dist(generator)) * 0.375;
-        }
-        // noise value deternmination
-        std::normal_distribution<double> dist1(0., noise);
-        // noise creation
-        double strip_energy = (strip_A[i] / 0.00386) + abs(dist1(generator));
-        //if(distribution1(generator) < kill_value){strip_energy = 0.;}
+        // convert strip signal to killo-electrons and add noise 
+        double strip_energy = (strip_A[i] / PAIR_CREATION_ENERGY) + abs(dist1(generator));
+
+        // cluster finding logic
         if (strip_energy < THRESHOLD && !inside)        
-        {} else if (strip_energy < THRESHOLD && inside)
+        {
+            // do nothing
+        } 
+        else if (strip_energy < THRESHOLD && inside)
         {
             clus_size_A.push_back(size);
             if(size <= 5) res_A.at(size - 1) += 1;
-            clus_pos_A.push_back(floor((i - 1) - (size / 2) + 0.5));
+            clus_pos_A.push_back((double) (i - 1) - ((double) size / 2) + 0.5);
             size = 0;
             inside = false;
-        } else if (strip_energy >= THRESHOLD && !inside)
+        } 
+        else if (strip_energy >= THRESHOLD && !inside)
         {
             nbr_hits_A += 1;
             size = 1;
@@ -61,11 +72,12 @@ bool CBC2(
             {
                 clus_size_A.push_back(1);
                 res_A.at(0) += 1;
-                clus_pos_A.push_back(i);
+                clus_pos_A.push_back((double) i);
                 size = 0;
                 inside = false;
             }
-        } else if (strip_energy >= THRESHOLD && inside)
+        } 
+        else if (strip_energy >= THRESHOLD && inside)
         {
             nbr_hits_A += 1;
             size += 1;
@@ -73,7 +85,7 @@ bool CBC2(
             {
                 clus_size_A.push_back(size);
                 if(size <= 5) res_A.at(size - 1) += 1;
-                clus_pos_A.push_back(floor(i - (size / 2) + 0.5));
+                clus_pos_A.push_back((double) i - ((double) size / 2) + 0.5);
                 size = 0;
                 inside = false;
             }
@@ -86,33 +98,27 @@ bool CBC2(
     inside = false;
     size = 0;
     int nbr_hits_B = 0;
+
     // Loop on sensor B strips
     for (int i = 0; i < NBR_STRIP; ++i)
     {
-        // noise parameters determination
-        if (distribution1(generator) >= 0.5)
-        {
-            std::normal_distribution<double> dist(1.36, 0.06);
-            noise = abs(dist(generator)) * 0.375;
-        } else
-        {
-            std::normal_distribution<double> dist(2.38, 0.6);
-            noise = abs(dist(generator)) * 0.375;
-        }
-        // noise value deternmination
-        std::normal_distribution<double> dist1(0., noise);
-        // noise creation
-        double strip_energy = (strip_B[i] / 0.00386) + abs(dist1(generator));
-        //if(distribution1(generator) < kill_value){strip_energy = 0.;}
+        // convert strip signal to killo-electrons and add noise 
+        double strip_energy = (strip_B[i] / PAIR_CREATION_ENERGY) + abs(dist1(generator));
+
+        // cluster finding logic
         if (strip_energy < THRESHOLD && !inside)        
-        {} else if (strip_energy < THRESHOLD && inside)
+        {
+            // do nothing
+        } 
+        else if (strip_energy < THRESHOLD && inside)
         {
             clus_size_B.push_back(size);
             if(size <= 5) res_B.at(size - 1) += 1;
-            clus_pos_B.push_back(floor((i - 1) - (size / 2) + 0.5));
+            clus_pos_B.push_back((double) (i - 1) - ((double) size / 2) + 0.5);
             size = 0;
             inside = false;
-        } else if (strip_energy >= THRESHOLD && !inside)
+        } 
+        else if (strip_energy >= THRESHOLD && !inside)
         {
             nbr_hits_B += 1;
             size = 1;
@@ -121,11 +127,12 @@ bool CBC2(
             {
                 clus_size_B.push_back(1);
                 res_B.at(0) += 1;
-                clus_pos_B.push_back(i);
+                clus_pos_B.push_back((double) i);
                 size = 0;
                 inside = false;
             }
-        } else if (strip_energy >= THRESHOLD && inside)
+        } 
+        else if (strip_energy >= THRESHOLD && inside)
         {
             nbr_hits_B += 1;
             size += 1;
@@ -133,7 +140,7 @@ bool CBC2(
             {
                 clus_size_B.push_back(size);
                 if(size <= 5) res_B.at(size - 1) += 1;
-                clus_pos_B.push_back(floor(i - (size / 2) + 0.5));
+                clus_pos_B.push_back((double) i - ((double) size / 2) + 0.5);
                 size = 0;
                 inside = false;
             }
@@ -177,44 +184,62 @@ bool CBC2(
     // return false if no possible stub
     if (clus_pos_A.size() == 0 || clus_pos_B.size() == 0)
     {
+        res.at(0) = 0.;
+        res.at(1) = 0.;
         return false;
     }
 
     // stub finding logic
-    for (int i = 0; i < clus_pos_A.size(); ++i)
+    std::vector<double> stub_pos;
+    std::vector<double> stub_bend;
+
+    // loop over all identified clusters
+    for (int i = 0; i < clus_pos_A.size(); ++i) // for each seed in sensor A ....
     {
-        for (int j = 0; j < clus_pos_B.size(); ++j)
+        for (int j = 0; j < clus_pos_B.size(); ++j) // .... look for correlation in sensor B.
         {
-            if (abs(clus_pos_A.at(i) - clus_pos_B.at(j)) <= CLUSTER_WINDOW)
+            if (abs(clus_pos_A.at(i) - clus_pos_B.at(j)) <= CLUSTER_WINDOW)  // correlation only if inside window
             {
-                return true;
+                stub_pos.push_back(clus_pos_A.at(i));
+                stub_bend.push_back(abs((double) clus_pos_A.at(i) - clus_pos_B.at(j)));
             }
         }
     }
-    return false;
+    if (stub_pos.size() != 0)   
+    {
+        res.at(0) = stub_pos.size();
+        res.at(1) = std::accumulate(stub_bend.begin(), stub_bend.end(), 0.0) / stub_pos.size();
+        return true;
+    } 
+    else
+    {
+        res.at(0) = 0.;
+        res.at(1) = 0.;
+        return false;
+    }
 }
 
 void figure14() {
 	// data for Adam2020
 
 	// open file
-    TFile *f = TFile::Open("/media/matthieu/ssd1/Geant4/Data/Data_figure13-16/data100k_pions.root", "read");
+    TFile *f = TFile::Open("/media/matthieu/ssd1/Geant4/Full-size/Data_figure13-16/data500k_sB.root", "read");
 
     //************* variable ***************//
-    const int NBR_STRIP = 254;
+    const int NBR_STRIP = 1016;
 
     const int MAX_CLUSTER_WIDTH = 3;
-    const int CLUSTER_WINDOW = 5;
+    const double CLUSTER_WINDOW = 3.5;
 
     const int NBR_BINS = 14;
     const int NBR_BINS_IRR = 16;
 
     // array creation
-    Double_t x1[NBR_BINS] = {	0.69750,
+    Double_t x1[NBR_BINS] = {	5.21850,
+                                0.69750,
                                 1.46438,
                                 2.23125,
                                 2.95800,
-                                5.21850,
                                 5.98538,
                                 7.47874,
                                 9.69881,
@@ -228,11 +253,11 @@ void figure14() {
     Double_t ex1[NBR_BINS] = {0.};
     Double_t ey1[NBR_BINS] = {0.};
 
-    Double_t x2[NBR_BINS] = {   0.70200,
+    Double_t x2[NBR_BINS] = {   5.20875,
+                                0.70200,
                                 1.46175,
                                 2.22150,
                                 2.95538,
-                                5.20875,
                                 5.96850,
                                 7.46201,
                                 9.71539,
@@ -387,7 +412,7 @@ void figure14() {
     auto data = f->Get<TTree>("data");
 
     // Get the number of entries in TTree
-    const int ENTRIES = data->GetEntries() / 10;
+    const int ENTRIES = data->GetEntries();
     //cout << std::scientific << "Number of entries: " << ENTRIES << endl;
 
     //**************** Set BranchAddress for datas recovery ***************
@@ -422,8 +447,8 @@ void figure14() {
     for (int j = 0; j < NBR_BINS; ++j)
     {
 	    // Create vectors for stat
-	    std::vector<double> nbr_hitsA(100, 0);
-	    std::vector<double> nbr_hitsB(100, 0);
+	    std::vector<double> nbr_hitsA(25, 0);
+	    std::vector<double> nbr_hitsB(25, 0);
 
 	    //****************** Main loop over all entries **********************//
 	    int count_loop = 0;
@@ -433,29 +458,31 @@ void figure14() {
 	        // fill variables with datas from entry i
 	        data->GetEntry(k);
 
+            std::vector<double> resA(2, 0);
+            std::vector<double> resB(2, 0);
 	        std::vector<double> res_A1(10, 0);
 	        std::vector<double> res_B1(10, 0);
             std::vector<double> res_A2(10, 0);
             std::vector<double> res_B2(10, 0);
 
-	        bool stub1 = CBC2(strip_A, strip_B, res_A1, res_B1, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, x1[j]);
-            bool stub2 = CBC2(strip_A, strip_B, res_A2, res_B2, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, x2[j]);
+	        bool stub1 = CBC3(strip_A, strip_B, resA, res_A1, res_B1, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, x1[j]);
+            bool stub2 = CBC3(strip_A, strip_B, resB, res_A2, res_B2, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, x2[j]);
 
-	        nbr_hitsA.at(loop_number) += (double) res_A1.at(5) / (ENTRIES / 100);
+	        nbr_hitsA.at(loop_number) += (double) res_A1.at(5) / (ENTRIES / 25);
 
-	        nbr_hitsB.at(loop_number) += (double) res_B2.at(5) / (ENTRIES / 100);
+	        nbr_hitsB.at(loop_number) += (double) res_B2.at(5) / (ENTRIES / 25);
 
 	        count_loop += 1;
-	        if (count_loop == ENTRIES / 100)
+	        if (count_loop == ENTRIES / 25)
 	        {
 	        	count_loop = 0;
 	        	loop_number += 1;
 	        }
 	    }
 	    double variance1 = 0., deviation1 = 0., average1 = 0.;
-		average1 = std::accumulate(nbr_hitsA.begin(), nbr_hitsA.end(), 0.0) / 100;
-		for (int i = 0; i < 100; ++i){variance1 += pow((nbr_hitsA.at(i) - average1), 2);}
-		variance1 /= 99;
+		average1 = std::accumulate(nbr_hitsA.begin(), nbr_hitsA.end(), 0.0) / 25;
+		for (int i = 0; i < 25; ++i){variance1 += pow((nbr_hitsA.at(i) - average1), 2);}
+		variance1 /= 24;
 		deviation1 = sqrt(variance1);
 		
 
@@ -463,9 +490,9 @@ void figure14() {
 		ey1[j] = deviation1;
 
 		double variance2 = 0., deviation2 = 0., average2 = 0.;
-		average2 = std::accumulate(nbr_hitsB.begin(), nbr_hitsB.end(), 0.0) / 100;
-		for (int i = 0; i < 100; ++i){variance2 += pow((nbr_hitsB.at(i) - average2), 2);}
-		variance2 /= 99;
+		average2 = std::accumulate(nbr_hitsB.begin(), nbr_hitsB.end(), 0.0) / 25;
+		for (int i = 0; i < 25; ++i){variance2 += pow((nbr_hitsB.at(i) - average2), 2);}
+		variance2 /= 24;
 		deviation2 = sqrt(variance2);
 		cout << std::scientific << x1[j] << "\t" << average1 << "\t" << deviation1 << "\t" << average2 << "\t" << deviation2 << endl;
 
@@ -487,13 +514,13 @@ void figure14() {
 
     TGraphErrors *gr1 = new TGraphErrors(NBR_BINS,x1,y1,ex1,ey1);
     gr1->SetName("gr1");
-    gr1->SetMarkerColor(kRed+2);
+    gr1->SetMarkerColor(kBlue+2);
     gr1->SetMarkerStyle(20);
     gr1->SetMarkerSize(1.0);
 
     TGraphErrors *gr2 = new TGraphErrors(NBR_BINS,x2,y2,ex2,ey2);
     gr2->SetName("gr2");
-    gr2->SetMarkerColor(kRed+2);
+    gr2->SetMarkerColor(kBlue+2);
     gr2->SetMarkerStyle(25);
     gr2->SetMarkerSize(1.0);
 
@@ -579,7 +606,7 @@ void figure14() {
     gPad->Modified();
     //*********************** 
 
-    c1->SaveAs("figure14_386.pdf");
+    c1->SaveAs("figure14_sB.pdf");
     // Close file when finished
     //f.Close();
 }

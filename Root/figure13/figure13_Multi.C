@@ -407,17 +407,17 @@ bool CBC2(
     return false;
 }
 
-void figure13() {
+void figure13_Multi() {
 	// data for Adam2020
     const int NBR_BINS = 14;
     const int NBR_BINS_IRR = 16;
 
     // array creation
-    Double_t x1[NBR_BINS] = {	5.21850,
-    							0.69750,
+    Double_t x1[NBR_BINS] = {	0.69750,
                                 1.46438,
                                 2.23125,
                                 2.95800,
+                                5.21850,
                                 5.98538,
                                 7.47874,
                                 9.69881,
@@ -427,15 +427,57 @@ void figure13() {
                                 20.97015,
                                 22.45403,
                                 23.94750}; // in keV !!!
-    Double_t y1[NBR_BINS] = {0.};
-    Double_t ex1[NBR_BINS] = {0.};
-    Double_t ey1[NBR_BINS] = {0.};
+    Double_t y1[NBR_BINS] = {   4.9381E+02,
+                                1.4626E+02,
+                                2.7247E+01,
+                                4.2766E+00,
+                                1.1251E+00,
+                                1.1216E+00,
+                                1.1135E+00,
+                                1.0999E+00,
+                                1.0909E+00,
+                                1.0647E+00,
+                                1.0335E+00,
+                                9.7480E-01,
+                                8.6380E-01,
+                                7.1770E-01,
+                                };
+    Double_t ex1[NBR_BINS] = {  1.4583E+00,
+                                1.1206E+00,
+                                4.7950E-01,
+                                1.8336E-01,
+                                8.0309E-02,
+                                7.9082E-02,
+                                7.2938E-02,
+                                6.0495E-02,
+                                5.3221E-02,
+                                4.0388E-02,
+                                4.0060E-02,
+                                4.5249E-02,
+                                5.1223E-02,
+                                6.2294E-02
+                                };
+    Double_t ey1[NBR_BINS] = {  1.4583E+00,
+                                1.1206E+00,
+                                4.7950E-01,
+                                1.8336E-01,
+                                8.0309E-02,
+                                7.9082E-02,
+                                7.2938E-02,
+                                6.0495E-02,
+                                5.3221E-02,
+                                4.0388E-02,
+                                4.0060E-02,
+                                4.5249E-02,
+                                5.1223E-02,
+                                6.2294E-02
+                                };
 
-    Double_t x2[NBR_BINS] = {   5.25863,
-    							0.73800,
+    Double_t x2[NBR_BINS] = {   0.73800,
                                 1.50488,
                                 2.23125,
-                                2.99813,                               
+                                2.99813,
+                                5.25863,
                                 5.98538,
                                 7.47874,
                                 9.73916,
@@ -445,8 +487,36 @@ void figure13() {
                                 21.00090,
                                 22.49438,
                                 23.98785}; // in keV !!!
-    Double_t y2[NBR_BINS] = {0.};
-    Double_t ex2[NBR_BINS] = {0.};
+    Double_t y2[NBR_BINS] = {   4.6856E+02,
+                                1.3529E+02,
+                                2.7232E+01,
+                                3.9563E+00,
+                                1.1620E+00,
+                                1.1577E+00,
+                                1.1464E+00,
+                                1.1258E+00,
+                                1.1121E+00,
+                                1.0772E+00,
+                                1.0446E+00,
+                                9.8210E-01,
+                                8.7070E-01,
+                                7.1990E-01
+                                };
+    Double_t ex2[NBR_BINS] = {  1.3936E+00,
+                                1.1558E+00,
+                                4.9097E-01,
+                                2.1856E-01,
+                                1.1649E-01,
+                                1.1456E-01,
+                                1.0593E-01,
+                                9.2629E-02,
+                                8.1777E-02,
+                                5.6373E-02,
+                                5.1843E-02,
+                                5.3904E-02,
+                                6.2897E-02,
+                                6.5912E-02
+                                };
     Double_t ey2[NBR_BINS] = {0.};
 
     // adam D0
@@ -464,22 +534,50 @@ void figure13() {
                                 20.97015,
                                 22.45403,
                                 23.94750}; // in keV !!!
-    Double_t y3[NBR_BINS] = {   38.080700,
-                                20.937800,
-                                4.368410,
-                                1.542830,
-                                1.157780,
-                                1.144010,
-                                1.116960,
-                                1.090560,
-                                1.077590,
-                                0.944719,
-                                0.717475,
-                                0.581773,
-                                0.466412,
-                                0.362798};
-    Double_t ex3[NBR_BINS] = {0.};
-    Double_t ey3[NBR_BINS] = {0.};
+    Double_t y3[NBR_BINS] = {   4.9378E+02,
+                                1.4621E+02,
+                                2.7183E+01,
+                                4.2168E+00,
+                                1.0647E+00,
+                                1.0627E+00,
+                                1.0594E+00,
+                                1.0517E+00,
+                                1.0460E+00,
+                                1.0329E+00,
+                                1.0051E+00,
+                                9.4920E-01,
+                                8.3810E-01,
+                                6.9090E-01
+                                };
+    Double_t ex3[NBR_BINS] = {  1.4664E+00,
+                                1.1246E+00,
+                                4.7346E-01,
+                                1.8076E-01,
+                                4.0363E-02,
+                                3.9128E-02,
+                                3.7600E-02,
+                                3.2037E-02,
+                                2.8955E-02,
+                                2.2487E-02,
+                                2.3932E-02,
+                                3.3505E-02,
+                                4.1795E-02,
+                                5.2399E-02
+                                };
+    Double_t ey3[NBR_BINS] = {  1.4664E+00,
+                                1.1246E+00,
+                                4.7346E-01,
+                                1.8076E-01,
+                                4.0363E-02,
+                                3.9128E-02,
+                                3.7600E-02,
+                                3.2037E-02,
+                                2.8955E-02,
+                                2.2487E-02,
+                                2.3932E-02,
+                                3.3505E-02,
+                                4.1795E-02,
+                                5.2399E-02};
 
     // adam D1
     Double_t x4[NBR_BINS] = {   0.73800,
@@ -496,130 +594,171 @@ void figure13() {
                                 21.00090,
                                 22.49438,
                                 23.98785}; // in keV !!!
-    Double_t y4[NBR_BINS] = {   41.406900,
-                                19.959500,
-                                3.438860,
-                                1.470740,
-                                1.200090,
-                                1.185810,
-                                1.144010,
-                                1.116960,
-                                1.103680,
-                                0.972574,
-                                0.734848,
-                                0.599618,
-                                0.472025,
-                                0.376055};
-    Double_t ex4[NBR_BINS] = {0.};
-    Double_t ey4[NBR_BINS] = {0.};
+    Double_t y4[NBR_BINS] = {   4.6854E+02,
+                                1.3523E+02,
+                                2.7169E+01,
+                                3.8931E+00,
+                                1.1025E+00,
+                                1.0984E+00,
+                                1.0921E+00,
+                                1.0803E+00,
+                                1.0722E+00,
+                                1.0492E+00,
+                                1.0166E+00,
+                                9.5410E-01,
+                                8.4560E-01,
+                                6.9930E-01
+                                };
+    Double_t ex4[NBR_BINS] = {  1.3972E+00,
+                                1.1291E+00,
+                                4.9971E-01,
+                                1.8169E-01,
+                                6.2448E-02,
+                                5.9742E-02,
+                                5.5438E-02,
+                                4.7746E-02,
+                                4.2866E-02,
+                                3.2214E-02,
+                                2.8292E-02,
+                                3.7473E-02,
+                                4.4593E-02,
+                                5.5619E-02
+                                };
+    Double_t ey4[NBR_BINS] = {  1.3972E+00,
+                                1.1291E+00,
+                                4.9971E-01,
+                                1.8169E-01,
+                                6.2448E-02,
+                                5.9742E-02,
+                                5.5438E-02,
+                                4.7746E-02,
+                                4.2866E-02,
+                                3.2214E-02,
+                                2.8292E-02,
+                                3.7473E-02,
+                                4.4593E-02,
+                                5.5619E-02};
 
     // adam D0_IRR
-    Double_t x5[NBR_BINS_IRR] = {   0.70275,
-                                    1.47000,
-                                    2.20538,
-                                    2.97263,
-                                    4.47488,
-                                    5.21025,
-                                    5.97713,
-                                    8.95009,
-                                    9.71726,
-                                    11.21966,
-                                    14.22450,
-                                    19.46693,
-                                    19.47071,
-                                    20.96933,
-                                    22.47173,
-                                    23.97413}; // in keV !!!
-    Double_t y5[NBR_BINS_IRR] = {   30.1215000,
-                                    6.7070400,
-                                    1.9182700,
-                                    1.1759900,
-                                    0.9366170,
-                                    0.8848140,
-                                    0.8264180,
-                                    0.6433920,
-                                    0.6147630,
-                                    0.5424320,
-                                    0.3899660,
-                                    0.1416410,
-                                    0.1412730,
-                                    0.1090240,
-                                    0.0858497,
-                                    0.0668366};
-    Double_t ex5[NBR_BINS_IRR] = {0.};
-    Double_t ey5[NBR_BINS_IRR] = {0.};
+    Double_t x5[NBR_BINS] = {   0.69750,
+                                1.46438,
+                                2.23125,
+                                2.95800,
+                                5.21850,
+                                5.98538,
+                                7.47874,
+                                9.69881,
+                                11.23268,
+                                16.48005,
+                                19.46704,
+                                20.97015,
+                                22.45403,
+                                23.94750}; // in keV !!!
+    Double_t y5[NBR_BINS] = {   4.9377E+02,
+                                1.4620E+02,
+                                2.7187E+01,
+                                4.2165E+00,
+                                1.0665E+00,
+                                1.0644E+00,
+                                1.0604E+00,
+                                1.0543E+00,
+                                1.0496E+00,
+                                1.0355E+00,
+                                1.0076E+00,
+                                9.4680E-01,
+                                8.3690E-01,
+                                6.7960E-01
+                                };
+    Double_t ex5[NBR_BINS] = {  1.4648E+00,
+                                1.1293E+00,
+                                4.7364E-01,
+                                1.7664E-01,
+                                4.6414E-02,
+                                4.5711E-02,
+                                4.3552E-02,
+                                4.1615E-02,
+                                3.8321E-02,
+                                2.7464E-02,
+                                2.9987E-02,
+                                3.9283E-02,
+                                4.6725E-02,
+                                5.7541E-02
+                                };
+    Double_t ey5[NBR_BINS] = {  1.4648E+00,
+                                1.1293E+00,
+                                4.7364E-01,
+                                1.7664E-01,
+                                4.6414E-02,
+                                4.5711E-02,
+                                4.3552E-02,
+                                4.1615E-02,
+                                3.8321E-02,
+                                2.7464E-02,
+                                2.9987E-02,
+                                3.9283E-02,
+                                4.6725E-02,
+                                5.7541E-02};
 
     // adam D1_IRR
-    Double_t x6[NBR_BINS_IRR] = {   0.69750,
-                                    1.44750,
-                                    2.20538,
-                                    2.94750,
-                                    4.44750,
-                                    5.19750,
-                                    5.94750,
-                                    8.94750,
-                                    9.69750,
-                                    11.19750,
-                                    14.19750,
-                                    19.44750,
-                                    19.46693,
-                                    20.97015,
-                                    22.44750,
-                                    23.94750}; // in keV !!!
-    Double_t y6[NBR_BINS_IRR] = {   29.2426000,
-                                    6.1077500,
-                                    1.7713900,
-                                    1.1762000,
-                                    0.9612890,
-                                    0.8955480,
-                                    0.8407000,
-                                    0.6526200,
-                                    0.6244690,
-                                    0.5483190,
-                                    0.3952350,
-                                    0.1473400,
-                                    0.1482370,
-                                    0.1148180,
-                                    0.0918478,
-                                    0.0727227};
-    Double_t ex6[NBR_BINS_IRR] = {0.};
-    Double_t ey6[NBR_BINS_IRR] = {0.};
+    Double_t x6[NBR_BINS] = {   0.73800,
+                                1.50488,
+                                2.23125,
+                                2.99813,
+                                5.25863,
+                                5.98538,
+                                7.47874,
+                                9.73916,
+                                11.23268,
+                                16.49768,
+                                19.50739,
+                                21.00090,
+                                22.49438,
+                                23.98785}; // in keV !!!
+    Double_t y6[NBR_BINS] = {   4.6852E+02,
+                                1.3522E+02,
+                                2.7157E+01,
+                                3.8824E+00,
+                                1.0921E+00,
+                                1.0894E+00,
+                                1.0840E+00,
+                                1.0727E+00,
+                                1.0656E+00,
+                                1.0464E+00,
+                                1.0126E+00,
+                                9.5120E-01,
+                                8.4390E-01,
+                                6.9700E-01
+                                };
+    Double_t ex6[NBR_BINS] = {  1.3963E+00,
+                                1.1539E+00,
+                                4.9567E-01,
+                                1.8543E-01,
+                                5.1704E-02,
+                                5.1909E-02,
+                                4.9093E-02,
+                                4.2660E-02,
+                                3.9653E-02,
+                                2.8587E-02,
+                                2.6232E-02,
+                                3.3972E-02,
+                                4.8386E-02,
+                                5.8990E-02
+                                };
+    Double_t ey6[NBR_BINS] = {  1.3963E+00,
+                                1.1539E+00,
+                                4.9567E-01,
+                                1.8543E-01,
+                                5.1704E-02,
+                                5.1909E-02,
+                                4.9093E-02,
+                                4.2660E-02,
+                                3.9653E-02,
+                                2.8587E-02,
+                                2.6232E-02,
+                                3.3972E-02,
+                                4.8386E-02,
+                                5.8990E-02};
 
-    // open file 1
-    TFile *f = TFile::Open("/media/matthieu/ssd1/Geant4/Full-size/Data_figure13-16/data500k_sB.root", "read");
-
-    //************* variable ***************//
-    const int NBR_STRIP = 1016;
-
-    const int MAX_CLUSTER_WIDTH = 3;
-    const double CLUSTER_WINDOW = 3.5;
-
-
-    //************ Get the TTree ******************************************
-    auto data = f->Get<TTree>("data");
-
-    // Get the number of entries in TTree
-    const int ENTRIES = data->GetEntries();
-    cout << std::scientific << "Number of entries: " << ENTRIES << endl;
-
-    //**************** Set BranchAddress for datas recovery ***************
-    // for strips
-    std::vector<double> strip_A(NBR_STRIP, 0);
-    std::vector<double> strip_B(NBR_STRIP, 0);
-
-    for (int i = 0; i < NBR_STRIP; ++i)
-    {
-        string strip_name = "s" + std::to_string(i);
-        char const *pchar = strip_name.c_str();
-        data->SetBranchAddress(pchar, &strip_B.at(i));
-    }
-    for (int i = NBR_STRIP; i < (2*NBR_STRIP); ++i)
-    {
-        string strip_name = "s" + std::to_string(i);
-        char const *pchar = strip_name.c_str();
-        data->SetBranchAddress(pchar, &strip_A.at(i-NBR_STRIP));
-    }
-    // for other datas (pT)
 
     //****************** Create Histo ************************************//
     auto c1 = new TCanvas("c1","c1",1000,600);
@@ -631,97 +770,17 @@ void figure13() {
 
     gPad->SetTitle("Figure 1: threshold variation");
 
-    for (int j = 0; j < NBR_BINS; ++j)
-    {
-	    // Create vectors for stat
-	    std::vector<double> nbr_hitsA(25, 0);
-	    std::vector<double> nbr_hitsB(25, 0);
 
-	    //****************** Main loop over all entries **********************//
-	    int count_loop = 0;
-	    int loop_number = 0;
-	    for (int k = 0; k < ENTRIES; k++)
-	    {
-	        // fill variables with datas from entry i
-	        data->GetEntry(k);
 
-            std::vector<double> resA(2, 0);
-            std::vector<double> resB(2, 0);
-	        std::vector<double> res_A1(10, 0);
-	        std::vector<double> res_B1(10, 0);
-            std::vector<double> res_A2(10, 0);
-            std::vector<double> res_B2(10, 0);
-
-	        bool stub1 = CBC3(strip_A, strip_B, resA, res_A1, res_B1, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, x1[j]);
-            bool stub2 = CBC3(strip_A, strip_B, resB, res_A2, res_B2, MAX_CLUSTER_WIDTH, CLUSTER_WINDOW, x2[j]);
-
-	        nbr_hitsA.at(loop_number) += (double) res_A1.at(9) / (ENTRIES / 25);
-
-	        nbr_hitsB.at(loop_number) += (double) res_B2.at(9) / (ENTRIES / 25);
-
-	        count_loop += 1;
-	        if (count_loop == ENTRIES / 25)
-	        {
-	        	count_loop = 0;
-	        	loop_number += 1;
-	        }
-	    }
-	    double variance1 = 0., deviation1 = 0., average1 = 0.;
-		average1 = std::accumulate(nbr_hitsA.begin(), nbr_hitsA.end(), 0.0) / 25;
-		for (int i = 0; i < 25; ++i){variance1 += pow((nbr_hitsA.at(i) - average1), 2);}
-		variance1 /= 24;
-		deviation1 = sqrt(variance1);
-		
-
-		y1[j] = average1;
-		ey1[j] = deviation1;
-
-		double variance2 = 0., deviation2 = 0., average2 = 0.;
-		average2 = std::accumulate(nbr_hitsB.begin(), nbr_hitsB.end(), 0.0) / 25;
-		for (int i = 0; i < 25; ++i){variance2 += pow((nbr_hitsB.at(i) - average2), 2);}
-		variance2 /= 24;
-		deviation2 = sqrt(variance2);
-		cout << std::scientific << x1[j] << "\t" << average1 << "\t" << deviation1 << "\t" << average2 << "\t" << deviation2 << endl;
-
-		y2[j] = average2;
-		ey2[j] = deviation2;
-	}
     for (int i = 0; i < NBR_BINS; ++i)
     {
         x1[i] *= 1000.;
         x2[i] *= 1000.;
         x3[i] *= 1000.;
         x4[i] *= 1000.;
-    }
-    for (int i = 0; i < NBR_BINS_IRR; ++i)
-    {
         x5[i] *= 1000.;
         x6[i] *= 1000.;
     }
-
-    TGraphErrors *gr3 = new TGraphErrors(NBR_BINS,x3,y3,ex3,ey3);
-    gr3->SetName("gr3");
-    gr3->SetMarkerColor(12);
-    gr3->SetMarkerStyle(20);
-    gr3->SetMarkerSize(1.0);
-
-    TGraphErrors *gr4 = new TGraphErrors(NBR_BINS,x4,y4,ex4,ey4);
-    gr4->SetName("gr4");
-    gr4->SetMarkerColor(12);
-    gr4->SetMarkerStyle(25);
-    gr4->SetMarkerSize(1.0);
-
-    TGraphErrors *gr5 = new TGraphErrors(NBR_BINS_IRR,x5,y5,ex5,ey5);
-    gr5->SetName("gr5");
-    gr5->SetMarkerColor(12);
-    gr5->SetMarkerStyle(22);
-    gr5->SetMarkerSize(1.0);
-
-    TGraphErrors *gr6 = new TGraphErrors(NBR_BINS_IRR,x6,y6,ex6,ey6);
-    gr6->SetName("gr6");
-    gr6->SetMarkerColor(12);
-    gr6->SetMarkerStyle(26);
-    gr6->SetMarkerSize(1.0);
 
     TGraphErrors *gr1 = new TGraphErrors(NBR_BINS,x1,y1,ex1,ey1);
     gr1->SetName("gr1");
@@ -734,6 +793,30 @@ void figure13() {
     gr2->SetMarkerColor(kBlue+2);
     gr2->SetMarkerStyle(25);
     gr2->SetMarkerSize(1.0);
+
+    TGraphErrors *gr3 = new TGraphErrors(NBR_BINS,x3,y3,ex3,ey3);
+    gr3->SetName("gr3");
+    gr3->SetMarkerColor(kRed+2);
+    gr3->SetMarkerStyle(20);
+    gr3->SetMarkerSize(1.0);
+
+    TGraphErrors *gr4 = new TGraphErrors(NBR_BINS,x4,y4,ex4,ey4);
+    gr4->SetName("gr4");
+    gr4->SetMarkerColor(kRed+2);
+    gr4->SetMarkerStyle(25);
+    gr4->SetMarkerSize(1.0);
+
+    TGraphErrors *gr5 = new TGraphErrors(NBR_BINS,x5,y5,ex5,ey5);
+    gr5->SetName("gr5");
+    gr5->SetMarkerColor(kGreen+2);
+    gr5->SetMarkerStyle(20);
+    gr5->SetMarkerSize(1.0);
+
+    TGraphErrors *gr6 = new TGraphErrors(NBR_BINS,x6,y6,ex6,ey6);
+    gr6->SetName("gr6");
+    gr6->SetMarkerColor(kGreen+2);
+    gr6->SetMarkerStyle(25);
+    gr6->SetMarkerSize(1.0);
 
     TMultiGraph *mg = new TMultiGraph();
     mg->Add(gr3);
@@ -782,12 +865,12 @@ void figure13() {
     A1->Draw("SAME");
 
     auto legend = new TLegend(0.55,0.9,0.9,0.6);
-    legend->AddEntry("gr1","Geant4 - top sensor","ep");
-    legend->AddEntry("gr2","Geant4 - bottom sensor","ep");
-    legend->AddEntry("gr3","Adam et al. - top sensor","p");
-    legend->AddEntry("gr4","Adam et al. - bottom sensor","p");
-    legend->AddEntry("gr5","Adam et al. - top sensor irr.","p");
-    legend->AddEntry("gr6","Adam et al. - bottom sensor irr.","p");
+    legend->AddEntry("gr1","B = 0 - capteur 1","ep");
+    legend->AddEntry("gr2","B = 0 - capteur 2","ep");
+    legend->AddEntry("gr3","By = 3T - capteur 1","ep");
+    legend->AddEntry("gr4","By = 3T - capteur 2","ep");
+    legend->AddEntry("gr5","Bz = 3T - capteur 1","ep");
+    legend->AddEntry("gr6","Bz = 3T - capteur 2","ep");
     legend->Draw();
 
     gPad->Modified();

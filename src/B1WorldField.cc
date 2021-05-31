@@ -53,10 +53,10 @@ void B1WorldField::GetFieldValue( const G4double Point[4], G4double* Bfield ) co
 
   Bfield[0]=0;
   Bfield[1]=0.*tesla;
-  Bfield[2]=0;
+  Bfield[2]=0.*tesla;
   Bfield[3]=0;
   Bfield[4]=0;
-  Bfield[5]= 0. * volt/m;
+  Bfield[5]=0.*volt/m;
 
 
   return;

@@ -55,7 +55,7 @@ numbers20 = [   1.32089,
                 15.07380]
 
 
-for x in range(len(numbers20)):
-    print("/generator/momentum/SetMomentum " + str(round(numbers20[x], 5)))
-    print("/analysis/setFileName /media/matthieu/ssd1/Geant4/Data/Data_figure20/data_" + str(x))
-    print("/run/beamOn 100000")
+for x in range(len(numbers17)):
+    print("/generator/momentum/SetMomentum " + str(round(numbers17[x], 5)))
+    print("/analysis/setFileName /media/matthieu/ssd1/Geant4/Full-size/Data_figure17-19B/data_" + str(x))
+    print("/run/beamOn 300000")

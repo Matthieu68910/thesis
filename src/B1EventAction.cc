@@ -58,7 +58,7 @@ B1EventAction::~B1EventAction()
 void B1EventAction::BeginOfEventAction(const G4Event*)
 {
     if(EdepVector.size() == 0){
-        for (long unsigned int i = 0; i < 508; ++i) {
+        for (long unsigned int i = 0; i < 2032; ++i) {
             EdepVector.push_back(0.);
         }
     }
