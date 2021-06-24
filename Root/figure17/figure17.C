@@ -414,7 +414,7 @@ void figure17() {
 
 	    // Get the number of entries in TTree
 	    const int ENTRIES = data->GetEntries();
-	    //cout << std::scientific << "Number of entries: " << ENTRIES << endl;
+	    cout << std::scientific << "Number of entries: " << ENTRIES << endl;
 
 	    //**************** Set BranchAddress for datas recovery ***************
 	    // for strips
@@ -528,7 +528,7 @@ void figure17() {
 
     TMultiGraph *mg = new TMultiGraph();
     mg->Add(gr1);
-    mg->Add(gr3);
+    //mg->Add(gr3);
     mg->Add(gr2);
     mg->SetTitle("");
     mg->Draw("AP");
@@ -566,9 +566,9 @@ void figure17() {
     A1->ChangeLabel(7, -1, -1, -1, -1, -1, "1.4");
 	A1->Draw("SAME");
 
-    auto legend = new TLegend(0.15,0.6,0.45,0.85);
-    legend->AddEntry("gr1","Adam et al. - non-irr.","p");
-    legend->AddEntry("gr3","Adam et al. - irr.","p");
+    auto legend = new TLegend(0.15,0.7,0.45,0.85);
+    legend->AddEntry("gr1","Adam et al.","p");
+    //legend->AddEntry("gr3","Adam et al. - irr.","p");
     legend->AddEntry("gr2","Geant4","ep");
     legend->Draw();
 
