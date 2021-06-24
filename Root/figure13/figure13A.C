@@ -179,10 +179,10 @@ void figure13A() {
     xaxis->SetRangeUser(0., 25000);
     yaxis->SetLabelFont(42);
     yaxis->SetLabelSize(0.04);
-    yaxis->SetTitle("Erreur relative");
+    yaxis->SetTitle("#varepsilon_{rel} = #frac{x_{sim} #minus x_{exp}}{x_{exp}}");
     yaxis->SetTitleFont(22);
     yaxis->SetTitleSize(0.05);
-    yaxis->SetTitleOffset(0.5);
+    yaxis->SetTitleOffset(0.7);
     yaxis->SetRangeUser(-0.5, 0.5);
 
     c1->RedrawAxis();

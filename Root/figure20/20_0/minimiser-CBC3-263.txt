@@ -1,0 +1,27 @@
+****************************************
+Minimizer is Minuit / Migrad
+Chi2                      = 2.965393e-03
+NDf                       =           21
+Edm                       = 2.795962e-08
+NCalls                    =           61
+p0                        = 9.835369e-01   +/-   2.990480e-03
+p1                        = 1.877012e+00   +/-   2.082638e-03
+p2                        = 1.580876e-01   +/-   4.338375e-03
+
+****************************************
+Minimizer is Minuit / Migrad
+Chi2                      = 1.780272e-03
+NDf                       =           13
+Edm                       = 1.537522e-08
+NCalls                    =           62
+p0                        = 9.606317e-01   +/-   4.829723e-03
+p1                        = 2.139471e+00   +/-   2.155518e-03
+p2                        = 1.776862e-01   +/-   4.954474e-03
+ FCN=19.9022 FROM MIGRAD    STATUS=CONVERGED     139 CALLS         140 TOTAL
+                     EDM=4.1903e-10    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  p0           9.91900e-01   6.96987e-04   1.54924e-06  -2.80486e-02
+   2  p1           1.95616e+00   2.03534e-03   4.07668e-06   3.98828e-03
+   3  p2           1.07551e-01   3.10096e-03   6.21274e-06  -7.27010e-03
+Info in <TCanvas::Print>: pdf file figure20_0_full_263.pdf has been created
