@@ -732,7 +732,7 @@ void figure20_0_full() {
 
     TMultiGraph *mg = new TMultiGraph();
     mg->Add(gr1);
-    mg->Add(gr2);
+    //mg->Add(gr2);
     mg->Add(gr4);
     mg->Add(gr3);
     mg->SetTitle("");
@@ -788,8 +788,8 @@ void figure20_0_full() {
 	A1->Draw("SAME");
 
     auto legend = new TLegend(0.1,0.9,0.4,0.6);
-    legend->AddEntry("gr1","Adam et al. - mini  module - non-irr.","p");
-    legend->AddEntry("gr2","Adam et al. - mini  module - irr.","p");
+    legend->AddEntry("gr1","Adam et al. - mini  module","p");
+    //legend->AddEntry("gr2","Adam et al. - mini  module - irr.","p");
     legend->AddEntry("gr4","Geant4      - mini  module","ep");
     legend->AddEntry("gr3","Geant4 + By - grand module","ep");
     legend->Draw();
