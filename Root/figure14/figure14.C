@@ -42,7 +42,7 @@ bool CBC2(
         // noise value deternmination
         std::normal_distribution<double> dist1(0., noise);
         // noise creation
-        double strip_energy = (strip_A[i] / 0.00386) + abs(dist1(generator));
+        double strip_energy = (strip_A[i] / 0.00362) + abs(dist1(generator));
         //if(distribution1(generator) < kill_value){strip_energy = 0.;}
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
@@ -102,7 +102,7 @@ bool CBC2(
         // noise value deternmination
         std::normal_distribution<double> dist1(0., noise);
         // noise creation
-        double strip_energy = (strip_B[i] / 0.00386) + abs(dist1(generator));
+        double strip_energy = (strip_B[i] / 0.00362) + abs(dist1(generator));
         //if(distribution1(generator) < kill_value){strip_energy = 0.;}
         if (strip_energy < THRESHOLD && !inside)        
         {} else if (strip_energy < THRESHOLD && inside)
@@ -524,8 +524,8 @@ void figure14() {
     TMultiGraph *mg = new TMultiGraph();
     mg->Add(gr3);
     mg->Add(gr4);
-    mg->Add(gr5);
-    mg->Add(gr6);
+    //mg->Add(gr5);
+    //mg->Add(gr6);
     mg->Add(gr1);
     mg->Add(gr2);
     mg->SetTitle("");
@@ -567,13 +567,13 @@ void figure14() {
     //A1->ChangeLabel(7, -1, -1, -1, -1, -1, "1.4");
     A1->Draw("SAME");
 
-    auto legend = new TLegend(0.55,0.9,0.9,0.6);
+    auto legend = new TLegend(0.55,0.9,0.9,0.7);
     legend->AddEntry("gr1","Geant4 - top sensor","ep");
     legend->AddEntry("gr2","Geant4 - bottom sensor","ep");
     legend->AddEntry("gr3","Adam et al. - top sensor","p");
     legend->AddEntry("gr4","Adam et al. - bottom sensor","p");
-    legend->AddEntry("gr5","Adam et al. - top sensor irr.","p");
-    legend->AddEntry("gr6","Adam et al. - bottom sensor irr.","p");
+    //legend->AddEntry("gr5","Adam et al. - top sensor irr.","p");
+    //legend->AddEntry("gr6","Adam et al. - bottom sensor irr.","p");
     legend->Draw();
 
     gPad->Modified();

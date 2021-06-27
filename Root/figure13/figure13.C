@@ -387,7 +387,7 @@ void figure13() {
     auto data = f->Get<TTree>("data");
 
     // Get the number of entries in TTree
-    const int ENTRIES = data->GetEntries();
+    const int ENTRIES = data->GetEntries() / 10;
     cout << std::scientific << "Number of entries: " << ENTRIES << endl;
 
     //**************** Set BranchAddress for datas recovery ***************
@@ -524,8 +524,8 @@ void figure13() {
     TMultiGraph *mg = new TMultiGraph();
     mg->Add(gr3);
     mg->Add(gr4);
-    mg->Add(gr5);
-    mg->Add(gr6);
+    //mg->Add(gr5);
+    //mg->Add(gr6);
     mg->Add(gr1);
     mg->Add(gr2);
     mg->SetTitle("");
@@ -567,13 +567,13 @@ void figure13() {
     //A1->ChangeLabel(7, -1, -1, -1, -1, -1, "1.4");
     A1->Draw("SAME");
 
-    auto legend = new TLegend(0.55,0.9,0.9,0.6);
+    auto legend = new TLegend(0.55,0.9,0.9,0.7);
     legend->AddEntry("gr1","Geant4 - top sensor","ep");
     legend->AddEntry("gr2","Geant4 - bottom sensor","ep");
     legend->AddEntry("gr3","Adam et al. - top sensor","p");
     legend->AddEntry("gr4","Adam et al. - bottom sensor","p");
-    legend->AddEntry("gr5","Adam et al. - top sensor irr.","p");
-    legend->AddEntry("gr6","Adam et al. - bottom sensor irr.","p");
+    //legend->AddEntry("gr5","Adam et al. - top sensor irr.","p");
+    //legend->AddEntry("gr6","Adam et al. - bottom sensor irr.","p");
     legend->Draw();
 
     gPad->Modified();
